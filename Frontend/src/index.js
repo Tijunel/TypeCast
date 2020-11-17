@@ -1,17 +1,35 @@
+'use strict';
+
+// Module imports
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Switch, BrowserRouter as Router, Route } from 'react-router-dom';
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+// Page imports
+import Home from './pages/home';
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+class App extends React.Component {
+  constructor() {
+    super();
+  }
+
+  componentDidMount = () => {
+    // Check for token
+  }
+
+  render = () => {
+    return (
+      <React.Fragment>
+        <Router>
+          <Switch>
+            <Route exact path="/" component={() => <Home/>}/>
+          </Switch>
+        </Router>
+      </React.Fragment>
+    );
+  }
+}
+
+ReactDOM.render(<App/>, document.getElementById("root"));
