@@ -6,6 +6,41 @@
     color: white;
 }
 
+#top .navbar-toggler {
+    border: 0px !important;
+}
+
+@media only screen and (max-width: 575px) {
+    #top button:active, button:focus {
+        outline: none;
+    }
+    #top .navbar-collapse {
+        text-align: center;
+        margin-left: -1rem;
+        margin-right: -1rem;
+        margin-top: 0.5rem;
+    }
+    #top .navbar-collapse .link-1 {
+        border-top: 1px dashed;
+        border-bottom: 1px dashed;
+    }
+    #top .navbar-collapse .link-2 {
+        border-bottom: 1px dashed;
+    }
+    #top .navbar-collapse .link-3 {
+        border-bottom: 1px dashed;
+    }
+    #top .navbar-collapse .link-4 {
+        border-bottom: 1px dashed;
+    }
+    #top .navbar-collapse .link-5 {
+        border-bottom: 1px dashed;
+    }
+    #top .navbar-collapse a {
+        background-color: #84ACD5;
+    }
+}
+
 /* Dark Blue: #3E6C99
 
 Darkest Blue: #1F364D
