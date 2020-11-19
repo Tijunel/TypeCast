@@ -1,0 +1,32 @@
+#footer {
+    height: 30px;
+    position: relative;
+    text-align: center;
+    font-size: 12px;
+}
+
+#footer-content {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+#footer #licenses-button {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    height: 14.67px;
+    color: #5490CC;
+    cursor: pointer;
+}
+
+#footer #attributions-button {
+    position: absolute;
+    left: 10px;
+    top: 0;
+    height: 14.67px;
+    color: #5490CC;
+    cursor: pointer;
+}

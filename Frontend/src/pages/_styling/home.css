@@ -1,0 +1,13 @@
+#home {
+    padding-top: 76px;
+    /* This is to make the content not overlap with the foote*/
+    min-height: calc(100vh - 30px);
+    text-align: center;
+}
+
+#home p {
+    max-width: 50%;
+    min-width: 300px;
+    margin: auto;
+    text-align: justify;
+}

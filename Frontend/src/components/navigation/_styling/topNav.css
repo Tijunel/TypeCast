@@ -2,14 +2,17 @@
     background-color: #5490CC;
 }
 
+/* Make all text white */
 #top a {
     color: white;
 }
 
+/* Remove border from hamburger button */
 #top .navbar-toggler {
     border: 0px !important;
 }
 
+/* Mobile Styling */
 @media only screen and (max-width: 575px) {
     #top button:active, button:focus {
         outline: none;

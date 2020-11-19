@@ -18,6 +18,7 @@ import Game from './pages/game';
 import Error from './pages/error';
 
 import TopNav from './components/navigation/topNav';
+import Footer from './components/navigation/footer';
 
 class App extends React.Component {
   constructor() {
@@ -45,6 +46,7 @@ class App extends React.Component {
             <Route path="*" component={() => <Error/>}/>
           </Switch>
         </Router>
+        <Footer/>
       </React.Fragment>
     );
   }
