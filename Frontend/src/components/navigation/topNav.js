@@ -7,7 +7,9 @@ export default class TopNav extends React.Component {
         super();
     }
 
-    handleClick = () => {
+    handleClick = (e) => {
+        console.log("User clicked NavBar Link: " + e);
+
         // If not signed in
             // Go to sign in page if clicked:
                 // Type
@@ -36,7 +38,7 @@ export default class TopNav extends React.Component {
                         <Nav className='log'>
                             {/* Make this dynamic (Sign In vs. Sign Out) */}
                             <Nav.Link className="link-4" onClick={this.handleAuth}>Sign In/Out</Nav.Link>
-                            <Nav.Link className="link-5" onClick={this.handleClick}>Profile</Nav.Link>
+                            <Nav.Link className="link-5" href="/profile" onClick={this.handleClick}>Profile</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>
