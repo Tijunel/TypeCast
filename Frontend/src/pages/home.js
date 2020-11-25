@@ -18,6 +18,14 @@ export default class Home extends React.Component {
                     <br/><br/>
                    -The TypeCasters
                 </p>
+                <h1>LOGIN</h1>
+                <form>
+                  <label>
+                    Name:
+                    <input type="text" name="name" />
+                  </label>
+                  <input type="submit" value="Submit" />
+                </form>
             </div>
         );
     }

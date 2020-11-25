@@ -1,0 +1,31 @@
+#login {
+    padding-top: 76px;
+    /* This is to make the content not overlap with the foote*/
+    min-height: calc(100vh - 30px);
+    text-align: center;
+}
+
+#login p {
+    max-width: 50%;
+    min-width: 300px;
+    margin: auto;
+    text-align: justify;
+}
+
+#label {
+    font-weight: normal;
+    text-align: left;
+}
+
+.button {
+    background-color: #84ACD5;
+    border: none;
+    padding: 5px;
+    width: 160px;
+    margin: 5px 2px;
+    font-size: larger;
+}
+
+.reg {
+    background-color: #D3D3D3;
+}
