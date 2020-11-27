@@ -40,7 +40,7 @@ class App extends React.Component {
             <Route path="/register" component={() => <Register/>}/>
             <Route path="/join" component={() => <Join/>}/>
             <Route path="/lobby/:id" component={() => <Lobby/>}/>
-            <Route path="/profile/:id" component={() => <Profile/>}/>
+            <Route path="/profile/" component={() => <Profile/>}/>
             <Route path="/game/:id" component={() => <Game/>}/>
             <Route path="/" component={() => <Home/>}/>
           </Switch>
