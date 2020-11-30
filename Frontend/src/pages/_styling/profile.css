@@ -1,0 +1,51 @@
+#profile {
+    padding-top: 76px;
+    /* This is to make the content not overlap with the foote*/
+    min-height: calc(100vh - 30px);
+    text-align: center;
+}
+
+#profile p {
+    max-width: 50%;
+    min-width: 300px;
+    margin: auto;
+    text-align: justify;
+}
+
+.row {
+    padding: 0px 400px;
+    display: flex;
+}
+
+.leftcolumn {
+    float: left;
+    width: 40%;
+    padding: 20px;
+}
+
+.rightcolumn {
+    float: right;
+    width: 60%;
+    padding: 20px;
+}
+
+.button {
+    background-color: #84ACD5;
+    border: none;
+    padding: 5px;
+    width: 220px;
+    margin: 5px 2px;
+    font-size: larger;
+}
+
+table {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+td {
+    border: 1px solid;
+    text-align: center;
+    padding: 5px;
+}
