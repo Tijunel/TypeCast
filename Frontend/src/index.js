@@ -35,7 +35,6 @@ class App extends React.Component {
         <TopNav/>
         <Router>
           <Switch>
-            <Route path="/" component={() => <Home/>}/>
             <Route path="/home" component={() => <Home/>}/>
             <Route path="/login" component={() => <Login/>}/>
             <Route path="/register" component={() => <Register/>}/>
@@ -43,7 +42,7 @@ class App extends React.Component {
             <Route path="/lobby/:id" component={() => <Lobby/>}/>
             <Route path="/profile/:id" component={() => <Profile/>}/>
             <Route path="/game/:id" component={() => <Game/>}/>
-            <Route path="*" component={() => <Error/>}/>
+            <Route path="/" component={() => <Home/>}/>
           </Switch>
         </Router>
         <Footer/>

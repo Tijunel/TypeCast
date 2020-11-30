@@ -18,6 +18,7 @@ export default class TopNav extends React.Component {
     }
 
     handleAuth = () => {
+        //window.location.href="../"
         // Handle sign in or sign out button
     }
 
@@ -29,13 +30,13 @@ export default class TopNav extends React.Component {
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className='mr-auto'>
-                            <Nav.Link className="link-1" href="/">Home</Nav.Link> 
+                            <Nav.Link className="link-1" href="/home">Home</Nav.Link> 
                             <Nav.Link className="link-2" onClick={this.handleClick}>Type</Nav.Link> 
                             <Nav.Link className="link-3" onClick={this.handleClick}>Game</Nav.Link>
                         </Nav>
                         <Nav className='log'>
                             {/* Make this dynamic (Sign In vs. Sign Out) */}
-                            <Nav.Link className="link-4" onClick={this.handleAuth}>Sign In/Out</Nav.Link>
+                            <Nav.Link className="link-4" href="/login" onClick={this.handleAuth}>Sign In/Out</Nav.Link>
                             <Nav.Link className="link-5" onClick={this.handleClick}>Profile</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
