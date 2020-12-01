@@ -1,3 +1,5 @@
+// page for viewing user's profile
+
 import React from 'react';
 import './_styling/profile.css';
 
