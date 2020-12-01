@@ -1,3 +1,5 @@
+// page where existing members log in to the game
+
 import React from 'react';
 import './_styling/login.css';
 import Form from 'react-bootstrap';
