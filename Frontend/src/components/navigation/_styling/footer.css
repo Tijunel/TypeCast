@@ -3,6 +3,7 @@
     position: relative;
     text-align: center;
     font-size: 12px;
+    background: #5490cc;
 }
 
 #footer-content {
@@ -18,7 +19,7 @@
     right: 10px;
     top: 0;
     height: 14.67px;
-    color: #5490CC;
+    color: white;
     cursor: pointer;
 }
 
@@ -27,6 +28,6 @@
     left: 10px;
     top: 0;
     height: 14.67px;
-    color: #5490CC;
+    color: white;
     cursor: pointer;
 }
