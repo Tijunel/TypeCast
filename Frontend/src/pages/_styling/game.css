@@ -1,0 +1,39 @@
+#game {
+  max-width: 900px;
+  margin: 3.5rem auto 0 auto;
+  min-height: calc(100vh - (3.5rem + 2rem));
+  font-size: 1rem;
+  padding: 30px;
+}
+#game-status {
+  margin: 20px 0;
+}
+#race-visualization {
+  min-height: 100px;
+  width: 100%;
+  background: rgba(255, 255, 0, 0.1);
+  margin-bottom: 20px;
+}
+#speed-indicators {
+  background: rgba(255, 0, 0, 0.2);
+  float: right;
+  min-height: 100px;
+}
+#codebox {
+  background: rgba(67, 219, 168, 0.075);
+  padding: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  font-size: 1rem;
+}
+.typed {
+  padding: 0 20px;
+  background: transparent;
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  width: 100%;
+  overflow: hidden;
+  resize: none;
+}
+.typed:focus {
+  outline: 0;
+}
