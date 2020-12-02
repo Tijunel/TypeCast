@@ -2,5 +2,7 @@
 /UserDataMS/node_modules
 /GamingMS/node_modules
 /Frontend/node_modules
+/node_modules
 .idea/
 Frontend/debug.log
+client/node_modules
