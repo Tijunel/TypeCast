@@ -10,6 +10,7 @@ const users = express.Router();
 // Register
 users.post('/register', async(req, res) => {
     // Create user if not existing and serve JWT if successful
+    // Create ID entry in firebase as well
 });
 
 // Log In
@@ -30,7 +31,13 @@ users.get('/invalidate', withAuth, async(req, res) => {
     res.sendStatus(200).end();
 });
 
-users.put('/:id', withAuth, async(req, res) => {
+// Change username and/or password
+users.put('/', withAuth, async(req, res) => {
+    //req.params.id provides the id
+});
+
+// Delete account, delete firebase too
+users.delete('/', withAuth, async(req, res) => {
 
 });
 
