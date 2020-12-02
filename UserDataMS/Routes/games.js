@@ -2,6 +2,7 @@
 
 const express = require("express");
 const games = express.Router();
+const firebase = require('../Config/firebase');
 
 // Post a new game upon completion
 games.post('/', (req, res) => {

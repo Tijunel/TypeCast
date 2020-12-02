@@ -26,7 +26,7 @@ class MSCall {
                 searchParameters,
                 method,
                 json
-            })l
+            });
         } catch (error) {
             return { status: 500 }
         }

@@ -2,6 +2,7 @@
 
 const express = require("express");
 const users = express.Router();
+const firebase = require('../Config/firebase');
 
 // Create new user entry in firebase on registration
 users.post('/', (req, res) => {
