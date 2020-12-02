@@ -1,8 +1,8 @@
 'use strict';
 
-// Import dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
 const app = express();
@@ -15,11 +15,8 @@ app.use((req, res, next) => {
 
 // Configure the bodyParser middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-
-// Configure the CORs middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cors());
 
 // This middleware informs the express application to serve our compiled React files
@@ -31,11 +28,19 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
     });
 };
 
-// Catch any bad requests
+// Import routes
+const gaming = require('./Routes/gaming');
+const userdata = require('./Routes/userData');
+const users = require('./Routes/users');
+
+// Setup routes
+app.use("/gaming", gaming);
+app.use("/userdata", userdata);
+app.use("/users", users);
+
+// Catch bad requests
 app.get('*', (req, res) => {
-    res.status(200).json({
-        msg: 'Catch All'
-    });
+    res.sendStatus(404).end();
 });
 
 // Configure our server to listen on the port defiend by our port variable
