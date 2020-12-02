@@ -3,7 +3,8 @@ body {
   font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: white !important;
+  background: #45495c !important;
+  color: white !important;
 }
 
 body, #root {
