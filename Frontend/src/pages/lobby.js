@@ -22,7 +22,7 @@ export default class Lobby extends React.Component {
   constructor() {
     super();
     this.state = {
-      roomCode: this.generateRoomCode(),  // todo (returns hardcoded value rn)
+      roomCode: this.getRoomCode(),
       lobbyName: "(edit me)",
       isPrivateLobby: false,
       timeLimit: 60,
@@ -33,9 +33,11 @@ export default class Lobby extends React.Component {
     this.DEBUG = true;  // for console debug info
   }
 
-  generateRoomCode = () => {
-    // todo: make it generate a random code instead
-    return "JGGS";
+  getRoomCode = () => {
+    // pull the code from the last 4 digits of the URL, defined by sending page
+    // (There's probably a much more React-y way to do this...)
+    let url = window.location.pathname;
+    return url.substr(url.length - 4);
   }
 
   loadPlayers = () => {
