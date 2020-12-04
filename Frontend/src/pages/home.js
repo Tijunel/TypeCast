@@ -1,3 +1,8 @@
+// home page for the app
+
+// NOTE: just using a simple redirect for the buttons rn to go to the other
+//       'pages'. If you have a better way of doing this, change it.
+
 import React from 'react';
 import './_styling/home.css';
 
@@ -7,11 +12,20 @@ export default class Home extends React.Component {
   }
 
   hostGame = () => {
-    // generate a random 4 digit lobby ID and then pass it to the lobby page
-    let lobbyID = "ASDF"; // todo: make this random
-    //window.location.href = "http://www.w3schools.com";
-    // need to load lobby page AND pass in some properties...
+    // generate a random 4 digit room code / lobby code
+    let roomCode = "";
+    let menu = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var menuLength = 26;
+    for (let i = 0; i < 4; i++)
+      roomCode += menu.charAt(Math.floor(Math.random() * menuLength));
 
+    // load lobby page. Not sure how else to do it. This is not very React-y
+    window.location.href = "/lobby/:" + roomCode;
+  }
+
+  logOut = () => {
+    // todo: do whatever needs to be done to log out
+    alert("todo: implement this logOut() method")
   }
 
   render = () => {
@@ -27,7 +41,10 @@ export default class Home extends React.Component {
         -The TypeCasters
         </p><br/><br/>
 
-        <button onclick={() => this.hostGame()}>Host Game</button>
+        <button onClick={() => this.hostGame()} className="homebtn">Host Game</button>
+        <button onClick={() => window.location.href = "/join"} className="homebtn">Join Game</button>
+        <button onClick={() => window.location.href = "/profile/"} className="homebtn">Profile</button>
+        <button onClick={() => this.logOut()} className="log-out-btn">Log out</button>
 
       </div>
     );

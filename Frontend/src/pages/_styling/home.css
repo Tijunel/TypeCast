@@ -1,17 +1,25 @@
 #home {
-    padding-top: 76px;
-    /* This is to make the content not overlap with the foote*/
-    min-height: calc(100vh - 30px);
-    text-align: center;
+  margin: 3.5rem auto 0 auto;
+  padding: 30px;
+  min-height: calc(100vh - (3.5rem + 2rem));
+  text-align: center;
 }
 #home p {
-    max-width: 50%;
-    min-width: 300px;
-    margin: auto;
-    text-align: justify;
+  max-width: 700px;
+  min-width: 300px;
+  margin: auto;
+  text-align: justify;
 }
-button {
+.homebtn, .log-out-btn {
   background: #5490CC;
   border-radius: 4px;
   padding: 5px 30px;
+  display: block;
+  min-width: 200px;
+  margin: 20px auto;
+  color: white;
+  font-size: 1.2rem;
+}
+.log-out-btn {
+  margin-top: 70px;
 }
