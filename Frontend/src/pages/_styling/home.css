@@ -4,10 +4,14 @@
     min-height: calc(100vh - 30px);
     text-align: center;
 }
-
 #home p {
     max-width: 50%;
     min-width: 300px;
     margin: auto;
     text-align: justify;
+}
+button {
+  background: #5490CC;
+  border-radius: 4px;
+  padding: 5px 30px;
 }
