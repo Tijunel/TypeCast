@@ -1,31 +1,63 @@
 #login {
-    padding-top: 76px;
-    /* This is to make the content not overlap with the foote*/
-    min-height: calc(100vh - 30px);
-    text-align: center;
+  margin: 3.5rem auto 0 auto;
+  min-height: calc(100vh - (3.5rem + 2rem));
+  font-size: 1.5rem;
+  padding: 30px;
 }
-
-#login p {
-    max-width: 50%;
-    min-width: 300px;
-    margin: auto;
-    text-align: justify;
+#login h1 {
+  text-align: center;
+  margin: 30px 0;
 }
-
-#label {
-    font-weight: normal;
-    text-align: left;
+#login form {
+  max-width: 400px;
+  margin: 0 auto 30px;
 }
-
-.button {
-    background-color: #84ACD5;
-    border: none;
-    padding: 5px;
-    width: 160px;
-    margin: 5px 2px;
-    font-size: larger;
+#login form label {
+  padding-left: 5px;
 }
-
-.reg {
-    background-color: #D3D3D3;
+#login form input {
+  width: 100%;
+  padding: 5px 15px;
+  margin-bottom: 15px;
+  border-radius: 50px;
+}
+#login form input:focus {
+  outline: none;
+}
+#login form input[type="submit"] {
+  display: block;
+  background-color: #5490CC;
+  color: white;
+  padding: 5px 0;
+  margin: 30px auto 0 auto;
+  max-width: 250px;
+}
+.login-btn {
+  display: block;
+  background-color: #5490CC;
+  color: white;
+  padding: 5px 0;
+  margin: 30px auto 0 auto;
+  max-width: 250px;
+}
+#regbox {
+  max-width: 250px;
+  margin: 0 auto;
+}
+#login button {
+  background-color: #333;
+  color: white;
+  width: 100%;
+  max-width: 250px;
+  border-radius: 50px;
+  margin: 0 auto;
+}
+#forgotpw {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+#forgotpw a {
+  color: #ccc;
+  font-size: 1.1rem !important;
 }
