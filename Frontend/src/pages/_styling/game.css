@@ -20,20 +20,24 @@
   min-height: 100px;
 }
 #codebox {
-  background: rgba(67, 219, 168, 0.075);
+  background: rgba(248, 255, 252, 0.199);
   padding: 20px;
   border: 3px solid rgba(255, 255, 255, 0.4);
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
-.typed {
-  padding: 0 20px;
+.typingbox {
+  padding: 5px 20px;
   background: transparent;
   color: white;
   border: 3px solid rgba(255, 255, 255, 0.4);
-  width: 100%;
-  overflow: hidden;
-  resize: none;
+  border-radius: 0;
+  font-size: 1.2rem;
 }
-.typed:focus {
+.typingbox:focus {
   outline: 0;
 }
+pre {
+  color: white;
+}
+
+
