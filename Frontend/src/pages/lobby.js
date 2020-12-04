@@ -22,7 +22,7 @@ export default class Lobby extends React.Component {
   constructor() {
     super();
     this.state = {
-      roomCode: this.getRoomCode(),
+      lobbyCode: this.getLobbyCode(),
       lobbyName: "(edit me)",
       isPrivateLobby: false,
       timeLimit: 60,
@@ -33,7 +33,7 @@ export default class Lobby extends React.Component {
     this.DEBUG = true;  // for console debug info
   }
 
-  getRoomCode = () => {
+  getLobbyCode = () => {
     // pull the code from the last 4 digits of the URL, defined by sending page
     // (There's probably a much more React-y way to do this...)
     let url = window.location.pathname;
@@ -57,8 +57,8 @@ export default class Lobby extends React.Component {
     return true;
   }
   
-  copyRoomCode = () => {
-    navigator.clipboard.writeText(this.state.roomCode);
+  copyLobbyCode = () => {
+    navigator.clipboard.writeText(this.state.lobbyCode);
     alert("Copied!");
   }
 
@@ -78,7 +78,7 @@ export default class Lobby extends React.Component {
           "Replace this with code that removes this player from the lobby.");
   }
 
-  buildPlayerTable = () => {
+  getPlayerTable = () => {
     let playerTable = [];
     playerTable.push(
       <tr key="headings">
@@ -188,17 +188,17 @@ export default class Lobby extends React.Component {
               <div className="fixed-name">{this.state.lobbyName}</div>
             }lobby
           </div>
-          <div id="room-code-section">
-            <div id="code-heading">Room Code:</div>
-            <button className="copy-btn" onClick={ () => this.copyRoomCode() }>
+          <div id="lobby-code-section">
+            <div id="code-heading">Lobby Code:</div>
+            <button className="copy-btn" onClick={ () => this.copyLobbyCode() }>
               Copy
             </button>
-            <div id="code">{this.state.roomCode}</div>
+            <div id="code">{this.state.lobbyCode}</div>
           </div>
         </div>
 
         <table id="players">
-          <tbody>{this.buildPlayerTable()}</tbody>
+          <tbody>{this.getPlayerTable()}</tbody>
         </table>
 
         <div id="settings">
