@@ -16,11 +16,11 @@ export default class Register extends React.Component {
     }
   }
 
-  submitHandler = (event) => {
+  registrationHandler = (event) => {
     // todo: update this with our server details when ready:
-    if  (this.verifyPassword() ) {
+    if  (this.passwordsMatch() ) {
       // boilerplate template --------------------------------------
-      // fetch('http://localhost:5000/register', {
+      // fetch('http://localhost:8000/register', {
       //   method: 'POST',
       //   headers: {'Content-Type': 'application/json'},
       //   body: JSON.stringify(this.state) 
@@ -31,8 +31,7 @@ export default class Register extends React.Component {
       //     });
       //   });
       // -----------------------------------------------------------
-      alert("You are now registered! Redirecting you to xyz page...\n" +
-            "(todo: update this method to ACTUALLY register the user)");
+      alert("todo: implement this registrationHandler() method");
     } else {
       this.handlePasswordMismatch();
     }
@@ -45,7 +44,7 @@ export default class Register extends React.Component {
     this.setState({[name]: val});
   }
 
-  verifyPassword = () => {
+  passwordsMatch = () => {
     if (this.state.password === this.state.password2)
       return true;
     return false;
@@ -62,8 +61,8 @@ export default class Register extends React.Component {
 
         <h1>Register</h1>
         
-        <form onSubmit={this.submitHandler}>
-          <p>Username</p>
+        <form onSubmit={this.registrationHandler}>
+          <label>Username</label>
           <input
             type='text'
             name='fName'
@@ -71,7 +70,7 @@ export default class Register extends React.Component {
             onChange={this.myChangeHandler}
           />
 
-          <p>Email</p>
+          <label>Email</label>
           <input
             type='email'
             name='email'
@@ -79,7 +78,7 @@ export default class Register extends React.Component {
             onChange={this.myChangeHandler}
           />
 
-          <p>Password</p>
+          <label>Password</label>
           <input
             type='password'
             name='password'
@@ -87,7 +86,7 @@ export default class Register extends React.Component {
             onChange={this.myChangeHandler}
           />
 
-          <p>Confirm Password</p>
+          <label>Confirm Password</label>
           <input
             type='password'
             name='password2'
@@ -95,7 +94,7 @@ export default class Register extends React.Component {
             onChange={this.myChangeHandler}
           />
           
-          <input type='submit' value='Register' className='register-btn'/>
+          <input type='submit' value='Register'/>
         </form>
       </div>
     );
