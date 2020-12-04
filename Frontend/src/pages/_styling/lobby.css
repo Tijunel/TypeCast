@@ -54,7 +54,7 @@ button:focus {
 .editable-name:focus {
   outline: none;
 }
-#room-code-section{
+#lobby-code-section{
   flex: 3;
   padding-left: 20px;
   color: white;
