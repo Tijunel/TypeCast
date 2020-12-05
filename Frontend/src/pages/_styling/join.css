@@ -1,20 +1,20 @@
 #join {
-    max-width: 900px;
-    margin: 3.5rem auto 0 auto;
-    min-height: calc(100vh - (3.5rem + 2rem));
-    background: #45495c;
-    color: white;
-    font-size: 1.6rem;
-    padding: 30px;
+  max-width: 900px;
+  margin: 3.5rem auto 0 auto;
+  min-height: calc(100vh - (3.5rem + 2rem));
+  font-size: 1.6rem;
+  padding: 30px;
 }
 #join-heading {
-  margin-bottom: 40px;
-  margin-left: 50px;
+  margin: 20px 0 40px 50px;
+}
+#join table {
+  width: 80%;
 }
 #games {
   min-height: 100px;
   margin: 0 auto 40px auto;
-  min-width: 400px;
+  min-width: 500px;
 }
 #games tr {
   display: flex;

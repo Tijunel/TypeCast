@@ -85,7 +85,7 @@ export default class Lobby extends React.Component {
 
   getPlayerTable = () => {
     let playerTable = [];
-    playerTable.push(
+    playerTable.push( // table headings
       <tr key="headings">
         <td className="player-name">Players</td>
         {/* <td className="is-ready">Status<br/>
@@ -94,8 +94,8 @@ export default class Lobby extends React.Component {
         <td className="remove-player">Remove?</td>
       </tr>
     );
-    const numPlayers = this.state.players.length;
-    for (let i = 0; i < numPlayers; i++) {
+    // rest of the table, from the list of players
+    for (let i = 0; i < this.state.players.length; i++) {
       playerTable.push( 
         <tr key={"player"+(i+1)}>
           <td className="player-name">
@@ -171,7 +171,8 @@ export default class Lobby extends React.Component {
     return (
       <div id='lobby'>
 
-        <a href="../join"><button className="back-btn">Back</button></a>
+        <button  onClick={() => window.location.href = document.referrer} 
+                 className="back-btn">Back</button>
 
         <div id="top-section">
           <div id="lobby-name">

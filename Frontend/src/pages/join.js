@@ -3,8 +3,6 @@
 // todo: implement joinGame() so it pulls in the actual active games
 //       ...as of now, it's just using hardcoded values for the games
 
-
-
 import React from 'react';
 import './_styling/join.css';
 
@@ -18,7 +16,6 @@ export default class Join extends React.Component {
     this.MAX_PLAYERS_PER_GAME = 5;
   }
 
-  
   getGames = () => {
     // todo: get the ACTUAL games data from somewhere else/via some process
     // just returning a hardcoded list for now:
@@ -29,12 +26,19 @@ export default class Join extends React.Component {
              {lobbyCode: "ECMA", name: "umm dunno", numPlayers: 2}, ];
   }
 
+  componentDidMount = () => {
+    // align the page title with the left edge of the table of games
+    const tableWidth = document.querySelector("#games").offsetWidth;
+    let title = document.querySelector("#join-heading");
+    title.style.marginLeft = ((900 - tableWidth - 60) / 2) + "px";
+  } 
 
+
+  // ----- These are all related ----------------------------------------------
   joinGame = (gameIndex) => {
     // send user to the game they clicked on
     window.location.href = "/lobby/:" + this.state.games[gameIndex].lobbyCode;
   }
-
   joinGameByCode = (event) => {
     if (this.state.joinCode.length !== 4) 
       alert("Lobby codes are 4 letters long: try re-entering");
@@ -47,7 +51,6 @@ export default class Join extends React.Component {
   
     event.preventDefault();  // prevent page reload on form submission
   }
-
   gameSpecifiedExists = (code) => {
     // determines if a game specified by the input lobby code exists
     for (let i = 0; i < this.state.games.length; i++) {
@@ -56,13 +59,11 @@ export default class Join extends React.Component {
     }
     return false;
   }
-
   gameIsFull = (code) => {
     // determines if a game specified by the input lobby code is full
     let n = this.state.games[this.getGameIndexFromLobbyCode(code)].numPlayers;
     return  n >= this.MAX_PLAYERS_PER_GAME;
   }
-
   getGameIndexFromLobbyCode = (code) => {
     // assumes a game with this lobby code definitely exists in this.state.game
     for (let i = 0; i < this.state.games.length; i++) {
@@ -70,6 +71,7 @@ export default class Join extends React.Component {
         return i;
     }
   }
+  // ----- / related ----------------------------------------------------------
 
 
   joinCodeUpdater = (event) => {
@@ -85,13 +87,14 @@ export default class Join extends React.Component {
 
   getGameTable = () => {
     let gameTable = [];
-    gameTable.push(
+    gameTable.push( // table headings
       <tr key="headings">
         <td className="game-name">Name</td>
         <td className="player-count">Players</td>
         <td className="join-game">&nbsp;</td>
       </tr>
     );
+    // rest of the table, from the list of games
     for (let i = 0; i < this.state.games.length; i++) {
       gameTable.push( 
         <tr key={"game"+(i+1)}>
@@ -120,24 +123,16 @@ export default class Join extends React.Component {
     return gameTable;
   }
 
-  componentDidMount = () => {
-    // align with the left edge of the table of games
-    const tableWidth = document.querySelector("#games").offsetWidth;
-    let title = document.querySelector("#join-heading");
-    title.style.marginLeft = ((900 - tableWidth - 60) / 2) + "px";
-  } 
-
 
   render = () => {
     return (
       <div id='join'>
-        <a href="../home"><button className="back-btn">Back</button></a>
+        <button  onClick={() => window.location.href = document.referrer} 
+                 className="back-btn">Back</button>
 
         <div id="join-heading"><h1>Join Game</h1></div>
 
-        <table id="games">
-          <tbody>{this.getGameTable()}</tbody>
-        </table>
+        <table id="games"><tbody>{this.getGameTable()}</tbody></table>
 
         <div id="join-by-code">
           <form onSubmit={this.joinGameByCode}>

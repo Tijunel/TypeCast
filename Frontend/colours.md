@@ -16,4 +16,7 @@ Grey: #484D52
 
 
 ------- experimenting... -------
+
 join button blue: #2b50c9
+
+crazy blue: #2d5eff

@@ -22,7 +22,7 @@ export default class Login extends React.Component {
     // todo: connect to the users db and do the login stuff
     alert("todo: implement this loginHandler() method")
 
-    event.preventDefault();  // prevent page reload on form submission, if you want
+    event.preventDefault();  // prevent page reload on form submission
   }
 
   myChangeHandler = (event) => {

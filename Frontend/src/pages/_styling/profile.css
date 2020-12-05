@@ -1,51 +1,182 @@
 #profile {
-    padding-top: 76px;
-    /* This is to make the content not overlap with the foote*/
-    min-height: calc(100vh - 30px);
-    text-align: center;
+  margin: 3.5rem auto 0 auto;
+  min-height: calc(100vh - (3.5rem + 2rem));
+  font-size: 1.6rem;
+  text-align: center;
+  padding-top: 30px;
+} 
+#profile-heading {
+  margin: 20px 0 40px;
 }
 
-#profile p {
-    max-width: 50%;
-    min-width: 300px;
-    margin: auto;
-    text-align: justify;
+/* --- table ------------- */
+#table-container {
+  margin: 0 auto 100px auto;
+  font-size: 1.2rem;
+}
+#table-forehead {
+  width: 100%;
+  background: rgba(0,0,0,0.14);
+  border-radius: 25px 25px 0 0;
+  color: rgb(137, 197, 253);
+  border: 0 !important;
+  padding: 15px 0 !important;
+  font-style: italic;
+}
+#past-games {
+  min-width: 500px;
+  margin-bottom: 30px;
+}
+#past-games td {
+  padding: 3px;
+  background: #29547e;
+  border: 2px solid black;
+}
+#past-games tr {
+  display: flex;
+}
+.position {
+  flex: 18;
+}
+.speed {
+  flex: 22;
+}
+.time {
+  flex: 27;
+}
+.date {
+  flex: 33;
+}
+#past-games pre {
+  display: inline;
+  font-size: 1.2rem;
+}
+.lpm {
+  font-size: 0.9rem;
+}
+#past-games tr:nth-child(1) td {
+  background: rgba(0, 0, 0, 0.27) !important;
+  border: 0;
+}
+#past-games tr:last-child td {
+  padding-bottom: 5px;
+}
+#past-games tr:last-child td:first-child {
+  border-radius: 0 0 0 25px;
+}
+#past-games tr:last-child td:last-child {
+  border-radius: 0 0 25px 0;
+}
+/* --- /table ------------ */
+
+#table-chin {
+  /* background: rgba(0,0,0,0.14); */
+}
+#table-chin a {
+  color: white;
+  text-decoration: underline;
+  font-size: 1rem;
+}
+#table-chin a:hover {
+  text-decoration: none;
+}
+#avg-speed {
+  display: inline-block;
+  margin-right: 50px;
+}
+#avg-speed-nbr{
+  display: inline-block;
 }
 
-.row {
-    padding: 0px 400px;
-    display: flex;
-}
 
-.leftcolumn {
-    float: left;
-    width: 40%;
-    padding: 20px;
+#extended-footer {
+  background: rgba(0,0,0,0.3);
+  height: 380px;
 }
-
-.rightcolumn {
-    float: right;
-    width: 60%;
-    padding: 20px;
+#user-menu {
+  background: rgba(0,0,0,0.15);
 }
-
-.button {
-    background-color: #84ACD5;
-    border: none;
-    padding: 5px;
-    width: 220px;
-    margin: 5px 2px;
-    font-size: larger;
+#user-menu button {
+  display: inline-block;
+  background: transparent;
+  color: #ddd;
+  padding: 10px 20px;
+  border: 0;
+  font-size: 0.9rem;
 }
-
-table {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+#user-menu button:hover {
+  text-decoration: underline;
 }
-
-td {
-    border: 1px solid;
-    text-align: center;
-    padding: 5px;
+#user-menu button:focus {
+  outline: none;
+}
+.del-acct-btn {
+  color: rgb(255, 136, 136) !important;
+}
+#change-username-box, 
+#change-password-box,
+#delete-account-box {
+  margin: 50px auto 0;
+  font-size: 1.2rem;
+}
+#change-password-box {
+  max-width: 500px;
+}
+#change-username-box input[type="text"] {
+  background: #3E6C99;
+  color: white;
+  padding: 2px 12px;
+  margin-right: 14px;
+  border-radius: 50px;
+}
+#change-username-box input[type="submit"] {
+  background: #3E6C99;
+  color: white;
+  padding: 2px 25px;
+  position: relative;
+  top: 3px;
+  border-radius: 50px;
+}
+.flex-container {
+  display: flex;
+  margin-bottom: 20px;
+  text-align: right;
+}
+#change-password-box form label {
+  flex: 41;
+}
+#change-password-box form input {
+  flex: 59;
+  padding: 0 12px;
+  background: #3E6C99;
+  color: white;
+  border-radius: 50px;
+}
+#change-password-box form input[type="submit"] {
+  padding: 3px 30px;
+  float: right;
+  margin-top: 10px;
+  border-radius: 50px;
+}
+#delete-account-box {
+  font-size: 1.2rem;
+  color: rgb(255, 136, 136);
+}
+.delete-acct-button {
+  background: rgb(255, 136, 136);
+  color: black;
+  font-weight: 900;
+  padding: 16px 32px;
+  border-radius: 50px;
+  margin-top: 40px;
+}
+#delete-account-box .changed-my-mind  {
+  margin-top: 40px;
+  background: transparent;
+  border: 0;
+  color: #FFF;
+  font-size: 1rem;
+}
+#delete-account-box .changed-my-mind:hover {
+  text-decoration: underline;
 }
