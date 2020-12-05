@@ -15,7 +15,7 @@ import Join from './pages/join';
 import Lobby from './pages/lobby';
 import Profile from './pages/profile';
 import Game from './pages/game';
-import Error from './pages/error';
+import Error from './pages/error'; // <-- can we delete this?
 
 import TopNav from './components/navigation/topNav';
 import Footer from './components/navigation/footer';
