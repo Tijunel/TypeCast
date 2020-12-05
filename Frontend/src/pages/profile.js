@@ -31,13 +31,7 @@ export default class Profile extends React.Component {
     let tableContainer = document.querySelector("#table-container");
     tableContainer.style.width = tableWidth + "px";
     // set the height of the extended footer so it fills all available window space
-    // This is janky af. Clean this up if there's time:
-    const extFooter = document.querySelector('#extended-footer');
-    let offset = extFooter.getBoundingClientRect();
-    let topOfFooter = offset.top;
-    let diff = window.innerHeight - topOfFooter;
-    if (diff > 380) // we need at least 380px of height for the bottom ctrl pannel
-      extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem))";
+    this.sizeTheExtendedFooter("inital load");
   }
   
 
@@ -53,6 +47,23 @@ export default class Profile extends React.Component {
 
     this.setState({username: username, password: password, pastGames: pastGames,
                    newUsername: username});
+  }
+
+
+  sizeTheExtendedFooter = (situation) => {
+    // This is janky af. Clean this up if there's time:
+    const extFooter = document.querySelector('#extended-footer');
+    let offset = extFooter.getBoundingClientRect();
+    let topOfFooter = offset.top;
+    let diff = window.innerHeight - topOfFooter;
+    if (diff > 380) { // we need at least 380px of height for the bottom ctrl pannel
+      if (situation == "inital load") {
+        extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem))";
+
+      } else if (situation == "after deletion") {
+        extFooter.style.cssText = "min-height: calc(100vh - (255px + 70px + 5.5rem))";
+      }
+    }
   }
 
 
@@ -81,12 +92,12 @@ export default class Profile extends React.Component {
     this.setState({username: this.state.newUsername});
     setTimeout( () => {
       alert("Username changed!");
-      this.setState({changeUNVisible: false});
+      //this.setState({changeUNVisible: false});
     }, 500);
 
     // todo: connect to db and update this user's username
     setTimeout(() => {alert("todo: implement the rest of this " +
-                            "updateUsernameHandler() method")}, 1000);
+                            "updateUsernameHandler() method")}, 700);
 
     event.preventDefault();  // prevent page reload
   }
@@ -138,6 +149,7 @@ export default class Profile extends React.Component {
                      pastGames: [], 
                      delAcctVisible: false  
                   });
+    this.sizeTheExtendedFooter("after deletion"); // resize the footer
 
     // todo: remove the user from the db and logout the user
     setTimeout( () => alert("todo: implement the rest of this deleteAccount() method"), 500);
@@ -224,7 +236,8 @@ export default class Profile extends React.Component {
               <div id="avg-speed">
                 Average LPM: <div id="avg-speed-nbr">{this.getAverageSpeed()}</div>
               </div>
-              <a href="" onClick={() => this.resetScore()}>Reset Score</a>
+              <button onClick={() => this.resetScore()}
+                      className="text-btn">Reset Score</button>
             </div>
           </div>
         </div>

@@ -41,3 +41,9 @@ button:focus, input:focus {
   border-color: white;
   color: white;
 }
+.text-btn {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  color: white;
+}
