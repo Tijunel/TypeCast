@@ -7,3 +7,89 @@
     font-size: 1.6rem;
     padding: 30px;
 }
+#join-heading {
+  margin-bottom: 40px;
+  margin-left: 50px;
+}
+#games {
+  min-height: 100px;
+  margin: 0 auto 40px auto;
+  min-width: 400px;
+}
+#games tr {
+  display: flex;
+}
+#games td {
+  background: #1F364D;
+  padding: 10px 15px;
+  border: 2px solid black;
+}
+#games tr:nth-child(1) td {
+  font-size: 1.2rem;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  padding: 0 17px;
+  margin-bottom: 12px;
+  background: transparent;
+  color: #eee;
+}
+#games tr:nth-child(1) td:nth-child(1) {
+  padding-left: 17px;
+}
+#games tr:nth-child(1) {
+  border: 0;
+}
+.game-name {
+  flex: 70;
+  text-align: left;
+}
+.player-count {
+  flex: 12;
+  padding: auto 0 !important;
+}
+.not-joinable {
+  background: rgb(13, 32, 73);
+  color: #415a72;
+  padding: 10px 0;
+  font-weight: 900;
+  width: 100%;
+  height: 100%;
+  border-right: 1px solid black !important;
+}
+.join-game {
+  flex: 18;
+  padding: 0 !important;
+}
+.join-game button {
+  background: #2b50c9;;
+  font-weight: 900;
+  width: 100%;
+  height: 100%;
+  color: white;
+  border-right: 1px solid black !important;
+}
+.join-game button:hover{
+  background: #3b65f0;
+}
+#games button {
+  border-width: 0px;
+}
+.joinWithCodeField {
+  width: 80px;
+  position: relative;
+  top: -3px;
+  padding-left: 5px;
+}
+#join-by-code input[type="submit"] {
+  margin-left: 15px;
+  padding: 2px 20px;
+  background: #2b50c9;
+  border: 3px solid black;
+  color: white;
+  position: relative;
+  top: -3px;
+}
+#join-by-code input[type="submit"]:hover {
+  background: #3b65f0;
+}

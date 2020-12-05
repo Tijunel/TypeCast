@@ -73,9 +73,14 @@ export default class Lobby extends React.Component {
   }
 
   removePlayer = (playerIndex) => {
-    alert("Alert fired from inside the 'removePlayer()' method.\n" + 
-          "Request to remove: " + this.state.players[playerIndex].name + "\n" +
-          "Replace this with code that removes this player from the lobby.");
+    // todo
+    alert("todo: implement this removePlayer() method");
+
+  }
+
+  startGame = () => {
+      // todo
+      alert("todo: implement this startGame() method");
   }
 
   getPlayerTable = () => {
@@ -104,7 +109,8 @@ export default class Lobby extends React.Component {
                 onClick={ () => this.toggleReady(i) } >
                 Ready
               </button>
-            : <div className ={this.state.players[i].isReady ? "ready" : "not-ready"}>
+            : 
+              <div className ={this.state.players[i].isReady ? "ready" : "not-ready"}>
                 Ready
               </div>  
             }
@@ -120,11 +126,6 @@ export default class Lobby extends React.Component {
       ); // playerTable.push
     }
     return playerTable;
-  }
-
-  startGame = () => {
-    alert("Alert fired from inside the 'startGame()' method.\n" +
-          "Replace this with code that starts the game.");
   }
 
   settingsChangeHandler = (event) => {

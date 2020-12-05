@@ -67,6 +67,7 @@ button:focus {
   background: black;
   font-weight: 900;
   padding: 10px 25px;
+  text-transform: uppercase;
   float: right;
 }
 .copy-btn {
