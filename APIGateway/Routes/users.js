@@ -11,6 +11,7 @@ const users = express.Router();
 users.post('/register', async(req, res) => {
     // Create user if not existing and serve JWT if successful
     // Create ID entry in firebase as well
+    
 });
 
 // Log In
