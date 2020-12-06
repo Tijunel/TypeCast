@@ -92,7 +92,6 @@
 #players tr:nth-child(1) td:nth-child(1),
 #players tr:nth-child(1) td:nth-child(2) {
   padding-left: 11px;
-
 }
 #players tr:nth-child(1) {
   border: 0;
@@ -101,7 +100,6 @@
 #players tr:nth-child(2) td:nth-child(2) {
   border-top: 3px solid black;
 }
-
 #players button {
   border-width: 0px;
 }
@@ -118,19 +116,18 @@
   height: 100%;
   background: transparent;
 }
-.is-ready button:hover {
-  background: #284563;
-  color: #496580;
-}
-.is-ready button:focus {
-  background: #1F364D; 
-  color: #6eff7a;
-}
 .ready {
   color: #6eff7a;
 }
+.myReadyBtn.ready:hover {
+  background: #284563;
+}
 .not-ready {
   color: #3d556b;
+}
+.myReadyBtn.not-ready:hover {
+  background: #284563;
+  color: #496580;
 }
 div.ready, div.not-ready {
   padding: 10px 0;
@@ -172,7 +169,7 @@ div.ready, div.not-ready {
   min-height: 100px;
   margin: 0 auto 40px auto;
   padding: 20px 0 5px;
-  max-width: 70%;
+  max-width: 80%;
   min-width: 580px;
   font-size: 1.3rem;
 }

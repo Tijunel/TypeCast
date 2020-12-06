@@ -34,9 +34,9 @@ export default class Lobby extends React.Component {
 
   componentDidMount = () => {
     this.loadLobbyDataFromDB();
-    // properly sizes lobby name. Needs a slight delay...
-    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1); 
-    setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 15000); 
+    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1);
+    setTimeout(()=> this.resizeTableForNonAdmins(this.state.lobbyName), 1);
+    setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 15000);
   }
 
 
@@ -123,6 +123,32 @@ export default class Lobby extends React.Component {
   }
 
 
+  resizeNameBox = (roomName) => {
+    // properly sizes lobby name. Needs a slight delay...
+    // this method is inefficient, but oh well. Fix if all else is done.
+    const nameBox = this.state.iAmHost ? 
+                      document.querySelector(".editable-name") :
+                      document.querySelector(".fixed-name");
+    const lobbyName = document.querySelector("#lobby-name");
+    let extraRoom = 0;
+    if (roomName.length < 12) {
+      document.querySelector("#lobby-name").style.fontSize = "50px";
+      if (this.state.iAmHost) extraRoom = 14;
+      nameBox.style.width = String(roomName.length * 30 + extraRoom)+"px";
+      lobbyName.style.marginTop = "15px";
+    } else if (roomName.length < 23) {
+      document.querySelector("#lobby-name").style.fontSize = "30px";
+      extraRoom = this.state.iAmHost ? 10 : 0;
+      nameBox.style.width = String(roomName.length * 18 + extraRoom)+"px";
+      lobbyName.style.marginTop = "25px";
+    } else {
+      document.querySelector("#lobby-name").style.fontSize = "24px";
+      nameBox.style.width = String(roomName.length * 13 + 22)+"px"; // was 14
+      lobbyName.style.marginTop = "30px";
+    }
+  }
+
+
   flashVisualIndicatorForReadyButton = () => {
     if (this.alreadyToggledReady) 
        return;
@@ -131,6 +157,26 @@ export default class Lobby extends React.Component {
   }
   
 
+  resizeTableForNonAdmins = () => {
+    // resize and center table when not Admin
+    if ( ! this.state.iAmHost ) {
+      let elements = document.querySelectorAll("#players td:nth-child(3)");
+      for (let x of elements)
+        x.style.display = "none";
+
+      elements = document.querySelectorAll(".player-name");
+      for (let x of elements)
+        x.style.flex = "80";
+
+      elements = document.querySelectorAll(".is-ready");
+      for (let x of elements)
+        x.style.flex = "20";
+
+      document.querySelector('#lobby table').style.width = '80%';
+    }
+  }
+
+  
   copyLobbyCode = () => {
     // copies the lobby code to the clipboard
     navigator.clipboard.writeText(this.state.lobbyCode);
@@ -195,7 +241,7 @@ export default class Lobby extends React.Component {
           <td className="is-ready">
             { i === this.state.myPlayerIndex ?
               <button 
-                className={this.state.players[i].isReady ? "ready" : "myReadyBtn not-ready"}
+                className={this.state.players[i].isReady ? "ready myReadyBtn" : "not-ready myReadyBtn"}
                 onClick={ () => this.toggleReady(i) } >
                 Ready
               </button>
@@ -229,31 +275,6 @@ export default class Lobby extends React.Component {
       this.resizeNameBox(val);
   }
   
-
-  resizeNameBox = (roomName) => {
-    // this method is inefficient, but oh well. Fix if all else is done.
-    const nameBox = this.state.iAmHost ? 
-                      document.querySelector(".editable-name") :
-                      document.querySelector(".fixed-name");
-    const lobbyName = document.querySelector("#lobby-name");
-    let extraRoom = 0;
-    if (roomName.length < 12) {
-      document.querySelector("#lobby-name").style.fontSize = "50px";
-      if (this.state.iAmHost) extraRoom = 14;
-      nameBox.style.width = String(roomName.length * 30 + extraRoom)+"px";
-      lobbyName.style.marginTop = "15px";
-    } else if (roomName.length < 23) {
-      document.querySelector("#lobby-name").style.fontSize = "30px";
-      extraRoom = this.state.iAmHost ? 10 : 0;
-      nameBox.style.width = String(roomName.length * 18 + extraRoom)+"px";
-      lobbyName.style.marginTop = "25px";
-    } else {
-      document.querySelector("#lobby-name").style.fontSize = "24px";
-      nameBox.style.width = String(roomName.length * 13 + 22)+"px"; // was 14
-      lobbyName.style.marginTop = "30px";
-    }
-  }
-
 
   render = () => {
     return (
