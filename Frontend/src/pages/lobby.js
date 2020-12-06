@@ -24,16 +24,19 @@ export default class Lobby extends React.Component {
       timeLimit: 60,
       players: [],
       myPlayerIndex: 0,
-      iAmHost: this.determineIfIAmHost()
+      iAmHost: this.determineIfIAmHost(),
     };
     this.DEBUG = true;  // for console debug info
+    this.alreadyToggledReady = false;
+    this.readyHasFlashedAlready = false;
   }
 
 
   componentDidMount = () => {
     this.loadLobbyDataFromDB();
     // properly sizes lobby name. Needs a slight delay...
-    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1);  
+    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1); 
+    setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 15000); 
   }
 
 
@@ -118,22 +121,40 @@ export default class Lobby extends React.Component {
                  // on home page. This is definitely not an infaliable way
                  // of doing this, but it will work for now.
   }
+
+
+  flashVisualIndicatorForReadyButton = () => {
+    if (this.alreadyToggledReady) 
+       return;
+    this.readyHasFlashedAlready = true;
+    document.querySelector('.myReadyBtn').classList.add('flashReady');
+  }
   
 
   copyLobbyCode = () => {
+    // copies the lobby code to the clipboard
     navigator.clipboard.writeText(this.state.lobbyCode);
     alert("Copied!");
   }
 
 
-  toggleReady = (playerIndex) => {
-    if (playerIndex != this.state.myPlayerIndex)
-      return;  // can only toggle your own Ready status
+  toggleReady = (i) => {
+
+    if ( ! this.alreadyToggledReady && this.readyHasFlashedAlready ) {
+      const myReadyButton = document.querySelector(".myReadyBtn");
+      myReadyButton.classList.remove("flashReady");
+      myReadyButton.classList.remove("not-ready");
+      myReadyButton.classList.add("ready");
+    }
+    
     let toggled = this.state.players;
-    toggled[playerIndex].isReady = !toggled[playerIndex].isReady;
+    toggled[i].isReady = !toggled[i].isReady;
     this.setState({ players: toggled });
-    this.DEBUG && console.log("Player " + (playerIndex+1) + " ready?  " +
-                               this.state.players[playerIndex].isReady);
+
+
+    this.alreadyToggledReady = true;
+    this.DEBUG && console.log("Player " + (i+1) + " ready?  " +
+                               this.state.players[i].isReady);
   }
 
 
@@ -174,7 +195,7 @@ export default class Lobby extends React.Component {
           <td className="is-ready">
             { i === this.state.myPlayerIndex ?
               <button 
-                className={this.state.players[i].isReady ? "ready" : "not-ready"}
+                className={this.state.players[i].isReady ? "ready" : "myReadyBtn not-ready"}
                 onClick={ () => this.toggleReady(i) } >
                 Ready
               </button>
@@ -243,7 +264,7 @@ export default class Lobby extends React.Component {
 
         <div id="top-section">
           <div id="lobby-name">
-            { this.state.iAmHost ? // if user is Host, show an editable lobby name  
+            { this.state.iAmHost ? // if user is Host, show editable name 
               <form>
                 <input
                   type='text' 
@@ -259,7 +280,7 @@ export default class Lobby extends React.Component {
           </div>
           <div id="lobby-code-section">
             <div id="code-heading">Lobby Code:</div>
-            <button className="copy-btn" onClick={ () => this.copyLobbyCode() }>
+            <button className="copy-btn" onClick={() => this.copyLobbyCode()}>
               Copy
             </button>
             <div id="code">{this.state.lobbyCode}</div>
@@ -271,33 +292,46 @@ export default class Lobby extends React.Component {
         </table>
 
         <div id="settings">
-          <form>
-            <div className="setting">
-              <div className="labl">Private Lobby?&nbsp;</div> 
-              <div className="inpt">
-                <input 
-                type='checkbox' 
-                name='isPublicLobby'
-                className='checkbox'
-                value={!this.state.isPublicLobby}
-                onChange={this.settingsChangeHandler}
-                />
+          { this.state.iAmHost ?
+            <form>
+              <div className="setting">
+                <div className="labl">
+                  Time Limit <span className="seconds">(seconds)</span>&nbsp;
+                </div>
+                <div className="inpt">
+                  <input 
+                    type='number'
+                    max={9999}
+                    name='timeLimit'
+                    className='timefield'
+                    value={this.state.timeLimit}
+                    onChange={this.settingsChangeHandler}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="setting">
-              <div className="labl">Time Limit (s):&nbsp;</div>
-              <div className="inpt">
-                <input 
-                  type='number' 
-                  name='timeLimit'
-                  className='timefield'
-                  value={this.state.timeLimit}
+              <div className="setting">
+                <div className="labl">Private Lobby?&nbsp;</div> 
+                <div className="inpt">
+                  <input 
+                  type='checkbox' 
+                  name='isPublicLobby'
+                  className='checkbox'
+                  value={!this.state.isPublicLobby}
                   onChange={this.settingsChangeHandler}
-                />
+                  />
+                </div>
               </div>
+            </form>
+          :
+            <div id="lobby-settings-fixed">
+              <p>time: <span className="time-digits">
+                {this.state.timeLimit}</span> seconds</p>
+              <p>{this.state.isPublicLobby ? 
+                <span className="public">public</span> : 
+                <span className="private">private</span>} lobby</p>
             </div>
-          </form>
+          }
         </div>
 
         { this.state.iAmHost && // only show start button to Host

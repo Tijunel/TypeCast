@@ -75,7 +75,6 @@
 }
 #players tr {
   display: flex;
-  border-left: 2px solid black;
 }
 #players td {
   background: #1F364D;
@@ -120,17 +119,31 @@
   background: transparent;
 }
 .is-ready button:hover {
-  background: rgba(255,255,255,0.08);
+  background: #284563;
+  color: #496580;
+}
+.is-ready button:focus {
+  background: #1F364D; 
+  color: #6eff7a;
 }
 .ready {
   color: #6eff7a;
 }
 .not-ready {
-  color: #415a72;
+  color: #3d556b;
 }
 div.ready, div.not-ready {
   padding: 10px 0;
   /* should really do this via line-height */
+}
+.flashReady {
+  animation: flasher 3.2s linear infinite;
+}
+@keyframes flasher {
+  0%  { background: #1F364D; 
+        color: #3d556b; }
+  50% { background: #3e6b99cb;
+        color: #79a6ce; }
 }
 .inviz {
   flex: 15;
@@ -158,32 +171,59 @@ div.ready, div.not-ready {
   background: rgba(0,0,0,0.12);
   min-height: 100px;
   margin: 0 auto 40px auto;
-  padding: 10px;
-  max-width: 80%; 
+  padding: 20px 0 5px;
+  max-width: 70%;
+  min-width: 580px;
+  font-size: 1.3rem;
 }
 .setting {
   display: flex;
-  margin-bottom: 5px;
+  margin-bottom: 12px;
 }
 .labl {
-  flex: 5;
+  flex: 55;
   text-align: right;
 }
+.seconds {
+  font-size: 1.1rem;
+}
 .inpt {
-  flex: 5;
+  flex: 45;
 }
 .checkbox {
   width: 30px;
   height: 30px;
   position: relative;
   top: 5px;
-  margin-bottom: 30px;
   box-shadow: none;
 }
 .timefield {
   width: 88px;
   position: relative;
-  top: -3px;
+  padding-left: 7px;
+  background: #3E6C99;
+  color: white;
+}
+.timefield:hover {
+  background: #4b7cad;
+}
+#lobby-settings-fixed {
+  text-align: center;
+  font-size: 1.3rem;
+}
+#lobby-settings-fixed p {
+  margin-bottom: 10px;
+  color: #cfcfcf;
+}
+.time-digits {
+  color: #fff;
+  text-decoration: underline;  
+}
+#lobby-settings-fixed .public {
+  color: #6eff7a;
+}
+#lobby-settings-fixed .private {
+  color: rgb(255, 65, 65);
 }
 .start-btn {
   display: block;
