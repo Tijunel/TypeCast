@@ -52,7 +52,7 @@ export default class Register extends React.Component {
 
   handlePasswordMismatch = () => {
     alert('Your passwords do not match.\n' +
-          'Fix them and then click \"Register\" button again');
+          'Fix them and then click "Register" button again');
   }
 
   render = () => {

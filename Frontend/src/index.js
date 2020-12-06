@@ -1,4 +1,4 @@
-'use strict';
+'use strict';  // <-- console warming "unneccessary inside of modules" ?
 
 // Module imports
 import React from 'react';
@@ -15,7 +15,7 @@ import Join from './pages/join';
 import Lobby from './pages/lobby';
 import Profile from './pages/profile';
 import Game from './pages/game';
-import Error from './pages/error'; // <-- can we delete this?
+// import Error from './pages/error';  <-- can we delete this?
 
 import TopNav from './components/navigation/topNav';
 import Footer from './components/navigation/footer';
@@ -23,6 +23,7 @@ import Footer from './components/navigation/footer';
 class App extends React.Component {
   constructor() {
     super();
+    this.state={}
   }
 
   componentDidMount = () => {

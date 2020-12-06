@@ -11,37 +11,30 @@ export default class Game extends React.Component {
     this.state = {
       raceCodeStr: this.getRaceCode(), // a string of the entire code
       raceCode: [],  // array of just the words (no spaces)
-      raceCodeHTML: null,
-      spaces: [],  // array of the spaces that exist between the words
+      raceCodeHTML: [],
       typed: "",  // what has been typed so far for the current word
       cwi: 0,  // current word index 
       cw: "",  // current "word" the player is working on (CAN BE A CHUNK OF SPACES!)
-      cl: "", // current letter the player has to type (can be a whitespace)
+      cc: "", // current character the player has to type (can be a whitespace)
+      //cwIsAWord: true // current word is a word? true if cw is a word, false if it's a 'word' of whitespace
     }
     this.DEBUG = true;
   } // this.setState({ key: value });
 
   componentDidMount = () => {
     // initialize stuff
-    let raceCode = this.state.raceCodeStr.split(' '); // need to find a way to include ALL whitespace
+    let raceCode = this.state.raceCodeStr.split(/(\s+)/); // >> need to find a way to include ALL whitespace
     this.setState({raceCode: raceCode});
-    this.setState({raceCodeHTML: raceCode.map(word => <span>{word} </span>)});
-    this.setState({cl: raceCode[0][0]});
-    this.setState({cw: raceCode[0]});
-
-    // create the spaces map
-    const code = this.state.raceCodeStr;
-    const len = code.length;
-    let s = "";
-    let spaces = [];
-    for (let i = 0; i < len; i++) {
-      if (s.length > 0 && code[i] != " ") {
-        spaces.push(s);
-        s = "";
-      }
-      if (code[i] == " ")  s += " ";
+    //this.setState({raceCodeHTML: raceCode.map(word => <span>{word}</span>)});
+    let raceCodeHTML = [];
+    for (let i = 0; i < raceCode.length; i++) {
+      //if (i % 2 == 0) // if this is a word
+        raceCodeHTML.push(<span key={i} className={"word"+i}>{raceCode[i]}</span>)
     }
-    this.setState({spaces: spaces});
+    this.setState({cc: raceCode[0][0]});
+    this.setState({cw: raceCode[0]});
+    this.setState({raceCodeHTML: raceCodeHTML})
+
 
     // anything else?
     
@@ -69,7 +62,7 @@ export default class Game extends React.Component {
   }
 
   changeHandler = (event) => {
-    let val = event.target.value; // val = what has been typed so for for this.state.cw (current word)
+    let val = event.target.value; // val = what has been typed so far for the current word
     this.setState({typed: val});
     if (this.DEBUG) console.log("typed:  " + val);
 
@@ -77,36 +70,27 @@ export default class Game extends React.Component {
     const len = val.length; // length of what has been typed so far for current word
     
     // correct character typed
-    if (val[len - 1] === this.state.cl) {
-      if (this.DEBUG) console.log("nice!");
-
+    if (val[len - 1] === this.state.cc) {
       // word not finished yet
       if (len !== this.state.cw.length) {
-        if (this.DEBUG) console.log("word not finished yet. Current word: '" + this.state.cw + "'");
-        this.setState({cl: this.state.cw[len]});
+        this.setState({cc: this.state.cw[len]});
       
       } else { // word IS finished
-        if (this.DEBUG) console.log("current word finished!");
+        if (this.DEBUG) console.log('"' + this.state.cw + '" word finished');
         this.setState({typed: ""});
-        // update cl, wi, cl; but first: did player finish an actual word or a 'word' of whitespace?
+        // update cc, wi, cc; but first: did player finish an actual word or a 'word' of whitespace?
         // ...word, so next thing to be typed is space(s)
-        if (this.state.cl !== ' ') { 
-          this.setState({cw: this.state.spaces[this.state.cwi]});
-          this.setState({cl: this.state.spaces[this.state.cwi][0]});
 
-        } else { // ...spaces, so next thing to be typed is an actual word
-          if (this.DEBUG) console.log("time to type an actual word!");
           let nwi = this.state.cwi + 1; // next word index
           this.setState({cwi: nwi});
           this.setState({cw: this.state.raceCode[nwi]});
-          this.setState({cl: this.state.raceCode[nwi][0]});
-        }
+          this.setState({cc: this.state.raceCode[nwi][0]});
+        
       }
     } else { // incorrect character typed
-      console.log("DOH! Current letter: '" + this.state.cl + "'");
+      console.log("DOH! Current letter = '" + this.state.cc + "'");
     }
   }
-
   render = () => {
     return (
       <div id='game'>
