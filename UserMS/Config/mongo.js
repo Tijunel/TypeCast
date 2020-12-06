@@ -1,6 +1,6 @@
 "use strict";
 const mongoose = require("mongoose");
-const mongoURI = ""; // Atlas database
+const mongoURI = "mongodb+srv://typecast:greentomato@cluster0.kwbnx.mongodb.net/typecast?retryWrites=true&w=majority"; // Atlas database
 
 const InitiateMongoServer = async () => {
     try {

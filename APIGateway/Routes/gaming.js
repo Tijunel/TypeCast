@@ -4,7 +4,7 @@ const express = require('express');
 const withAuth = require('../Middleware/auth');
 const MSCall = require('../Utilities/MSCall');
 const api = new MSCall();
-api.setURLPrefix('http://localhost:7000');
+const prefix = 'http://localhost:7000';
 const gaming = express.Router();
 
 // Get all lobbies

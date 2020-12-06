@@ -6,14 +6,39 @@ const express = require('express');
 const user = express.Router();
 
 // Register
-user.post('/register', (req, res) => {
-    // Encrypt password using bcrypt!
-    // Create user if not existing and serve status, handle JWT in gateway
+user.post('/register', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        let user = await User.findOne({ username });
+        if (user) return res.sendStatus(400).end();
+        user = new User({ username, password });
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+        await user.save();
+        const payload = {
+            user: { ID: user.id, username: username }
+        }
+        res.status(200).json(payload).end();
+    } catch (error) {
+        res.sendStatus(500).end();
+    }
 });
 
 // Log In
-user.post('/login', (req, res) => {
-    // Check if valid, return status, handle JWT in gateway
+user.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        let user = await User.findOne({ username });
+        if (!user) return res.sendStatus(400).end();
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).end();
+        const payload = {
+            user: { ID: user.id, username: username }
+        }
+        res.status(200).json(payload).end();
+    } catch (error) {
+        res.sendStatus(500).end();
+    }
 });
 
 // Change username and/or password
@@ -22,8 +47,15 @@ user.put('/', (req, res) => {
 });
 
 // Delete account, delete firebase too
-user.delete('/', (req, res) => {
-
+user.delete('/', async (req, res) => {
+    const username = req.body.username;
+    try {
+        let deleted = await User.findOneAndDelete({ username: username });
+        if (deleted === null) return res.sendStatus(400).end();
+        else return res.status(200).json({}).end();
+    } catch (error) {
+        res.sendStatus(500).end();
+    }
 });
 
 module.exports = user;

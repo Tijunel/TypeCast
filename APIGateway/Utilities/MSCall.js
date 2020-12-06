@@ -1,33 +1,39 @@
 'use strict';
 
+const { response } = require('express');
 const got = require('got');
 
 class MSCall {
     constructor() {
-        this.api = got.extend({ responseType: 'json' });
+        this.api = got.extend({
+            responseType: "json"
+        });
     }
 
-    setURLPrefix = (prefix) => {
-        this.api = this.api.extend({ prefixUrl: prefix });
-    }
+    setPrefixURL = (url) => {
+        this.api = this.api.extend({
+            prefixUrl: url
+        });
+    };
 
-    call = async (path, method, options) => {
-        const searchParameters = options.searchParameters || {};
+    call = async (path, method = "GET", options = {}) => {
+        options = options || {};
+        const searchParams = options.searchParams || {};
         const headers = options.headers || {};
-        const json = options.json || (method === 'GET' ? undefined : {});
-        let response;
+        const json = options.json || (method === "GET" ? undefined : {});
+        let res;
         try {
-            response = await this.api(path, {   // path contains req.params
+            res = await this.api(path, {        // path contains req.params
                 headers,                        // Translates to req.headers
-                searchParameters,               // Translates to req.query or what is after ? in URL
+                searchParams,                   // Translates to req.query or what is after ? in URL
                 method,                         // Translates to GET, POST, PUT, or DELETE
                 json                            // Translates to req.body
             });
         } catch (error) {
-            return { status: 500 }
+            return { status: 500 };
         }
-        response = { status: response.statusCode, body: response.body };
-        return response;
+        res = { status: res.statusCode, body: res.body };
+        return res;
     }
 }
 

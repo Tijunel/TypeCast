@@ -1,14 +1,8 @@
 'use strict';
 const mongoose = require("mongoose");
 
-// Every entry will have a unique objectID identifier (Well, there is a really high chance it will be unique).
-
 const UserSchema = mongoose.Schema({
     username: {
-        type: String,
-        required: true
-    },
-    email: {
         type: String,
         required: true
     },
@@ -20,6 +14,6 @@ const UserSchema = mongoose.Schema({
         type: Date,
         default: Date.now()
     }
-});
+}, {collection: 'user'});
 
 module.exports = mongoose.model("user", UserSchema);
