@@ -29,15 +29,14 @@ export default class Game extends React.Component {
     let raceCodeHTML = [];
     for (let i = 0; i < raceCode.length; i++) {
       //if (i % 2 == 0) // if this is a word
-        raceCodeHTML.push(<span key={i} className={"word"+i}>{raceCode[i]}</span>)
+        // idea: set classnames for words and spaces differently? Don't think it's needed...
+        raceCodeHTML.push(<span key={i} className={"word"+i}>{raceCode[i]}</span>);
     }
     this.setState({cc: raceCode[0][0]});
     this.setState({cw: raceCode[0]});
     this.setState({raceCodeHTML: raceCodeHTML})
 
-
     // anything else?
-    
   }
 
   getRaceCode = () => {
