@@ -35,7 +35,7 @@ user.post('/login', async(req, res) => {
     const { username, password } = req.body;
     try {
         let user = await User.findOne({ username });
-        if (user) return res.sendStatus(400).end();
+        if (!user) return res.sendStatus(400).end();
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).end();
         const payload = {
@@ -46,6 +46,7 @@ user.post('/login', async(req, res) => {
         }
         res.status(200).json(payload).end();
     } catch(error) {
+        console.log(error)
         res.sendStatus(500).end();
     }
 });

@@ -1,6 +1,6 @@
 'use strict';
 
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const withAuth = require('../Middleware/auth');
 const MSCall = require('../Utilities/MSCall');
@@ -11,17 +11,14 @@ api.setPrefixURL('http://localhost:9000');
 // Register
 user.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    const response = await api.call(`user/register`, 'POST', { 
-        json: {
-            username: username,
-            password: password
-        }
+    const response = await api.call('user/register', 'POST', { 
+        json: req.body
     });
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
-        jwt.sign(response.body, "Secret", { expiresIn: "30m" }, (err, token) => {
+        jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
             if (err) throw err;
-            res.cookie("token", token, { httpOnly: true });
+            res.cookie('token', token, { httpOnly: true });
             res.status(200).end();
         });
     }
@@ -29,12 +26,12 @@ user.post('/register', async (req, res) => {
 
 // Log In
 user.post('/login', async (req, res) => {
-    const response = await api.call(prefix + '/user/login', 'POST', { json: req.body });
+    const response = await api.call('user/login', 'POST', { json: req.body });
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
-        jwt.sign(response.body, "Secret", { expiresIn: "30m" }, (err, token) => {
+        jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
             if (err) throw err;
-            res.cookie("token", token, { httpOnly: true });
+            res.cookie('token', token, { httpOnly: true });
             res.status(200).end();
         });
     }
@@ -48,8 +45,8 @@ user.get('/validate', withAuth, async (req, res) => {
 // Invalidate Token (Sign Out)
 user.get('/invalidate', withAuth, async (req, res) => {
     const payload = {};
-    const token = jwt.sign(payload, "", { expiresIn: "1" });
-    res.cookie("token", token, { httpOnly: true });
+    const token = jwt.sign(payload, '', { expiresIn: '1' });
+    res.cookie('token', token, { httpOnly: true });
     res.sendStatus(200).end();
 });
 
