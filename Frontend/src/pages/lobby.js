@@ -1,37 +1,41 @@
-// page for viewing/configuring (if the host) a specific lobby
+// page for viewing/configuring (if the host) a specific game lobby
 
 // NOTE: this page conditionally renders elements depending on whether
 //       the user is the host, which it knows via the this.state.iAmHost flag.
 //       Also note: a player (indicated by this.state.myPlayerIndex) can only
 //       toggle his own Ready status (this is intentional).
 
+// todo: once things are wired up and working, we probably need to include a 
+//       menu of code to choose from, and if we have time: a way of uploading
+//       your own blocks of code to use for the game.
+
 // todo: the settings at bottom of page should only be editable by Host.
-// todo: the mobile styling needs work (spacing, sizing)
-// todo: (there are more embedded in the code below)
-
-// ^ I'll do/fix these soon (Cody)
-
-
 
 import React from 'react';
 import './_styling/lobby.css';
-
-//import Editable_lobby_name from '../components/lobby/editable-lobby-name';
 
 export default class Lobby extends React.Component {
   constructor() {
     super();
     this.state = {
       lobbyCode: this.getLobbyCode(),
-      lobbyName: "(edit me)",
-      isPrivateLobby: false,
+      lobbyName: "",
+      isPublicLobby: true,
       timeLimit: 60,
-      players: this.loadPlayers(),  // todo (returns hardcoded player array rn)
-      myPlayerIndex: 0,  // todo: (hardcoded rn)  Host should be index 0
-      iAmHost: this.determineIfIAmHost()  // todo (returns hardcoded value rn)
+      players: [],
+      myPlayerIndex: 0,
+      iAmHost: this.determineIfIAmHost()
     };
     this.DEBUG = true;  // for console debug info
   }
+
+
+  componentDidMount = () => {
+    this.loadLobbyDataFromDB();
+    // properly sizes lobby name. Needs a slight delay...
+    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1);  
+  }
+
 
   getLobbyCode = () => {
     // pull the code from the last 4 digits of the URL, defined by sending page
@@ -40,27 +44,87 @@ export default class Lobby extends React.Component {
     return url.substr(url.length - 4);
   }
 
-  loadPlayers = () => {
-    // todo: get the ACTUAL player data from somewhere else/via some process
-    return [ {name: "Player 1", isHost: true, isReady: true},
-             {name: "Player 2", isHost: false, isReady: false}, 
-             {name: "Player 3", isHost: false, isReady: true} ];
+
+  loadLobbyDataFromDB = () => {
+    // todo: replace the hardcoded lobby data below with actual data from our DB.
+    //       Fetch the lobby data from the db using this.state.lobbyCode as the key,
+    //       -and then use it to setState() for this lobby.      
+
+    // Hardcoded data to replace: =============================================
+    let players = [ {name: "Sarah W.", isHost: true, isReady: true},
+                    {name: "Navjeet 'Bring-The-Heat' Pravdaal", isHost: false, isReady: false}, 
+                    {name: "Chloe Salzar", isHost: false, isReady: true},
+                    {name: "ThiccBoi McGee", isHost: false, isReady: true},
+                    {name: "Mr. McChungus", isHost: false, isReady: false} ];
+    let games = 
+      [ {lobbyCode: "ASDF", name: "Herbert's Super Cool Game", numPlayers: 1, timeLimit: 60, public: true},
+        {lobbyCode: "XYZC", name: "THICCness", numPlayers: 4, timeLimit: 60, public: true},
+        {lobbyCode: "WOOT", name: "SENG 513", numPlayers: 4, timeLimit: 120, public: false},
+        {lobbyCode: "IJKL", name: "Nice Polite People Only", numPlayers: 1, timeLimit: 60, public: true}, 
+        {lobbyCode: "RUOK", name: "nastY SHIZZZZ", numPlayers: 5, timeLimit: 60, public: true},
+        {lobbyCode: "ECMA", name: "idk whatever", numPlayers: 3, timeLimit: 40, public: true}, ];
+
+    // Which lobby did the user click on, if they got here via the Join page?
+    // (You don't have to do with the real data from the db)
+    let index = -1;
+    for (let i = 0; i < games.length; i++) {
+      if ( games[i].lobbyCode == this.state.lobbyCode ) {
+         index = i;
+         break;
+      }
+    }
+    // for simplicity (a hardcoded user to represent me)
+    let me = {name: "Me", isHost: true, isReady: false};
+    // Now, just set the state with that data. 
+    // Below I have to handle two cases because I'm trying to match user behaviour with the sample data
+    // (...you don't have to do this with the real data)
+    // So: if lobby code isn't in the placeholder data, the user proably got here via homepage
+    // and is hosting, so initialilize the lobby data for that:
+    if ( index === -1 ) {
+      this.setState({   lobbyName: '(edit name)', 
+                        isPublicLobby: true, 
+                        timeLimit: 60, 
+                        players: [me],
+                        myPlayerIndex: 0,
+                        iAmHost: true
+                    });
+      return; // we're done in this case (for the host)
+    }
+    // for players who joined via the Join screen
+    let playersPlusMe = players.slice(0, games[index].numPlayers);
+    me.isHost = false;
+    playersPlusMe.push(me);
+    this.setState({   lobbyName: games[index].name, 
+                      isPublicLobby: games[index].public,
+                      timeLimit: games[index].timeLimit,
+                      players: playersPlusMe,
+                      myPlayerIndex: games[index].numPlayers,
+                      iAmHost: false
+                  });
+    // ======== / hardcoded ===================================================
   }
 
+
   determineIfIAmHost = () => {
-    // todo:
-    // should use the current user's player index to access the information...
-    // in the this.state.players array and see if user's 'isHost' flag is set.
-    // Where do we get the current user's player index from?
-    // ...perhaps from props that are passed into this component... 
-    // for now, I'm just hardcoding the value
-    return true;
+    // todo:  come up with a less hacky way of determining if this user
+    //        is the admin. For now, it just looks at the referring page
+    //        to determine this, which could easily be sidestepped.
+    let lastURL = document.referrer;
+    if ( lastURL.substr(lastURL.length - 4) == "join" )
+        return false; // user reached this page via the join page, so he is
+                      // an ordinary player, not a host.
+
+    return true; // user (likely) got to this page by clicking "Host" button
+                 // on home page. This is definitely not an infaliable way
+                 // of doing this, but it will work for now.
   }
   
+
   copyLobbyCode = () => {
     navigator.clipboard.writeText(this.state.lobbyCode);
     alert("Copied!");
   }
+
 
   toggleReady = (playerIndex) => {
     if (playerIndex != this.state.myPlayerIndex)
@@ -72,26 +136,31 @@ export default class Lobby extends React.Component {
                                this.state.players[playerIndex].isReady);
   }
 
+
   removePlayer = (playerIndex) => {
     // todo
     alert("todo: implement this removePlayer() method");
 
   }
 
+
   startGame = () => {
       // todo
       alert("todo: implement this startGame() method");
   }
 
+
   getPlayerTable = () => {
     let playerTable = [];
-    playerTable.push( // table headings
+    playerTable.push(  // table headings
       <tr key="headings">
         <td className="player-name">Players</td>
-        {/* <td className="is-ready">Status<br/>
-            <div className="click-when-ready">click when ready</div></td> */}
         <td className="is-ready">Status</td>
-        <td className="remove-player">Remove?</td>
+        { this.state.iAmHost ? 
+          <td className="remove-player">Remove?</td>
+        :  
+          <td className="inviz"> &nbsp;</td>
+        }
       </tr>
     );
     // rest of the table, from the list of players
@@ -115,12 +184,12 @@ export default class Lobby extends React.Component {
               </div>  
             }
           </td>
-          { this.state.players[i].isHost  ? // Host can't remove himself
-              <td className="inviz">&nbsp;</td> 
-              : 
-              <td className="remove-player">
-                <button onClick={ () => this.removePlayer(i) }>X</button>
-              </td>
+          { this.state.iAmHost && i !== this.state.myPlayerIndex  ?
+            <td className="remove-player">
+              <button onClick={ () => this.removePlayer(i) }>X</button>
+            </td>
+          :
+            <td className="inviz">&nbsp;</td> 
           }
         </tr>
       ); // playerTable.push
@@ -128,9 +197,10 @@ export default class Lobby extends React.Component {
     return playerTable;
   }
 
+
   settingsChangeHandler = (event) => {
     let name = event.target.name;
-    let val = (name === 'isPrivateLobby') ? event.target.checked : 
+    let val = (name === 'isPublicLobby') ? event.target.checked : 
                                             event.target.value;
     this.setState({[name]: val});
     this.DEBUG && console.log(name + ": " + val);
@@ -138,34 +208,31 @@ export default class Lobby extends React.Component {
       this.resizeNameBox(val);
   }
   
+
   resizeNameBox = (roomName) => {
     // this method is inefficient, but oh well. Fix if all else is done.
     const nameBox = this.state.iAmHost ? 
                       document.querySelector(".editable-name") :
                       document.querySelector(".fixed-name");
+    const lobbyName = document.querySelector("#lobby-name");
     let extraRoom = 0;
     if (roomName.length < 12) {
       document.querySelector("#lobby-name").style.fontSize = "50px";
       if (this.state.iAmHost) extraRoom = 14;
       nameBox.style.width = String(roomName.length * 30 + extraRoom)+"px";
+      lobbyName.style.marginTop = "15px";
     } else if (roomName.length < 23) {
       document.querySelector("#lobby-name").style.fontSize = "30px";
       extraRoom = this.state.iAmHost ? 10 : 0;
-      nameBox.style.width = String(roomName.length * 17 + extraRoom)+"px";
+      nameBox.style.width = String(roomName.length * 18 + extraRoom)+"px";
+      lobbyName.style.marginTop = "25px";
     } else {
       document.querySelector("#lobby-name").style.fontSize = "24px";
       nameBox.style.width = String(roomName.length * 13 + 22)+"px"; // was 14
+      lobbyName.style.marginTop = "30px";
     }
   }
 
-  componentDidMount = () => {
-      this.resizeNameBox(this.state.lobbyName);  // properly sizes lobby name
-      if (! this.state.iAmHost) {  // only Host can remove players via a button
-        const ejectBtns = document.querySelectorAll("#players td:nth-child(3)")
-        for (let btn of ejectBtns)
-             btn.style.display = "none";
-      }
-  }
 
   render = () => {
     return (
@@ -206,13 +273,13 @@ export default class Lobby extends React.Component {
         <div id="settings">
           <form>
             <div className="setting">
-              <div className="labl">Private Lobby:&nbsp;</div> 
+              <div className="labl">Private Lobby?&nbsp;</div> 
               <div className="inpt">
                 <input 
                 type='checkbox' 
-                name='isPrivateLobby'
+                name='isPublicLobby'
                 className='checkbox'
-                value={this.state.isPrivateLobby}
+                value={!this.state.isPublicLobby}
                 onChange={this.settingsChangeHandler}
                 />
               </div>

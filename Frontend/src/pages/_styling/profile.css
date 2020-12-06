@@ -1,9 +1,9 @@
 #profile {
-  margin: 3.5rem auto 0 auto;
   min-height: calc(100vh - (3.5rem + 2rem));
-  font-size: 1.6rem;
-  text-align: center;
+  margin: 3.5rem auto 0 auto;
   padding-top: 30px;
+  text-align: center;
+  font-size: 1.6rem;
 } 
 #profile-heading {
   margin: 20px 0 40px;
@@ -76,7 +76,7 @@
   text-decoration: underline;
   font-size: 1rem;
 }
-#table-chin a:hover {
+#table-chin button:hover {
   text-decoration: none;
 }
 #avg-speed {
@@ -90,7 +90,8 @@
 
 #extended-footer {
   background: rgba(0,0,0,0.3);
-  height: 380px;
+  height: 420px;
+  position: relative;
 }
 #user-menu {
   background: rgba(0,0,0,0.15);
@@ -135,6 +136,16 @@
   position: relative;
   top: 3px;
   border-radius: 50px;
+}
+#close-pannel-container {
+  width: 100%;
+  position: absolute;
+  bottom: 40px;
+}
+#close-pannel-container .text-btn {
+  font-size: 0.9rem;
+  color: #888;
+  text-decoration: underline;
 }
 .flex-container {
   display: flex;

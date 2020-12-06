@@ -17,34 +17,31 @@
 }
 #login form input {
   width: 100%;
-  padding: 5px 15px;
+  padding: 5px 20px;
   margin-bottom: 15px;
   border-radius: 50px;
+  background: #3E6C99;
+  color: white;
 }
-#login form input:focus {
-  outline: none;
+#login form input:hover {
+  background: #4b7cad;
 }
-#login form input[type="submit"] {
+#login input[type="submit"] {
   display: block;
-  background-color: #5490CC;
+  background: #5490CC;
   color: white;
   padding: 5px 0;
   margin: 30px auto 0 auto;
   max-width: 250px;
 }
-.login-btn {
-  display: block;
-  background-color: #5490CC;
-  color: white;
-  padding: 5px 0;
-  margin: 30px auto 0 auto;
-  max-width: 250px;
+#login input[type="submit"]:hover {
+  background: #6daae7;
 }
 #regbox {
   max-width: 250px;
   margin: 0 auto;
 }
-#login button {
+#regbox button {
   background-color: #333;
   color: white;
   width: 100%;
@@ -52,12 +49,19 @@
   border-radius: 50px;
   margin: 0 auto;
 }
+#regbox button:hover  {
+  background: #555;
+}
 #forgotpw {
   width: 100%;
   text-align: center;
   margin-top: 20px;
 }
-#forgotpw a {
+#forgotpw button {
   color: #ccc;
   font-size: 1.1rem !important;
+}
+#forgotpw button:hover {
+  text-decoration: underline;
+  color: white;
 }

@@ -4,23 +4,29 @@
   min-height: calc(100vh - (3.5rem + 2rem));
   text-align: center;
 }
+#home h1 {
+  margin: 10px 0 30px;
+}
 #home p {
   max-width: 700px;
   min-width: 300px;
   margin: auto;
   text-align: justify;
 }
-.homebtn, .log-out-btn {
+#home button, .log-out-btn {
   background: #5490CC;
   border-radius: 4px;
-  padding: 5px 30px;
+  padding: 10px 30px !important;
   display: block;
-  min-width: 200px;
-  margin: 20px auto;
+  min-width: 300px;
+  margin: 20px auto 24px;
   color: white;
   font-size: 1.2rem;
   border-radius: 50px;
 }
 .log-out-btn {
-  margin-top: 70px;
+  margin-top: 70px !important;
+}
+#home button:hover, .log-out-btn:hover {
+  background: #6ba9e7;
 }

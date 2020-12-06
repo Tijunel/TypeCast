@@ -20,6 +20,11 @@
   border-radius: 50px;
   padding: 5px 15px;
   margin-bottom: 15px;
+  background: #3E6C99;
+  color: white;
+}
+#register input:hover {
+  background: #4b7cad;
 }
 #register form input:focus {
   outline: none;
@@ -30,4 +35,7 @@
   max-width: 250px;
   background: #5490CC;
   color: white;
+}
+#register input[type="submit"]:hover {
+  background: #6daae7;
 }

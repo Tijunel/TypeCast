@@ -59,6 +59,9 @@ export default class Register extends React.Component {
     return (
       <div id='register'>
 
+        <button  onClick={() => window.location.href = document.referrer} 
+                 className="back-btn">Back</button>
+
         <h1>Register</h1>
         
         <form onSubmit={this.registrationHandler}>
@@ -66,6 +69,7 @@ export default class Register extends React.Component {
           <input
             type='text'
             name='fName'
+            minLength='2'
             value={this.state.fName}
             onChange={this.myChangeHandler}
           />

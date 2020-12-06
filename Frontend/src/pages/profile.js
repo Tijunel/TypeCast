@@ -31,7 +31,7 @@ export default class Profile extends React.Component {
     let tableContainer = document.querySelector("#table-container");
     tableContainer.style.width = tableWidth + "px";
     // set the height of the extended footer so it fills all available window space
-    this.sizeTheExtendedFooter("inital load");
+    this.sizeTheExtendedFooter("initial load");
   }
   
 
@@ -49,16 +49,16 @@ export default class Profile extends React.Component {
                    newUsername: username});
   }
 
-
+  
   sizeTheExtendedFooter = (situation) => {
     // This is janky af. Clean this up if there's time:
     const extFooter = document.querySelector('#extended-footer');
     let offset = extFooter.getBoundingClientRect();
     let topOfFooter = offset.top;
     let diff = window.innerHeight - topOfFooter;
-    if (diff > 380) { // we need at least 380px of height for the bottom ctrl pannel
-      if (situation == "inital load") {
-        extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem))";
+    if (diff > 420) {  // need at least this much px height for the bottom ctrl pannel
+      if (situation == "initial load") {
+        extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem)); position: relative; height: 420px";
 
       } else if (situation == "after deletion") {
         extFooter.style.cssText = "min-height: calc(100vh - (255px + 70px + 5.5rem))";
@@ -113,7 +113,7 @@ export default class Profile extends React.Component {
       currentPassword: '',
       newPassword: '', 
       newPassword2: '',
-      changePWVisible: false
+      //changePWVisible: false
     });
     alert("Password changed!");
 
@@ -146,8 +146,9 @@ export default class Profile extends React.Component {
   deleteAccountHandler = () => {
     this.setState({  username: '', 
                      password: '', 
-                     pastGames: [], 
-                     delAcctVisible: false  
+                     pastGames: [],
+                     delAcctVisible: false,
+                     newUsername: ''
                   });
     this.sizeTheExtendedFooter("after deletion"); // resize the footer
 
@@ -164,6 +165,11 @@ export default class Profile extends React.Component {
     if (total == 0) return "";
     const avg = Math.round(total * 10.0 / this.state.pastGames.length) / 10;
     return avg;
+  }
+
+
+  closePannel = () => {
+      this.setState({changeUNVisible: false, changePWVisible: false, delAcctVisible: false});
   }
   
   
@@ -237,7 +243,7 @@ export default class Profile extends React.Component {
                 Average LPM: <div id="avg-speed-nbr">{this.getAverageSpeed()}</div>
               </div>
               <button onClick={() => this.resetScore()}
-                      className="text-btn">Reset Score</button>
+                      className="text-btn">Reset Score?</button>
             </div>
           </div>
         </div>
@@ -320,14 +326,23 @@ export default class Profile extends React.Component {
                 YES, PERMANENTLY DELETE MY ACCOUNT
               </button>
               <br/>
-              <button onClick={() => this.setState({delAcctVisible: false})}
-                      className="changed-my-mind">
+              <button onClick={() => this.closePannel()} className="changed-my-mind">
                 No! Get me out of here!
               </button>
             </div>
           :
             <p></p>
           }
+
+          { this.state.changeUNVisible || this.state.changePWVisible ?
+
+            <div id="close-pannel-container">
+              <button onClick={()=>this.closePannel()} className="text-btn">close pannel</button>
+            </div>
+          :
+            <p></p>
+          }
+
         </div>
 
       </div>

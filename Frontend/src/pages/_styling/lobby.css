@@ -66,7 +66,7 @@
   border-color: #bbb;
 }
 #lobby table {
-  width: 80%;
+  width: 100%;
 }
 #players {
   min-height: 100px;
@@ -90,9 +90,10 @@
   background: transparent;
   color: #eee;
 }
-#players tr:nth-child(1) td:nth-child(1) {
-  padding-left: 19px;
-  padding-right: 0;
+#players tr:nth-child(1) td:nth-child(1),
+#players tr:nth-child(1) td:nth-child(2) {
+  padding-left: 11px;
+
 }
 #players tr:nth-child(1) {
   border: 0;
@@ -101,9 +102,7 @@
 #players tr:nth-child(2) td:nth-child(2) {
   border-top: 3px solid black;
 }
-#players tr:nth-child(2) td:nth-child(2) {
-  border-right: 3px solid black;
-}
+
 #players button {
   border-width: 0px;
 }
@@ -136,7 +135,7 @@ div.ready, div.not-ready {
 .inviz {
   flex: 15;
   border: 0 !important;
-  border-left: 3px solid transparent !important;
+  border-left: 4px solid transparent !important;
   background: transparent !important;
   padding: 0 !important;
 }
@@ -195,6 +194,5 @@ div.ready, div.not-ready {
   color: white;
 }
 .start-btn:hover {
-  background: #3d6892;
-  border: 3px solid #bbb;
+  background: #6daae7;
 }

@@ -62,7 +62,8 @@ export default class Login extends React.Component {
         </div>
 
         <div id="forgotpw">
-          <a href=''onClick={()=>this.forgotPassword()}>Forgot your password?</a>
+          <button onClick={()=>this.forgotPassword()}
+                  className="text-btn">Forgot your password?</button>
         </div>
 
       </div>
