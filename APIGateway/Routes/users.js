@@ -10,14 +10,11 @@ api.setPrefixURL('http://localhost:9000');
 
 // Register
 user.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-    const response = await api.call('user/register', 'POST', { 
-        json: req.body
-    });
+    const response = await api.call('user/register', 'POST', { json: req.body });
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
-            if (err) throw err;
+            if (err) res.status(500).end();
             res.cookie('token', token, { httpOnly: true });
             res.status(200).end();
         });
@@ -30,7 +27,7 @@ user.post('/login', async (req, res) => {
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
-            if (err) throw err;
+            if (err) res.status(500).end();
             res.cookie('token', token, { httpOnly: true });
             res.status(200).end();
         });
@@ -45,7 +42,7 @@ user.get('/validate', withAuth, async (req, res) => {
 // Invalidate Token (Sign Out)
 user.get('/invalidate', withAuth, async (req, res) => {
     const payload = {};
-    const token = jwt.sign(payload, '', { expiresIn: '1' });
+    const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
     res.cookie('token', token, { httpOnly: true });
     res.sendStatus(200).end();
 });
@@ -57,7 +54,16 @@ user.put('/', withAuth, async (req, res) => {
 
 // Delete account, delete firebase too
 user.delete('/', withAuth, async (req, res) => {
-
+    const response = await api.call('user/', 'DELETE', {
+        json: { username: req.user.username }
+    });
+    if (response.status !== 200) return res.sendStatus(response.status).end();
+    else {
+        const payload = {};
+        const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
+        res.cookie('token', token, { httpOnly: true });
+        res.sendStatus(200).end();
+    }
 });
 
 module.exports = user;

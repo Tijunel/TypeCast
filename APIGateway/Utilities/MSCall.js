@@ -1,11 +1,12 @@
 'use strict';
 
+const { response } = require('express');
 const got = require('got');
 
 class MSCall {
     constructor() {
         this.api = got.extend({
-            responseType: "json",
+            responseType: "json"
         });
     }
 
