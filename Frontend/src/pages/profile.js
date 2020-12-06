@@ -57,10 +57,11 @@ export default class Profile extends React.Component {
     let topOfFooter = offset.top;
     let diff = window.innerHeight - topOfFooter;
     if (diff > 420) {  // need at least this much px height for the bottom ctrl pannel
-      if (situation == "initial load") {
-        extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem)); position: relative; height: 420px";
+      if (situation === "initial load") {
+        extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem));" +
+                                  "position: relative; height: 420px";
 
-      } else if (situation == "after deletion") {
+      } else if (situation === "after deletion") {
         extFooter.style.cssText = "min-height: calc(100vh - (255px + 70px + 5.5rem))";
       }
     }
@@ -69,6 +70,7 @@ export default class Profile extends React.Component {
 
   resetScore = () => {
     // todo: not sure what exactly this is supposed to do...
+    //       Clear their LPM? Or whipe out their entire race history?
     alert("todo: implement this resetScore() method");
   }
 
@@ -162,7 +164,7 @@ export default class Profile extends React.Component {
     let total = 0.0;
     for (let game of this.state.pastGames)
       total += game.lpm;
-    if (total == 0) return "";
+    if (total === 0) return "";
     const avg = Math.round(total * 10.0 / this.state.pastGames.length) / 10;
     return avg;
   }
@@ -182,9 +184,9 @@ export default class Profile extends React.Component {
 
   getFormattedPos = (pos) => {
     switch (pos) {
-      case (1): return "1st"; break;
-      case (2): return "2nd"; break;
-      case (3): return "3rd"; break;
+      case (1): return "1st"; //break;  ... console says don't need break? wth?
+      case (2): return "2nd"; //break;
+      case (3): return "3rd"; //break;
       default:  return pos + "th";
     }
   }

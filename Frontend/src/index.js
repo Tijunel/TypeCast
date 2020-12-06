@@ -1,4 +1,4 @@
-'use strict';
+'use strict';  // <-- console warming "unneccessary inside of modules" ?
 
 // Module imports
 import React from 'react';

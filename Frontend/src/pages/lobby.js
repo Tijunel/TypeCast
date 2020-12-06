@@ -71,7 +71,7 @@ export default class Lobby extends React.Component {
     // (You don't have to do with the real data from the db)
     let index = -1;
     for (let i = 0; i < games.length; i++) {
-      if ( games[i].lobbyCode == this.state.lobbyCode ) {
+      if ( games[i].lobbyCode === this.state.lobbyCode ) {
          index = i;
          break;
       }
@@ -113,7 +113,7 @@ export default class Lobby extends React.Component {
     //        is the admin. For now, it just looks at the referring page
     //        to determine this, which could easily be sidestepped.
     let lastURL = document.referrer;
-    if ( lastURL.substr(lastURL.length - 4) == "join" )
+    if ( lastURL.substr(lastURL.length - 4) === "join" )
         return false; // user reached this page via the join page, so he is
                       // an ordinary player, not a host.
 
