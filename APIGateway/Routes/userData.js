@@ -18,6 +18,7 @@ const userData = express.Router();
 //                      time: float (seconds)
 //                      date: UTC
 
+
 // Get all game information for specified user
 userData.get('/games', withAuth, async(req, res) => {
     const games = await api.call('/games/', 'GET', {});
