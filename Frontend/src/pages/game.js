@@ -15,14 +15,16 @@ export default class Game extends React.Component {
       typed: "",  // what has been typed so far for the current word
       cwi: 0,  // current word index 
       cw: "",  // current "word" the player is working on (CAN BE A CHUNK OF SPACES!)
+      cci: 0,  // current character index
       cc: "", // current character the player has to type (can be a whitespace)
       //cwIsAWord: true // current word is a word? true if cw is a word, false if it's a 'word' of whitespace
+
     }
     this.DEBUG = true;
   } // this.setState({ key: value });
 
+
   componentDidMount = () => {
-    // initialize stuff
     let raceCode = this.state.raceCodeStr.split(/(\s+)/); // >> need to find a way to include ALL whitespace
     this.setState({raceCode: raceCode});
     //this.setState({raceCodeHTML: raceCode.map(word => <span>{word}</span>)});
@@ -32,16 +34,17 @@ export default class Game extends React.Component {
         // idea: set classnames for words and spaces differently? Don't think it's needed...
         raceCodeHTML.push(<span key={i} className={"word"+i}>{raceCode[i]}</span>);
     }
-    this.setState({cc: raceCode[0][0]});
+    this.setState({cc: this.state.raceCodeStr[0]});
     this.setState({cw: raceCode[0]});
     this.setState({raceCodeHTML: raceCodeHTML})
 
     // anything else?
   }
 
+
   getRaceCode = () => {
     // todo: retrieve the race code from somewhere. For now, it's hardcoded:
-    let raceCode = `The sun,  that brief December day, rose cheerless over hills of grey.`;
+    let raceCode = `The sun, that brief December day, rose cheerless over hills of grey.`;
     
 
     // `
@@ -60,36 +63,40 @@ export default class Game extends React.Component {
     return raceCode;
   }
 
-  changeHandler = (event) => {
+  typingHandler = (event) => {
     let val = event.target.value; // val = what has been typed so far for the current word
-    this.setState({typed: val});
-    if (this.DEBUG) console.log("typed:  " + val);
 
     // now do stuff to compare the user input to the racecode
-    const len = val.length; // length of what has been typed so far for current word
-    
-    // correct character typed
-    if (val[len - 1] === this.state.cc) {
-      // word not finished yet
-      if (len !== this.state.cw.length) {
-        this.setState({cc: this.state.cw[len]});
-      
-      } else { // word IS finished
-        if (this.DEBUG) console.log('"' + this.state.cw + '" word finished');
-        this.setState({typed: ""});
-        // update cc, wi, cc; but first: did player finish an actual word or a 'word' of whitespace?
-        // ...word, so next thing to be typed is space(s)
+    let length = val.length; // length of what has been typed so far for current word
 
-          let nwi = this.state.cwi + 1; // next word index
-          this.setState({cwi: nwi});
-          this.setState({cw: this.state.raceCode[nwi]});
-          this.setState({cc: this.state.raceCode[nwi][0]});
-        
+    // correct character typed
+    if (val[length - 1] === this.state.cc) {
+
+      // update cc first (and cci), no matter what
+      let nci = this.state.cci + 1; // nci = next character index  
+      this.setState({cc: this.state.raceCodeStr[nci], cci: nci});
+
+      // current word IS finished (when user correctly types entire word + 1st character of next word)
+      if (length === this.state.cw.length + 1) { 
+        // update cc, wi, cc; 
+        let nwi = this.state.cwi + 1;  // next word index
+        this.setState({cw: this.state.raceCode[nwi], cwi: nwi});
+        // this letter was the start of a new 'word', so:
+        val = val[val.length-1];
+        if (this.DEBUG)  console.log('"' + this.state.cw + '" word finished');
       }
-    } else { // incorrect character typed
+    } 
+    // incorrect character typed
+    else { 
       console.log("DOH! Current letter = '" + this.state.cc + "'");
     }
+
+    this.setState({typed: val});
+
+    if (this.DEBUG)  console.log('typed: "' + val + '"');
   }
+
+
   render = () => {
     return (
       <div id='game'>
@@ -109,7 +116,7 @@ export default class Game extends React.Component {
           name='typed'
           className='typingbox'
           value={this.state.typed}
-          onChange={this.changeHandler}
+          onChange={this.typingHandler}
         />
   
       </div>

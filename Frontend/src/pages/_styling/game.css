@@ -30,11 +30,12 @@
 }
 .typingbox {
   padding: 5px 20px;
-  background: transparent;
+  background: rgba(256,256,256,0.3);
   color: white;
   border: 3px solid rgba(255, 255, 255, 0.4);
   border-radius: 0;
   font-size: 1.2rem;
+  width: 100%;
 }
 .typingbox:focus {
   outline: 0;
