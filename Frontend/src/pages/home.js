@@ -9,6 +9,9 @@ import './_styling/home.css';
 export default class Home extends React.Component {
   constructor() {
     super();
+    this.state = {
+        
+    }
   }
 
   hostGame = () => {

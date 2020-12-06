@@ -20,10 +20,13 @@
   min-height: 100px;
 }
 #codebox {
-  background: rgba(248, 255, 252, 0.199);
+  background: white;
   padding: 20px;
   border: 3px solid rgba(255, 255, 255, 0.4);
   font-size: 1.2rem;
+}
+#codebox span {
+  color: black;
 }
 .typingbox {
   padding: 5px 20px;
