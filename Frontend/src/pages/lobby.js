@@ -279,10 +279,6 @@ export default class Lobby extends React.Component {
   render = () => {
     return (
       <div id='lobby'>
-
-        <button  onClick={() => window.location.href = document.referrer} 
-                 className="back-btn">Back</button>
-
         <div id="top-section">
           <div id="lobby-name">
             { this.state.iAmHost ? // if user is Host, show editable name 

@@ -15,14 +15,17 @@ import Join from './pages/join';
 import Lobby from './pages/lobby';
 import Profile from './pages/profile';
 import Game from './pages/game';
-import Error from './pages/error'; // <-- can we delete this?
 
+// Navigation imports
 import TopNav from './components/navigation/topNav';
 import Footer from './components/navigation/footer';
 
 class App extends React.Component {
   constructor() {
     super();
+    this.state = {
+      signedIn: false
+    }
   }
 
   componentDidMount = () => {
@@ -32,23 +35,23 @@ class App extends React.Component {
   render = () => {
     return (
       <React.Fragment>
-        <TopNav/>
+        <TopNav signedIn={this.state.signedIn}/>
         <Router>
           <Switch>
-            <Route path="/home" component={() => <Home/>}/>
-            <Route path="/login" component={() => <Login/>}/>
-            <Route path="/register" component={() => <Register/>}/>
-            <Route path="/join" component={() => <Join/>}/>
-            <Route path="/lobby/:id" component={() => <Lobby/>}/>
-            <Route path="/profile/" component={() => <Profile/>}/>
-            <Route path="/game/:id" component={() => <Game/>}/>
-            <Route path="/" component={() => <Home/>}/>
+            <Route path="/home" component={() => <Home />} />
+            <Route path="/login" component={() => <Login />} />
+            <Route path="/register" component={() => <Register />} />
+            <Route path="/join" component={() => <Join />} />
+            <Route path="/lobby" component={() => <Lobby />} />
+            <Route path="/profile" component={() => <Profile />} />
+            <Route path="/game" component={() => <Game />} />
+            <Route path="/" component={() => <Home />} />
           </Switch>
         </Router>
-        <Footer/>
+        <Footer />
       </React.Fragment>
     );
   }
 }
 
-ReactDOM.render(<App/>, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));

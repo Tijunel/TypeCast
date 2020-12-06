@@ -139,9 +139,6 @@ export default class Join extends React.Component {
   render = () => {
     return (
       <div id='join'>
-        <button  onClick={() => window.location.href = document.referrer} 
-                 className="back-btn">Back</button>
-
         <div id="join-heading"><h1>Join Game</h1></div>
 
         <table id="games"><tbody>{this.getGameTable()}</tbody></table>
@@ -164,7 +161,6 @@ export default class Join extends React.Component {
             </div>
           </form>
         </div>
-
       </div>
     );
   }

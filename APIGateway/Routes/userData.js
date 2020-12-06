@@ -4,7 +4,7 @@ const express = require('express');
 const withAuth = require('../Middleware/auth');
 const MSCall = require('../Utilities/MSCall');
 const api = new MSCall();
-api.setURLPrefix('http://localhost:8000');
+const prefix = 'http://localhost:8000';
 const userData = express.Router();
 
 // Firebase structure:

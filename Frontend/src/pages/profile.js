@@ -230,9 +230,6 @@ export default class Profile extends React.Component {
     return (
       <div id='profile'>
         <div id="tophalf-profile">
-          <button  onClick={() => window.location.href = document.referrer} 
-                  className="back-btn">Back</button>
-
           <div id="profile-heading"><h1>{this.state.username}</h1></div>
 
           <div id="table-container">

@@ -40,12 +40,10 @@ export default class Home extends React.Component {
         <br/><br/>
         -The TypeCasters
         </p><br/>
-
         <button onClick={() => this.hostGame()}>Host Game</button>
         <button onClick={() => window.location.href = "/join"}>Join Game</button>
         <button onClick={() => window.location.href = "/profile/"}>Profile</button>
         <button onClick={() => this.logOut()} className="log-out-btn">Log out</button>
-
       </div>
     );
   }

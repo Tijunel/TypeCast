@@ -19,7 +19,7 @@ export default class Footer extends React.Component {
         return (
             <footer id='footer'>
                 <div id='footer-content'>
-                    <b>Copyright &copy; TypeCast 2020. </b>
+                    <b>Copyright &copy; TypeCast 2020 </b>
                     <b onClick={this.handleAttributions} id='attributions-button'>Attributions</b>
                     <b onClick={this.handleLicenses} id='licenses-button'>Licenses</b>
                 </div>
