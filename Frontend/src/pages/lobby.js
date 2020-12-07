@@ -218,8 +218,11 @@ class Lobby extends React.Component {
 
 
   startGame = () => {
-      // todo
-      alert("todo: implement this startGame() method");
+    // todo
+    alert("todo: implement this startGame() method properly");
+
+    // just for demo purposes:
+    window.location.href = "/game/:" + this.state.lobbyCode;
   }
 
 
