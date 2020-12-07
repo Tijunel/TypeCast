@@ -29,7 +29,7 @@ class Lobby extends React.Component {
     };
     this.DEBUG = true;  // for console debug info
     this.alreadyToggledReady = false;
-    this.readyHasFlashedAlready = false;
+    this.readyFlashedAlready = false;
   }
 
 
@@ -37,15 +37,7 @@ class Lobby extends React.Component {
     this.loadLobbyDataFromDB();
     setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1);
     setTimeout(()=> this.resizeTableForNonAdmins(this.state.lobbyName), 1);
-    setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 15000);
-  }
-
-
-  getLobbyCode = () => {
-    // pull the code from the last 4 digits of the URL, defined by sending page
-    // (There's probably a much more React-y way to do this...)
-    let url = window.location.pathname;
-    return url.substr(url.length - 4);
+    setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 10000);
   }
 
 
@@ -55,8 +47,13 @@ class Lobby extends React.Component {
     //       -and then use it to setState() for this lobby.      
 
     // Hardcoded data to replace: =============================================
+    
+    // The player data should really be included as a part of the game data 
+    // (each game should have a list of players part of its data). For simplicity
+    // with this sample data, I'm just going to keep them separate and use the same
+    // player data for all games listed below. Again: this is just for demo purposes.
     let players = [ {name: "Sarah W.", isHost: true, isReady: true},
-                    {name: "Navjeet 'Bring-The-Heat' Pravdaal", isHost: false, isReady: false}, 
+                    {name: "Navjeet Pravdaal", isHost: false, isReady: false}, 
                     {name: "Chloe Salzar", isHost: false, isReady: true},
                     {name: "ThiccBoi McGee", isHost: false, isReady: true},
                     {name: "Mr. McChungus", isHost: false, isReady: false} ];
@@ -109,6 +106,14 @@ class Lobby extends React.Component {
   }
 
 
+  getLobbyCode = () => {
+    // pull the code from the last 4 digits of the URL, defined by sending page
+    // (There's probably a much more React-y way to do this...)
+    let url = window.location.pathname;
+    return url.substr(url.length - 4);
+  }
+
+
   determineIfIAmHost = () => {
     // todo:  come up with a less hacky way of determining if this user
     //        is the admin. For now, it just looks at the referring page
@@ -153,7 +158,7 @@ class Lobby extends React.Component {
   flashVisualIndicatorForReadyButton = () => {
     if (this.alreadyToggledReady) 
        return;
-    this.readyHasFlashedAlready = true;
+    this.readyFlashedAlready = true;
     document.querySelector('.myReadyBtn').classList.add('flashReady');
   }
   
@@ -187,7 +192,7 @@ class Lobby extends React.Component {
 
   toggleReady = (i) => {
 
-    if ( ! this.alreadyToggledReady && this.readyHasFlashedAlready ) {
+    if ( ! this.alreadyToggledReady && this.readyFlashedAlready ) {
       const myReadyButton = document.querySelector(".myReadyBtn");
       myReadyButton.classList.remove("flashReady");
       myReadyButton.classList.remove("not-ready");

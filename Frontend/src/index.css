@@ -23,6 +23,9 @@ td {
 button:focus, input:focus {
   outline: none !important;
 }
+.flex {
+  display: flex;
+}
 .back-btn {
   background: #333;
   color: white;
@@ -34,7 +37,6 @@ button:focus, input:focus {
   position: absolute;
   right: 0;
   top: 3.5rem;
-
 }
 .back-btn:hover {
   background: #555;
