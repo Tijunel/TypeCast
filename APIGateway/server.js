@@ -34,9 +34,9 @@ const userdata = require('./Routes/userData');
 const users = require('./Routes/users');
 
 // Setup routes
-app.use("/gaming", gaming);
-app.use("/userdata", userdata);
-app.use("/user", users);
+app.use('/gaming', gaming);
+app.use('/userdata', userdata);
+app.use('/user', users);
 
 // Catch bad requests
 app.get('*', (req, res) => {

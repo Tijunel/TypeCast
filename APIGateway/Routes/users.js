@@ -7,6 +7,8 @@ const MSCall = require('../Utilities/MSCall');
 const user = express.Router();
 var api = new MSCall();
 api.setPrefixURL('http://localhost:9000');
+var firebaseAPI = new MSCall();
+firebaseAPI.setPrefixURL('http://localhost:8000');
 
 // Register
 user.post('/register', async (req, res) => {
@@ -14,9 +16,9 @@ user.post('/register', async (req, res) => {
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
-            if (err) res.status(500).end();
+            if (err) return res.sendStatus(500).end();
             res.cookie('token', token, { httpOnly: true });
-            res.status(200).end();
+            res.sendStatus(200).end();
         });
     }
 });
@@ -27,16 +29,33 @@ user.post('/login', async (req, res) => {
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
-            if (err) res.status(500).end();
+            if (err) return res.sendStatus(500).end();
             res.cookie('token', token, { httpOnly: true });
-            res.status(200).end();
+            res.sendStatus(200).end();
         });
     }
 });
 
-// Validate Token (Middleware does all the work)
-user.get('/validate', withAuth, async (req, res) => {
-    res.sendStatus(200).end();
+// Change username and/or password
+user.put('/', withAuth, async (req, res) => {
+    //req.params.id provides the id
+});
+
+// Delete account, delete firebase too
+user.delete('/', withAuth, async (req, res) => {
+    // Delete from MongoDB
+    const response = await api.call('user/', 'DELETE', {
+        json: { username: req.user.username }
+    });
+    if (response.status !== 200) res.sendStatus(response.status).end();
+    else {
+        // Delete from Firebase
+        response = await firebaseAPI.call('users/' + req.user.ID, 'DELETE', {});
+        const payload = {};
+        const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
+        res.cookie('token', token, { httpOnly: true });
+        res.sendStatus(200).end();
+    }
 });
 
 // Invalidate Token (Sign Out)
@@ -47,23 +66,9 @@ user.get('/invalidate', withAuth, async (req, res) => {
     res.sendStatus(200).end();
 });
 
-// Change username and/or password
-user.put('/', withAuth, async (req, res) => {
-    //req.params.id provides the id
-});
-
-// Delete account, delete firebase too
-user.delete('/', withAuth, async (req, res) => {
-    const response = await api.call('user/', 'DELETE', {
-        json: { username: req.user.username }
-    });
-    if (response.status !== 200) return res.sendStatus(response.status).end();
-    else {
-        const payload = {};
-        const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
-        res.cookie('token', token, { httpOnly: true });
-        res.sendStatus(200).end();
-    }
+// Validate Token (Middleware does all the work)
+user.get('/validate', withAuth, async (req, res) => {
+    res.sendStatus(200).end();
 });
 
 module.exports = user;

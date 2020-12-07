@@ -1,12 +1,11 @@
 'use strict';
 
-const { response } = require('express');
 const got = require('got');
 
 class MSCall {
     constructor() {
         this.api = got.extend({
-            responseType: "json"
+            responseType: 'json'
         });
     }
 
@@ -16,11 +15,11 @@ class MSCall {
         });
     };
 
-    call = async (path, method = "GET", options = {}) => {
+    call = async (path, method = 'GET', options = {}) => {
         options = options || {};
         const searchParams = options.searchParams || {};
         const headers = options.headers || {};
-        const json = options.json || (method === "GET" ? undefined : {});
+        const json = options.json || (method === 'GET' ? undefined : {});
         let res;
         try {
             res = await this.api(path, {        // path contains req.params
