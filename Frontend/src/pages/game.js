@@ -3,9 +3,10 @@
 // todo: basically everything. This is just a template so far...
 
 import React from 'react';
+import WithAuth from './withAuth';
 import './_styling/game.css';
 
-export default class Game extends React.Component {
+class Game extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -116,3 +117,5 @@ export default class Game extends React.Component {
     );
   }
 }
+
+export default WithAuth(Game);

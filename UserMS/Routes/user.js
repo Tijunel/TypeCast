@@ -43,7 +43,12 @@ user.post('/login', async (req, res) => {
 
 // Change username and/or password
 user.put('/', (req, res) => {
-    //req.params.id provides the id
+    const { ID, newUsername, oldPassword, newPassword } = req.body;
+    try {
+
+    } catch (error) {
+        res.sendStatus(500).end();
+    }
 });
 
 // Delete account, delete firebase too

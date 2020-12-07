@@ -4,9 +4,10 @@
 //       ... to get and send the user data.
 
 import React from 'react';
+import WithAuth from './withAuth';
 import './_styling/profile.css';
 
-export default class Profile extends React.Component {
+class Profile extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -348,3 +349,5 @@ export default class Profile extends React.Component {
     );
   }
 }
+
+export default WithAuth(Profile);

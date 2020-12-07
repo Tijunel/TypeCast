@@ -12,9 +12,10 @@
 // todo: the settings at bottom of page should only be editable by Host.
 
 import React from 'react';
+import WithAuth from './withAuth';
 import './_styling/lobby.css';
 
-export default class Lobby extends React.Component {
+class Lobby extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -361,3 +362,5 @@ export default class Lobby extends React.Component {
     );
   }
 }
+
+export default WithAuth(Lobby);
