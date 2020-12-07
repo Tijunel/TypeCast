@@ -6,7 +6,7 @@ const cors = require('cors');
 const PORT = 9000;
 
 // Initiate MongoDB connection
-const InitiateMongoServer = require("./Config/mongo");
+const InitiateMongoServer = require('./Config/mongo');
 InitiateMongoServer();
 
 app.use((req, res, next) => {
@@ -23,7 +23,7 @@ app.use(cors());
 const user = require('./Routes/user');
 
 // Setup routes
-app.use("/user", user);
+app.use('/user', user);
 
 // Start server
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

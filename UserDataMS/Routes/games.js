@@ -1,6 +1,6 @@
 'use strict';
 
-const express = require("express");
+const express = require('express');
 const games = express.Router();
 const firebase = require('../Config/firebase');
 
@@ -8,7 +8,7 @@ const firebase = require('../Config/firebase');
 games.post('/:id', (req, res) => {
     try {
         const userID = req.params.id;
-        const newGameRef = firebase.database().ref('users/' + userID + "/games").push();
+        const newGameRef = firebase.database().ref('users/' + userID + '/games').push();
         newGameRef.set({
             placement: req.body.placement,
             typingSpeed: req.body.typingSpeed,
@@ -26,8 +26,8 @@ games.get('/:id', async (req, res) => {
     try {
         var games = [];
         const userID = req.params.id;
-        const gamesRef = firebase.database().ref('users/' + userID + "/games");
-        await gamesRef.once("value").then(snapshot => {
+        const gamesRef = firebase.database().ref('users/' + userID + '/games');
+        await gamesRef.once('value').then(snapshot => {
             snapshot.forEach(child => {
                 games.push({
                     placement: child.val().placement,

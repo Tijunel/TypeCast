@@ -1,5 +1,5 @@
 'use strict';
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const UserSchema = mongoose.Schema({
     username: {
@@ -16,4 +16,4 @@ const UserSchema = mongoose.Schema({
     }
 }, {collection: 'user'});
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model('user', UserSchema);

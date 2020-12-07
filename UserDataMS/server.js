@@ -15,8 +15,8 @@ const games = require('./Routes/games');
 const users = require('./Routes/users');
 
 // Setup routes
-app.use("/games", games);
-app.use("/users", users);
+app.use('/games', games);
+app.use('/users', users);
 
 // Start server
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
