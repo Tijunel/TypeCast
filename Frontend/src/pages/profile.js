@@ -165,7 +165,7 @@ export default class Profile extends React.Component {
     for (let game of this.state.pastGames)
       total += game.lpm;
     if (total === 0) return "";
-    const avg = Math.round(total * 10.0 / this.state.pastGames.length) / 10;
+    const avg = Math.round(total * 100.0 / this.state.pastGames.length) / 100;
     return avg;
   }
 
