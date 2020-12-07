@@ -5,47 +5,59 @@ const games = express.Router();
 const firebase = require('../Config/firebase');
 
 // Post a new game upon completion
-games.post('/', (req, res) => {
+games.post('/:id', (req, res) => {
     try {
-        const userID = req.user.ID;
+        const userID = req.params.id;
         const newGameRef = firebase.database().ref('users/' + userID + "/games").push();
         newGameRef.set({
-            placement: req.data.placement,
-            typingSpeed: req.data.typingSpeed,
-            time: req.data.time,
-            date: req.data.date
+            placement: req.body.placement,
+            typingSpeed: req.body.typingSpeed,
+            time: req.body.time,
+            date: req.body.date
         });
-        res.status(200);
-    } catch (e) {
-        res.status(500).send('Error saving game details').end();
+        res.sendStatus(200).end();
+    } catch (error) {
+        res.sendStatus(500).end();
     }
 });
 
 // Get all games
-games.get('/', (req, res) => {
+games.get('/:id', async (req, res) => {
     try {
-        const userID = req.user.ID;
+        var games = [];
+        const userID = req.params.id;
         const gamesRef = firebase.database().ref('users/' + userID + "/games");
-        gamesRef.on("value", function(snapshot) {
-            res.data.games = snapshot.val();
-        }, function () {
-            console.log("Failed to retrieve games");
+        await gamesRef.once("value").then(snapshot => {
+            snapshot.forEach(child => {
+                games.push({
+                    placement: child.val().placement,
+                    typingSpeed: child.val().typingSpeed,
+                    time: child.val().time,
+                    date: child.val().date
+                });
+            });
         });
-        res.status(200);
-    } catch (e) {
-        res.status(500).send('Error getting games!').end();
+        games.sort((b, a) => {
+            if (a.date > b.date) return -1;
+            else if (b.date > a.date) return 1;
+            else return 0;
+        });
+        res.sendStatus(200).json({ lpm: 0, games: games }).end(); // TODO: Compute lpm in utilites
+    } catch (error) {
+        res.sendStatus(500).end();
     }
 });
 
 // Delete all games (If user wants to reset stats)
-games.delete('/', (req, res) => {
+games.delete('/:id', (req, res) => {
     try {
-        const userID = req.user.ID;
-        const userRef = firebase.database().ref('users/' + userID);
-        userRef.set({games: null}); //TODO: Not sure if this is the right way to remove all games or not
-        res.status(200);
-    } catch (e) {
-        res.status(500).send('Error deleting games!').end();
+        const userID = req.params.id;
+        const gamesRef = firebase.database().ref('users/' + userID + '/games');
+        gamesRef.remove()
+            .then(() => { res.sendStatus(200).end(); })
+            .catch(error => { res.sendStatus(500).end(); });
+    } catch (error) {
+        res.sendStatus(500).end();
     }
 });
 

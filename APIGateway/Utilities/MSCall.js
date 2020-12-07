@@ -1,6 +1,5 @@
 'use strict';
 
-const { response } = require('express');
 const got = require('got');
 
 class MSCall {
