@@ -4,9 +4,10 @@
 //       -of using these hardcoded placeholders.
 
 import React from 'react';
+import WithAuth from './withAuth';
 import './_styling/join.css';
 
-export default class Join extends React.Component {
+class Join extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -165,3 +166,5 @@ export default class Join extends React.Component {
     );
   }
 }
+
+export default WithAuth(Join);
