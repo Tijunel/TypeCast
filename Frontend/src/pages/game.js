@@ -4,9 +4,7 @@
 //       It's using hardcoded data,
 //       the structure of the 'this.state.players[]' data probably isn't perfect,
 //          ...(it contains attributes that perhaps only the server needs),
-//       there are still bugs (backspacing to the beginning of a word crashes), 
 //       the dynamic styling isn't finished (backspacing doesn't re-style, + other),
-//       it's not yet designed to handle multi-line strings,
 //       there is no timer yet,
 //       and lacks a lot of the visual read-outs.
 
@@ -20,7 +18,7 @@ class Game extends React.Component {
   constructor() {
     super();
     this.state = {
-      raceCodeID: "",             // unique ID for the race code being used. Store in
+      raceCodeID: "",             // unique ID for the race code being used.
       raceCodeStr: "",            // a string of the entire code
       raceCode: [],               // array of 'words' parsed from raceCodeStr
       raceCodeHTML: [],           // individually addressable words in HTML form, from raceCode
@@ -34,8 +32,10 @@ class Game extends React.Component {
       finishedRace: false,         // huser has finished the race?
       timer: 0
     }
-
+    this.enterPressed = false;
     this.serverUpdateInterval = 2000;  // how often to share player's data with the server
+
+
     this.DEBUG = true;                 // for debug mode (lots of console output)
   }
 
@@ -43,8 +43,22 @@ class Game extends React.Component {
   componentDidMount = () => {
     this.loadGameDataFromDB();
 
+    this.inputBoxSetup();
+
     // no idea how this should work, but here's an idea:
     this.tellServerImReady();
+  }
+
+
+  inputBoxSetup = () => {
+    const typingBox = document.querySelector(".typingbox");
+    typingBox.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        if (this.DEBUG)  console.log("ENTER");
+        this.enterPressed = true;
+        this.typingHandler();
+      }
+    });
   }
 
 
@@ -80,9 +94,17 @@ class Game extends React.Component {
 
   loadAndInitializeRaceCodeFromDB = () => {
     // todo: retrieve the race code from somewhere (the db I guess). It's hardcoded for now:
-    let codeString = "const nw = this.state.raceCode[this.state.cwi + 1];"
+    let codeString =  //"const nw = this.state.raceCode[this.state.cwi + 1];"
+
+`#include <iostream>
+
+using namespace std;
+
+int main() {
+  cout << "Hello, world!" << endl;
+  return 0;
+}`
     
-    // -----  code example (not yet working)  -----
     // `toggleReady = (playerIndex) => {
     //   if (playerIndex != this.state.myPlayerIndex)
     //     return;  // can only toggle your own Ready status
@@ -147,10 +169,13 @@ class Game extends React.Component {
 
 
   typingHandler = (event) => {
-    // used to handle user input from the text box and run the game
-    let text = event.target.value;
-    const cw = this.state.cw; // current 'word'
-    const nw = this.state.raceCode[this.state.cwi + 1]; // next 'word'
+    let text = '';
+    if (this.enterPressed) {  // handle Enter key presses for newlines
+      text = this.state.typed + '\n';
+      this.enterPressed = false;
+    } else  text = event.target.value;
+    const cw = this.state.cw;  // current 'word'
+    const nw = this.state.raceCode[this.state.cwi + 1];  // next 'word'
     const isLastWord = !nw;
     if (this.DEBUG)  console.log("\ntext: '" + text + "'\ncw: " + cw + "\nnw: " + nw + "\nisLastWord: " + isLastWord);
 
@@ -166,17 +191,19 @@ class Game extends React.Component {
       }
       else  this.styleMistakes(text, cw);
     } 
-    else {  // user isn't working on the last word
-      // Did user just finish the current word? (word + 1st char of next one)
+    else {  
+      // user hasn't reached the last word...
+      // Did user just finish the current word? (ie: text = word + 1st char of next word)
       if (text === cw + nw[0]) {
         // advance to next word
-        let nw = this.state.raceCode[this.state.cwi + 1];
-        let nwi = this.state.cwi + 1;
+        let extraForNewline = text[text.length-1] === '\n' ? 1 : 0;
+        let nw = this.state.raceCode[this.state.cwi + 1 + extraForNewline];
+        let nwi = this.state.cwi + 1 + extraForNewline;
         this.setState({cw: nw, cwi: nwi});
         text = text[text.length-1];
         // style the code appropriately
         this.underlineWord(nwi);
-        if (text[0] === ' ')  this.makeLastCharTypedGreen(text, nwi-1);
+        if (text[0] === ' ' || text[0] === '\n')  this.makeLastCharTypedGreen(text, nwi-1);
         else  this.makeLastCharTypedGreen(nw[0], nwi);
 
         if (this.DEBUG)  console.log("finished word: \"" + cw + "\"\nNext word: \"" + nw + "\"\n\n\n");
