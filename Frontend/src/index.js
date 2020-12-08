@@ -29,16 +29,25 @@ class App extends React.Component {
   }
 
   componentDidMount = () => {
-    // Check for token
+    fetch('/user/validate', {
+      method: 'GET',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => {
+        if (res.status === 200) this.setState({ signedIn: true });
+        else this.setState({ signedIn: false });
+      })
+      .catch(err => { this.setState({ signedIn: false }); });
   }
 
   render = () => {
     return (
       <React.Fragment>
-        <TopNav signedIn={this.state.signedIn}/>
+        <TopNav signedIn={this.state.signedIn} />
         <Router>
           <Switch>
-            <Route path="/home" component={() => <Home />} />
+            <Route path="/home" component={() => <Home signedIn={this.state.signedIn}/>} />
             <Route path="/login" component={() => <Login />} />
             <Route path="/register" component={() => <Register />} />
             <Route path="/join" component={() => <Join />} />
