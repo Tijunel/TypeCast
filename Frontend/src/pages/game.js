@@ -11,7 +11,7 @@
 
 //       I'll be fixing the above today and updating as I go (Cody)
 
-import React from 'react';
+import React, { Children } from 'react';
 import WithAuth from './withAuth';
 import './_styling/game.css';
 
@@ -51,6 +51,8 @@ class Game extends React.Component {
   componentDidMount = () => {
     this.loadGameDataFromDB();
 
+    setTimeout( () => this.underlineWord(0), 0);
+
     this.inputBoxSetup();
 
     // no idea how this should work, but here's an idea:
@@ -88,9 +90,14 @@ class Game extends React.Component {
   }
 
 
-  loadAndInitializeRaceCodeFromDB = () => {
+  loadAndInitializeRaceCodeFromDB = () => {  // BLAH: put the definition of codeString above, in loadGameDataFromDB(), THEN call this to build the other verions of it
     // todo: retrieve the race code from somewhere (the db I guess). It's hardcoded for now:
     let codeString =  //"const nw = this.state.raceCode[this.state.cwi + 1];"
+`int  main() {
+  cout << "hello!";
+  return 0;
+}`
+
 // `#include <iostream>
 
 // using namespace std;
@@ -104,11 +111,11 @@ class Game extends React.Component {
 //   return 0;
 // }}`
 
-`a
-bbbbbb
-c
-d
-e`
+// `aaa
+// bbbbbb
+// cc
+// d
+// e`
 
     // `toggleReady = (playerIndex) => {
     //   if (playerIndex != this.state.myPlayerIndex)
@@ -247,7 +254,7 @@ e`
         this.calcMyResults();
         this.sendMyDataToServer();
       }
-      else  this.styleMistakes(text, cw);
+      else  this.styleAnyMistakes(text, cw);
     } 
     else { // cw != last word
 
@@ -268,20 +275,22 @@ e`
                                      "word: \"" + cw + "\"\nNext word: \"" + nw + "\"\n" +
                                      "---------------------------\n\n\n\n\n");
         if (actualWordFinished) {
-          text = text[text.length-1];
-
-          // check the diliniating character
-          if (text[0] === ' ' || text[0] === '\n' ) {
-            this.makeLastCharTypedGreen(text, nwi-1);
-            if (text[0] === '\n')
-              this.wordWithEnters = '\n';
-            // else                                    DONT THINK THIS IS NEEDED. I COULD BE WRONG.
-            //   this.wordWithEnters = '';
-          }
+          //text = text[text.length-1];
+          let endingWS = text[text.length-1]; // delineating whitespace character that ended the word
+        
+          // check the delineating character
+          //if (endingWS === ' ' || endingWS === '\n' ) { // won't this always fire?...    // BLAH can prob delete
+          if (endingWS === '\n')
+            this.wordWithEnters = '\n';
+          else                                    // BLAH DONT THINK THIS IS NEEDED. I COULD BE WRONG.
+            this.wordWithEnters = '';
+          this.makeLastCharTypedGreen(text.substring(0, text.length-1), this.state.cwi);
+          //}
+          text = endingWS;
 
           // the last character typed was whitespace; see if that character IS
           // the entire next 'word' of whitespace (of length = 1)
-          if (text === nw) {
+          if (endingWS === nw) {
             text = '';
             this.wordWithEnters = '';
             nwi++;
@@ -289,11 +298,10 @@ e`
             //this.makeLastCharTypedGreen(nw[0], nwi);      // MIGHT HAVE TO MOD THE GREEN METHOD NOW
           }
         }
-
-        else { // we finished a whitespace 'word' with length > 1
+        // whitespace chunk finished (with length > 1)
+        else {
           text = '';
           this.wordWithEnters = '';
-          this.makeLastCharTypedGreen(nw[0], nwi);
         }
 
         // in either case (finished an actual word OR a chunk of whitespace)
@@ -303,7 +311,7 @@ e`
       // cw isn't finished...
       else {
         this.wordChanged = false;
-        this.styleMistakes(text, cw);
+        this.styleAnyMistakes(text, cw);
       } 
     }
 
@@ -312,26 +320,48 @@ e`
   }
 
 
-  styleMistakes = (text, cw) => {
+  styleAnyMistakes = (text, cw) => {
     let mistakesArePresent = text !== cw.substring(0, text.length);
     if (mistakesArePresent) {
+      // color the text input box red
       document.querySelector('.typingbox').style.cssText = "background: #e93535; color: white;";
+      // make red the background of the erroneosly-typed characters
+      let ch;
+      for (let i = 0; i < cw.length; i++) {
+        ch = document.querySelector(`.w${this.state.cwi}.c${i}`);
+        if (!text[i]) {
+          ch.style.background = "transparent"
+          ch.style.color = "white";
+        }
+        else if (text[i] === cw[i]) 
+          ch.style.background = "transparent";
+        else if (text[i] !== cw[i])
+          ch.style.background = "#ac2f2f";
+        else 
+          alert("This else should never be reached! :(");
+      }
       if(this.DEBUG)  console.log(`MISTAKE\ntext = '${text}'\ntyped = '${this.state.typed}'\ncurrent word = '${cw}'\n[0]: '${cw[0]}'\n[1]: '${cw[1]}'\n[2]: '${cw[2]}'\n[3]: '${cw[3]}'`);
     } 
     else { // no mistakes present
       document.querySelector('.typingbox').style.cssText = "background: #292d3e; color: #a6accd";
-
+      // used to un-color previously green words when backspacing past them
+      for (let i = 0; i < cw.length; i++) {
+        let ch = document.querySelector(`.w${this.state.cwi}.c${i}`);
+        if (!text[i])
+          ch.style.color = "white";
+      }
       // GREEN
-      // While we're at it, since we know if mistakes are present, we also know
-      // if they're NOT present. If they're not, turn the last typed character green:
+      // While we're at it, since we know no mistakes are present at this point,
+      // -so turn the last-typed character green:
       this.makeLastCharTypedGreen(text, this.state.cwi);
+      if (cw[text.length])  document.querySelector(`.w${this.state.cwi}.c${text.length}`).style.background = "transparent";
     }
   }
 
 
   makeLastCharTypedGreen = (text, cwi) => {
   // makes the last character of 'text' turn green to indicate correct input
-    if (text === '') return;
+    if (text === '') return;  // handles when user backspaces to start of word
     let char = document.querySelector('.w'+cwi+'.c'+(text.length-1));
     char.style.color = "yellowgreen";
   }
@@ -360,19 +390,25 @@ e`
   underlineWord = (wordIndex) => {
     // for the first word
     if (wordIndex === 0) {
-      if (this.state.whitespaceAtStart)  this.underlineHelper(1, true);
-      else  this.underlineHelper(0, true);
+      if (this.state.whitespaceAtStart)
+        this.underlineHelper(1, true);
+      else  
+        this.underlineHelper(0, true);
       return;
     }
-    // for the rest
-    this.underlineHelper(wordIndex, true);
-    this.underlineHelper(wordIndex - 2, false);
+    // for actual words only: underline them
+    const thisWordsFirstchar = this.state.raceCode[wordIndex][0];  // BLAH Refactor this into a method that checks if the word is a whitespace chunk or a word
+    if (thisWordsFirstchar !== ' ' && thisWordsFirstchar !== '\n')
+      this.underlineHelper(wordIndex, true);
+    // for all: remove underline from previous word (need the -2 for edge case)
+    this.underlineHelper(wordIndex-1, false);
+    this.underlineHelper(wordIndex-2, false);  // BLAH will this -2 one ever be out of bounds (ie: -1) ? What about if we start with whitespace in raceCodeStr?
   }
   underlineHelper = (i, wordShouldBeUnderlined) => {
-    let desiredTD = wordShouldBeUnderlined ? "underline" : "none";
+    let desiredTextDec = wordShouldBeUnderlined ? "underline" : "none";
     let word = document.querySelectorAll('.w'+i);
     for (let char of word)
-      char.style.textDecoration = desiredTD;
+      char.style.textDecoration = desiredTextDec;
   }
 
 
@@ -471,6 +507,7 @@ e`
             type='text'
             name='typed'
             className='typingbox'
+            autoComplete='off'
             value={this.state.typed}
             onChange={this.typingHandler}
           />
