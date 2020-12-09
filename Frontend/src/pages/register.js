@@ -1,6 +1,4 @@
-// page for registering as a new user
-
-// todo: submitHandler() method needs to be finished once our server is set up.
+'use strict';
 
 import React from 'react';
 import './_styling/register.css';
@@ -14,20 +12,26 @@ export default class Register extends React.Component {
 	}
 
 	registrationHandler = (event) => {
-		event.preventDefault();  
+		event.preventDefault();
 		if (this.password1.current.value === this.password2.current.value) {
 			fetch('/user/register', {
 				method: 'POST',
 				credentials: "include",
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username: this.username.current.value, password: this.password1.current.value })
+				body: JSON.stringify({
+					username: this.username.current.value,
+					password: this.password1.current.value
+				})
 			})
 				.then(res => {
 					if (res.status === 200) window.location.href = '/home';
 					else alert("Something went wrong, try again.");
 				})
-				.catch(err => { alert("Something went wrong, try again."); });
-		} else alert('Your passwords do not match.\n');
+				.catch(err => { 
+					alert("Something went wrong, try again."); 
+				});
+		}
+		else alert('Your passwords do not match.\n');
 	}
 
 	render = () => {
@@ -40,20 +44,17 @@ export default class Register extends React.Component {
 					<label>Username</label>
 					<input
 						type='text'
-						name='fName'
 						minLength='2'
 						ref={this.username}
 					/>
 					<label>Password</label>
 					<input
 						type='password'
-						name='password1'
 						ref={this.password1}
 					/>
 					<label>Confirm Password</label>
 					<input
 						type='password'
-						name='password2'
 						ref={this.password2}
 					/>
 					<input type='submit' value='Register' />

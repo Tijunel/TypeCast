@@ -1,4 +1,4 @@
-// page where existing members log in to the game
+'use strict';
 
 import React from 'react';
 import './_styling/login.css';
@@ -20,13 +20,18 @@ export default class Login extends React.Component {
 			method: 'POST',
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username: this.username.current.value, password: this.password1.current.value })
+			body: JSON.stringify({
+				username: this.username.current.value,
+				password: this.password.current.value
+			})
 		})
 			.then(res => {
 				if (res.status === 200) window.location.href = '/home';
 				else alert("Username or password is wrong. Try again.");
 			})
-			.catch(err => { alert("Username or password is wrong. Try again."); });
+			.catch(err => {
+				alert("Username or password is wrong. Try again.");
+			});
 	}
 
 	render = () => {
