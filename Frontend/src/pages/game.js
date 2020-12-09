@@ -1,12 +1,13 @@
 // page where you actually play the game
 
-// NOTE: this is still very rough.
+// NOTE: this is STILL a rough draft
 //       It's using hardcoded data,
 //       the structure of the 'this.state.players[]' data probably isn't perfect,
 //          ...(it contains attributes that perhaps only the server needs),
 //       the dynamic styling isn't finished (backspacing doesn't re-style, + other),
 //       there is no timer yet,
-//       and lacks a lot of the visual read-outs.
+//       it lacks a lot of the visual read-outs,
+//       and the 'game logic' looks like a complex mess, but will be refactored.
 
 //       I'll be fixing the above today and updating as I go (Cody)
 
@@ -24,15 +25,22 @@ class Game extends React.Component {
       raceCodeHTML: [],           // individually addressable words in HTML form, from raceCode
       whitespaceAtStart: false,   // helps the game with formatting
       cwi: 0,                     // current word index 
-      cw: "",                     // current "word" the player is working on (CAN BE A CHUNK OF SPACES!)
+      cw: "",                     // current 'word' the player is working on (can be a chunk of whitespace)
       typed: "",                  // what has been typed into the text box for the current 'word' so far
       players: [],                // holds the players' data for the race
       myPlayerIndex: 0,           // this user's index in players[]
       startedRace: false,         // user has started the race?
-      finishedRace: false,         // huser has finished the race?
+      finishedRace: false,        // user has finished the race?
       timer: 0
     }
     this.enterPressed = false;
+    this.wordWithEnters = "";
+    this.charLastWord = false;
+
+    this.undetectableBackspacePressed = false;
+    this.wordChanged = false;
+    this.textLenLastPress = 0;
+
     this.serverUpdateInterval = 2000;  // how often to share player's data with the server
 
 
@@ -47,18 +55,6 @@ class Game extends React.Component {
 
     // no idea how this should work, but here's an idea:
     this.tellServerImReady();
-  }
-
-
-  inputBoxSetup = () => {
-    const typingBox = document.querySelector(".typingbox");
-    typingBox.addEventListener("keyup", (event) => {
-      if (event.key === "Enter") {
-        if (this.DEBUG)  console.log("ENTER");
-        this.enterPressed = true;
-        this.typingHandler();
-      }
-    });
   }
 
 
@@ -95,16 +91,25 @@ class Game extends React.Component {
   loadAndInitializeRaceCodeFromDB = () => {
     // todo: retrieve the race code from somewhere (the db I guess). It's hardcoded for now:
     let codeString =  //"const nw = this.state.raceCode[this.state.cwi + 1];"
+// `#include <iostream>
 
-`#include <iostream>
+// using namespace std;
 
-using namespace std;
+// int main() {
+//   cout << "hello!";
+//   return 0;
+// }`
 
-int main() {
-  cout << "Hello, world!" << endl;
-  return 0;
-}`
-    
+// `int
+//   return 0;
+// }}`
+
+`a
+bbbbbb
+c
+d
+e`
+
     // `toggleReady = (playerIndex) => {
     //   if (playerIndex != this.state.myPlayerIndex)
     //     return;  // can only toggle your own Ready status
@@ -167,56 +172,143 @@ int main() {
   }
 
 
+  inputBoxSetup = () => {
+    const typingBox = document.querySelector(".typingbox");
+    typingBox.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        if (this.DEBUG)  console.log("ENTER");
+        this.enterPressed = true;          // 1st enter used (comes after a word)     more than one enter in this 'word'
+        this.wordWithEnters = (this.wordWithEnters === '') ? this.state.typed + '\n' : this.wordWithEnters += "\n";
+        this.typingHandler();
+      }
+      if (event.key === "Backspace") {
+        // if user made mistake by typing Enter as first letter of new word,
+        // this detects the backspace to correct it. This is needed because 
+        // Enter presses, while they are detected, they don't insert anything 
+        // into the text input box, and so in this particular case, right at 
+        // the start of a word when the text box is empty, there is nothing
+        // to backspace and cause a change in the content of the text box and
+        // trigger the typingHandler() method to record the backspace and
+        // update everything.
+        if (this.state.typed[0] === '\n' && this.wordWithEnters !== '') { // the first part of this is where a problem might exist
+          if (this.DEBUG)  console.log("Undetectable Backspace");
+          this.undetectableBackspacePressed = true;
+          this.wordWithEnters = this.wordWithEnters.substring(0, this.wordWithEnters.length-1);
+          this.typingHandler();
+        }
+      } 
+    });
+  }
+
 
   typingHandler = (event) => {
     let text = '';
-    if (this.enterPressed) {  // handle Enter key presses for newlines
-      text = this.state.typed + '\n';
-      this.enterPressed = false;
-    } else  text = event.target.value;
+    if (this.wordWithEnters !== '') {  // handle Enter key presses for newlines
+      if (this.enterPressed)
+        this.enterPressed = false;
+      else {
+        let lastPressWasBackspace = ( !this.wordChanged && (this.undetectableBackspacePressed || event.target.value < this.state.typed) ) ? true : false;
+        if (lastPressWasBackspace)
+          this.wordWithEnters = this.wordWithEnters.substring(0, this.wordWithEnters.length-1);
+        else {
+          let lastChar = event.target.value[event.target.value.length - 1];
+          this.wordWithEnters += lastChar; // (lastChar === ' ') ? ' ' : lastChar; <-- redundant wtf
+        }
+      }
+      text = this.wordWithEnters;
+    }
+    else if (this.undetectableBackspacePressed) {
+      text = this.wordWithEnters;
+      this.undetectableBackspacePressed = false;
+    }
+    else  text = event.target.value;
     const cw = this.state.cw;  // current 'word'
     const nw = this.state.raceCode[this.state.cwi + 1];  // next 'word'
-    const isLastWord = !nw;
-    if (this.DEBUG)  console.log("\ntext: '" + text + "'\ncw: " + cw + "\nnw: " + nw + "\nisLastWord: " + isLastWord);
+    let cwIsLastWord = !nw;
+    // even if !isLastWord, it might still be the last word if it's one character long...
+    if ( !cwIsLastWord && (nw.length === 1 && !this.state.raceCode[this.state.cwi + 2]) ) {  
+      cwIsLastWord = true;
+      this.charLastWord = true;
+    }
+    if (this.DEBUG)  console.log(`\ntext: '${text}'\ntyped = '${this.state.typed}'\ncw: '${cw}'\nnw: '${nw}'`);
 
-    // is this the last word?
-    if (isLastWord) {
+    if (cwIsLastWord) {
       // finished the race?
-      if (text === cw) {
-        this.underlineHelper(this.state.cwi, false); // refactor: shouldn't call this directly
-        this.makeLastCharTypedGreen(text, this.state.cwi);
+      if ( text === cw || (this.charLastWord && text[text.length-1] === this.state.raceCode[this.state.raceCode.length-1]) ) {
+        if (this.charLastWord) {
+          this.underlineHelper(this.state.raceCode.length-1, false); // refactor: shouldn't call this directly
+          this.makeLastCharTypedGreen(text[text.length-1], this.state.raceCode.length-1);
+        }
+        else {
+          this.underlineHelper(this.state.cwi, false); // refactor: shouldn't call this directly
+          this.makeLastCharTypedGreen(text, this.state.cwi);
+        }
         this.setState({finished: true});
         this.calcMyResults();
         this.sendMyDataToServer();
       }
       else  this.styleMistakes(text, cw);
     } 
-    else {  
-      // user hasn't reached the last word...
-      // Did user just finish the current word? (ie: text = word + 1st char of next word)
-      if (text === cw + nw[0]) {
+    else { // cw != last word
+
+      // Did user just finish the current word? 
+      // Words are completed by typing the entire word + the first character of following whitespace.
+      // Whitespace chunks complete on their final character (don't require the next word's 1st chracter).
+      const actualWordFinished = (text === cw + nw[0]);
+      const whitespaceFinished = (!this.state.whitespaceAtStart && this.state.cwi % 2 === 1 && text === cw) ||
+                                 (this.state.whitespaceAtStart && this.state.cwi % 2 === 0 && text === cw) ;
+      const finishedCW = actualWordFinished || whitespaceFinished;
+
+      if (finishedCW) {
         // advance to next word
-        let extraForNewline = text[text.length-1] === '\n' ? 1 : 0;
-        let nw = this.state.raceCode[this.state.cwi + 1 + extraForNewline];
-        let nwi = this.state.cwi + 1 + extraForNewline;
+        let nwi = this.state.cwi + 1;
+        let nw = this.state.raceCode[nwi];
+        this.wordChanged = true;
+        if (this.DEBUG)  console.log("---------------------------\nfinished " +
+                                     "word: \"" + cw + "\"\nNext word: \"" + nw + "\"\n" +
+                                     "---------------------------\n\n\n\n\n");
+        if (actualWordFinished) {
+          text = text[text.length-1];
+
+          // check the diliniating character
+          if (text[0] === ' ' || text[0] === '\n' ) {
+            this.makeLastCharTypedGreen(text, nwi-1);
+            if (text[0] === '\n')
+              this.wordWithEnters = '\n';
+            // else                                    DONT THINK THIS IS NEEDED. I COULD BE WRONG.
+            //   this.wordWithEnters = '';
+          }
+
+          // the last character typed was whitespace; see if that character IS
+          // the entire next 'word' of whitespace (of length = 1)
+          if (text === nw) {
+            text = '';
+            this.wordWithEnters = '';
+            nwi++;
+            nw = this.state.raceCode[nwi];
+            //this.makeLastCharTypedGreen(nw[0], nwi);      // MIGHT HAVE TO MOD THE GREEN METHOD NOW
+          }
+        }
+
+        else { // we finished a whitespace 'word' with length > 1
+          text = '';
+          this.wordWithEnters = '';
+          this.makeLastCharTypedGreen(nw[0], nwi);
+        }
+
+        // in either case (finished an actual word OR a chunk of whitespace)
         this.setState({cw: nw, cwi: nwi});
-        text = text[text.length-1];
-        // style the code appropriately
         this.underlineWord(nwi);
-        if (text[0] === ' ' || text[0] === '\n')  this.makeLastCharTypedGreen(text, nwi-1);
-        else  this.makeLastCharTypedGreen(nw[0], nwi);
-
-        if (this.DEBUG)  console.log("finished word: \"" + cw + "\"\nNext word: \"" + nw + "\"\n\n\n");
       }
-      else  this.styleMistakes(text, cw);
+      // cw isn't finished...
+      else {
+        this.wordChanged = false;
+        this.styleMistakes(text, cw);
+      } 
     }
 
+    // in ALL cases, whenever a key is pressed in the text box
     this.setState({typed: text});
-    // Very start of the game (first key press)?
-    if (!this.state.started) {
-      this.setState({started: true});
-      this.underlineWord(0);
-    }
   }
 
 
@@ -224,8 +316,7 @@ int main() {
     let mistakesArePresent = text !== cw.substring(0, text.length);
     if (mistakesArePresent) {
       document.querySelector('.typingbox').style.cssText = "background: #e93535; color: white;";
-
-      if(this.DEBUG)  console.log("MISTAKE! current word = \"" + cw + "\"");
+      if(this.DEBUG)  console.log(`MISTAKE\ntext = '${text}'\ntyped = '${this.state.typed}'\ncurrent word = '${cw}'\n[0]: '${cw[0]}'\n[1]: '${cw[1]}'\n[2]: '${cw[2]}'\n[3]: '${cw[3]}'`);
     } 
     else { // no mistakes present
       document.querySelector('.typingbox').style.cssText = "background: #292d3e; color: #a6accd";
@@ -235,17 +326,37 @@ int main() {
       // if they're NOT present. If they're not, turn the last typed character green:
       this.makeLastCharTypedGreen(text, this.state.cwi);
     }
-    
   }
 
 
   makeLastCharTypedGreen = (text, cwi) => {
+  // makes the last character of 'text' turn green to indicate correct input
     if (text === '') return;
     let char = document.querySelector('.w'+cwi+'.c'+(text.length-1));
     char.style.color = "yellowgreen";
   }
 
 
+  // underlineWord = (wordIndex) => {
+  //   // for the first word
+  //   if (wordIndex === 0) {
+  //     if (this.state.whitespaceAtStart)  this.underlineHelper(1, true);
+  //     else  this.underlineHelper(0, true);
+  //     return;
+  //   }
+  //   // for the rest
+  //   if (this.state.whitespaceAtStart) { // words on odd indeces; spaces on evens
+  //     if (wordIndex % 2 === 0) {
+  //       this.underlineHelper(wordIndex + 1, true);
+  //       this.underlineHelper(wordIndex - 1, false);
+  //     }
+  //   } else { // words on even indeces; spaces on odds
+  //     if ( (wordIndex % 2) === 1 ) {
+  //       this.underlineHelper(wordIndex + 1, true);
+  //       this.underlineHelper(wordIndex - 1, false);
+  //     }
+  //   }
+  // }
   underlineWord = (wordIndex) => {
     // for the first word
     if (wordIndex === 0) {
@@ -254,20 +365,11 @@ int main() {
       return;
     }
     // for the rest
-    if (this.state.whitespaceAtStart) { // words on odd indeces; spaces on evens
-      if (wordIndex % 2 === 0) {
-        this.underlineHelper(wordIndex + 1, true);
-        this.underlineHelper(wordIndex - 1, false);
-      }
-    } else { // words on even indeces; spaces on odds
-      if ( (wordIndex % 2) === 1 ) {
-        this.underlineHelper(wordIndex + 1, true);
-        this.underlineHelper(wordIndex - 1, false);
-      }
-    }
+    this.underlineHelper(wordIndex, true);
+    this.underlineHelper(wordIndex - 2, false);
   }
-  underlineHelper = (i, addUnderline) => {
-    let desiredTD = addUnderline ? "underline" : "none";
+  underlineHelper = (i, wordShouldBeUnderlined) => {
+    let desiredTD = wordShouldBeUnderlined ? "underline" : "none";
     let word = document.querySelectorAll('.w'+i);
     for (let char of word)
       char.style.textDecoration = desiredTD;
@@ -296,7 +398,7 @@ int main() {
     // todo: send myData to the server instead of just logging it to console
     const myData = this.state.players[this.state.myPlayerIndex];
 
-    console.log(myData);
+    console.log("---- Your Race Results -----\n" + myData);
   }
 
 
