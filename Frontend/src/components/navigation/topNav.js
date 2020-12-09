@@ -1,20 +1,10 @@
 import React from 'react';
-import { Nav, Navbar, Button } from 'react-bootstrap';
+import { Nav, Navbar } from 'react-bootstrap';
 import './_styling/topNav.css';
 
 export default class TopNav extends React.Component {
     constructor() {
         super();
-    }
-
-    handleClick = () => {
-        // If not signed in
-            // Go to sign in page if clicked:
-                // Type
-                // Game
-                // Sign In
-                // Profile
-        // Else do what it say
     }
 
     handleAuth = () => {
@@ -35,8 +25,9 @@ export default class TopNav extends React.Component {
                             <Nav.Link className="link-3" href="/lobby" onClick={this.handleClick}>Game</Nav.Link>
                         </Nav>
                         <Nav className='log'>
-                            {/* Make this dynamic (Sign In vs. Sign Out) */}
-                            <Nav.Link className="link-4" href="/login" onClick={this.handleAuth}>Sign In/Out</Nav.Link>
+                            <Nav.Link className="link-4" href="/login" onClick={this.handleAuth}>
+                                {this.props.signedIn ? "Log Out" : "Log In"}
+                            </Nav.Link>
                             <Nav.Link className="link-5" href="/profile" onClick={this.handleClick}>Profile</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>

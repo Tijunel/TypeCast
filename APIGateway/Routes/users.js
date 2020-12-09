@@ -12,7 +12,8 @@ firebaseAPI.setPrefixURL('http://localhost:8000');
 
 // Register
 user.post('/register', async (req, res) => {
-    const response = await api.call('user/register', 'POST', { json: req.body });
+    console.log(req.body)
+    const response = await api.call('user/register/', 'POST', { json: req.body });
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
@@ -25,7 +26,7 @@ user.post('/register', async (req, res) => {
 
 // Log In
 user.post('/login', async (req, res) => {
-    const response = await api.call('user/login', 'POST', { json: req.body });
+    const response = await api.call('user/login/', 'POST', { json: req.body });
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
