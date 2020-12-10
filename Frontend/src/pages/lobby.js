@@ -35,8 +35,9 @@ class Lobby extends React.Component {
 
   componentDidMount = () => {
     this.loadLobbyDataFromDB();
-    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 1);
-    setTimeout(()=> this.resizeTableForNonAdmins(this.state.lobbyName), 1);
+    // these first two used to be set to 1ms. Auth seems to slow things down...
+    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 200); 
+    setTimeout(()=> this.resizeTableForNonAdmins(this.state.lobbyName), 200);
     setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 10000);
   }
 

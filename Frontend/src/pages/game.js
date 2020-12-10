@@ -56,7 +56,7 @@ class Game extends React.Component {
     this.loadGameDataFromDB();
 
     setTimeout( () => this.underlineWord(0), 0);
-    setTimeout( () => document.querySelector(this.cursorLocation).classList.add('cursor'), 0 );
+    setTimeout( () => document.querySelector(this.cursorLocation).classList.add('cursor'), 500 ); // used to work with 0
 
     this.inputBoxSetup();
 
