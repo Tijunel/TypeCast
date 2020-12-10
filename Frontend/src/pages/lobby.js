@@ -9,7 +9,10 @@
 //       menu of code to choose from, and if we have time: a way of uploading
 //       your own blocks of code to use for the game.
 
-// todo: the settings at bottom of page should only be editable by Host.
+// todo: get rid of the hacky setTimeout() wait for the element styling
+//       and just make the code wait for those elements to exist before
+//       attempting to style (all my efforts at this have failed so far
+//       and I'm not wasting more time on this right now.)
 
 import React from 'react';
 import WithAuth from './withAuth';
@@ -35,9 +38,9 @@ class Lobby extends React.Component {
 
   componentDidMount = () => {
     this.loadLobbyDataFromDB();
-    // these first two used to be set to 1ms. Auth seems to slow things down...
-    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 200); 
-    setTimeout(()=> this.resizeTableForNonAdmins(this.state.lobbyName), 200);
+
+    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 500);
+    setTimeout(()=> this.resizeTableForAdmins(this.state.lobbyName), 500);
     setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 10000);
   }
 
@@ -133,25 +136,39 @@ class Lobby extends React.Component {
   resizeNameBox = (roomName) => {
     // properly sizes lobby name. Needs a slight delay...
     // this method is inefficient, but oh well. Fix if all else is done.
-    const nameBox = this.state.iAmHost ? 
-                      document.querySelector(".editable-name") :
-                      document.querySelector(".fixed-name");
-    const lobbyName = document.querySelector("#lobby-name");
+    let nameBox = this.state.iAmHost ? ".editable-name" : ".fixed-name";
+    let lobbyName = "#lobby-name";
+
+    // // wait for the above-named elements to exist
+    // // putting this inline seems to work better than encapsulating it in a method...
+    // const selectors = [nameBox, lobbyName];
+    // for (let s of selectors) {
+    //   let exists = setInterval( () => {
+    //     if ( document.querySelector(s) ) {
+    //        if (this.DEBUG) console.log(`${s} now exists\n`);
+    //       clearInterval(exists);
+    //     }
+    //   }, 50); // check every 50ms
+    // }
+
+    nameBox = document.querySelector(nameBox)
+    lobbyName = document.querySelector(lobbyName);
+
     let extraRoom = 0;
     if (roomName.length < 12) {
-      document.querySelector("#lobby-name").style.fontSize = "50px";
+        lobbyName.style.fontSize = "50px";
       if (this.state.iAmHost) extraRoom = 14;
       nameBox.style.width = String(roomName.length * 30 + extraRoom)+"px";
       lobbyName.style.marginTop = "15px";
     } else if (roomName.length < 23) {
-      document.querySelector("#lobby-name").style.fontSize = "30px";
       extraRoom = this.state.iAmHost ? 10 : 0;
       nameBox.style.width = String(roomName.length * 18 + extraRoom)+"px";
       lobbyName.style.marginTop = "25px";
+      lobbyName.style.fontSize = "30px";
     } else {
-      document.querySelector("#lobby-name").style.fontSize = "24px";
-      nameBox.style.width = String(roomName.length * 13 + 22)+"px"; // was 14
       lobbyName.style.marginTop = "30px";
+      lobbyName.style.fontSize = "24px";
+      nameBox.style.width = String(roomName.length * 13 + 22)+"px"; // was 14
     }
   }
 
@@ -164,22 +181,30 @@ class Lobby extends React.Component {
   }
   
 
-  resizeTableForNonAdmins = () => {
-    // resize and center table when not Admin
-    if ( ! this.state.iAmHost ) {
+  resizeTableForAdmins = () => {
+
+    // // wait for the player table to exist in DOM
+    // let exists = setInterval( () => {
+    //   if ( document.querySelector('#lobby table') ) {
+    //     if (this.DEBUG) console.log(`Players table now exists`);
+    //     clearInterval(exists);
+    //   }
+    // }, 50); // check every 50ms
+
+    if ( this.state.iAmHost ) {
       let elements = document.querySelectorAll("#players td:nth-child(3)");
       for (let x of elements)
-        x.style.display = "none";
+        x.style.display = "block";
 
       elements = document.querySelectorAll(".player-name");
       for (let x of elements)
-        x.style.flex = "80";
+        x.style.flex = "60";
 
       elements = document.querySelectorAll(".is-ready");
       for (let x of elements)
-        x.style.flex = "20";
+        x.style.flex = "25";
 
-      document.querySelector('#lobby table').style.width = '80%';
+      document.querySelector('#lobby table').style.width = '100%';
     }
   }
 

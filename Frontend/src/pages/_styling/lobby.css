@@ -16,7 +16,8 @@
   text-transform: uppercase;
   flex: 7;
   overflow: hidden;
-  padding: 10px 0
+  padding: 10px 0;
+  margin-top: 15px;
 }
 .editable-name, .fixed-name {
   background: #7c9fc250;
@@ -66,7 +67,7 @@
   border-color: #bbb;
 }
 #lobby table {
-  width: 100%;
+  width: 80%;
 }
 #players {
   min-height: 100px;
@@ -100,15 +101,20 @@
 #players tr:nth-child(2) td:nth-child(2) {
   border-top: 3px solid black;
 }
+/* styling for non-Amins */
+#players td:nth-child(3) {
+  display: none;
+}
+
 #players button {
   border-width: 0px;
 }
 .player-name {
-  flex: 60;
+  flex: 80;
   text-align: left;
 }
 .is-ready {
-  flex: 25;
+  flex: 20;
   padding: 0 !important;
 }
 .is-ready button {
