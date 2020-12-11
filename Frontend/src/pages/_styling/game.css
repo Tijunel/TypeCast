@@ -5,6 +5,20 @@
   font-size: 1rem;
   padding: 30px;
 }
+#timer {
+  font-size: 1.8rem;
+  float: right;
+}
+#getReady {
+  font-size: 1rem;
+  margin-right: 8px;
+}
+/* #timer::before {
+  content: "Time: ";
+}
+#timer::after {
+  content: " s";
+} */
 #game-status {
   margin: 20px 0;
 }
@@ -13,9 +27,6 @@
   width: 100%;
   margin-bottom: 20px;
   padding: 0 20px 1px;
-}
-#race-visualization table {
-
 }
 .playerdata {  /* the row */
   display: flex;
@@ -29,9 +40,14 @@
   border-bottom: 3px dashed #888;
   text-align: left;
 }
-.vis-playerspeed {  /* 2nd column */
+.vis-playerstats {  /* 2nd column */
   flex: 12;
   text-align: right;
+}
+.vis-playerstats .player-pos {
+}
+.vis-playerstats .player-lpm {
+
 }
 #codebox {
   background: #1c1f2b;
@@ -60,7 +76,6 @@ pre {
   color: white;
 }
 #race-results {
-
   text-align: center;
 }
 #result-heading {
@@ -80,7 +95,9 @@ pre {
   text-align: left;
   margin: 0 0 0 5px;
 }
-
+.units {
+  font-size: 1rem;
+}
 
 
 .cursor {
@@ -88,5 +105,13 @@ pre {
   animation: cursor 1s linear infinite;
 }
 @keyframes cursor {
+  50% { border-color: transparent }
+}
+
+.cursorEnd {
+  border-right: 1px solid #ffcc00;
+  animation: cursor 1s linear infinite;
+}
+@keyframes cursorEnd {
   50% { border-color: transparent }
 }
