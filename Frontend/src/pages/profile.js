@@ -5,6 +5,7 @@
 //       ... to get and send the user data.
 
 import React from 'react';
+import Cookies from 'js-cookie';
 import WithAuth from './withAuth';
 import './_styling/profile.css';
 
@@ -13,6 +14,7 @@ class Profile extends React.Component {
 		super();
 		this.state = {
 			username: "",
+			userID: "",
 			password: "",
 			pastGames: [],
 			changeUNVisible: false,
@@ -38,7 +40,29 @@ class Profile extends React.Component {
 
 	loadUserData = () => {
 		// todo: load the username, password, and data from their past games from the db
-		//       instead of using the hardcoded values below:
+		//       instead of using the hardcoded values below
+
+		//How to get current logged in user?
+		userID = JSON.parse(Cookies.get('userData').split('j:')[1]).userID;
+		username = JSON.parse(Cookies.get('userData').split('j:')[0]).username;
+		fetch('/userData/games', {
+			method: 'GET',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				username: this.username.current.value,
+				userID: this.userID.current.value
+			})
+		})
+		.then(res => {
+			if (res.status === 200) pastGames = res; //Not sure if this is right?
+			else pastGames = [];
+		})
+		.catch(err => {
+			alert("An error occured while finding your past games");
+		});
+
+
 		const username = "Thiccboi McGee";
 		const password = "123123";
 		const pastGames = [{ position: 1, lpm: 12, time: "0:25.16", date: "2020/10/28" },
@@ -71,7 +95,24 @@ class Profile extends React.Component {
 	resetScore = () => {
 		// todo: not sure what exactly this is supposed to do...
 		//       Clear their LPM? Or whipe out their entire race history?
-		alert("todo: implement this resetScore() method");
+		
+		fetch('/userData/games', {
+			method: 'DELETE',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				username: this.username.current.value,
+				userID: this.userID.current.value
+			})
+		})
+		.then(res => {
+			if (res.status === 200) alert("Game data successfully reset.");
+			else alert("Game data reset was unsucessful.");
+		})
+		.catch(err => {
+			alert("Game data reset was unsucessful.");
+		});
+
 	}
 
 	showChangeUsername = () => {
@@ -86,18 +127,39 @@ class Profile extends React.Component {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: true });
 	}
 
-	updateUsernameHandler = (event) => {
+	updateUsernameHandler = (event) => {		
+		// todo: connect to db and update this user's username
+		
+		fetch('/users/', {
+			method: 'PUT',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				userID: this.userID.current.value,
+				newUsername: this.state.newUsername,
+           		oldPassword: this.password.current.value,
+          		newPassword: this.password.current.value
+			})
+		})
+		.then(res => {
+			if (res.status === 200) alert("Username successfully changed.");
+			else alert("Username change was unsucessful.");
+		})
+		.catch(err => {
+			alert("Username change was unsucessful.");
+		});
+
 		this.setState({ username: this.state.newUsername });
 		setTimeout(() => {
 			alert("Username changed!");
 			//this.setState({changeUNVisible: false});
 		}, 500);
 
-		// todo: connect to db and update this user's username
-		setTimeout(() => {
-			alert("todo: implement the rest of this " +
-				"updateUsernameHandler() method")
-		}, 700);
+
+		// setTimeout(() => {
+		// 	alert("todo: implement the rest of this " +
+		// 		"updateUsernameHandler() method")
+		// }, 700);
 
 		event.preventDefault();  // prevent page reload
 	}
@@ -107,6 +169,26 @@ class Profile extends React.Component {
 			event.preventDefault(); // prevent page reload
 			return;                 // user made mistake(s), so stop here
 		}
+// todo: connect to db and update user's password
+		fetch('/users/', {
+			method: 'PUT',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				userID: this.userID.current.value,
+				newUsername: this.username.current.value,
+           		oldPassword: this.password.current.value,
+          		newPassword: this.state.newPassword
+			})
+		})
+		.then(res => {
+			if (res.status === 200) alert("Password successfully changed.");
+			else alert("Password change was unsucessful.");
+		})
+		.catch(err => {
+			alert("Password change was unsucessful.");
+		});
+
 		this.setState({
 			password: this.state.newPassword,
 			currentPassword: '',
@@ -116,11 +198,11 @@ class Profile extends React.Component {
 		});
 		alert("Password changed!");
 
-		// todo: connect to db and update user's password
-		setTimeout(() => {
-			alert("todo: implement the rest of this " +
-				"updatePasswordHandler() method")
-		}, 1000);
+		
+		// setTimeout(() => {
+		// 	alert("todo: implement the rest of this " +
+		// 		"updatePasswordHandler() method")
+		// }, 1000);
 
 		event.preventDefault();  // prevent page reload
 	}
@@ -143,6 +225,25 @@ class Profile extends React.Component {
 	}
 
 	deleteAccountHandler = () => {
+
+// todo: remove the user from the db and logout the user
+		fetch('/users/', {
+			method: 'DELETE',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				username: this.username.current.value,
+           		userID: this.userID.current.value,
+			})
+		})
+		.then(res => {
+			if (res.status === 200) window.location.href = '/login'; //Send to login page
+			else alert("Could not delete account.");
+		})
+		.catch(err => {
+			alert("An error has occured. Could not delete account.");
+		});
+
 		this.setState({
 			username: '',
 			password: '',
@@ -152,8 +253,8 @@ class Profile extends React.Component {
 		});
 		this.sizeTheExtendedFooter("after deletion"); // resize the footer
 
-		// todo: remove the user from the db and logout the user
-		setTimeout(() => alert("todo: implement the rest of this deleteAccount() method"), 500);
+		
+		// setTimeout(() => alert("todo: implement the rest of this deleteAccount() method"), 500);
 	}
 
 	getAverageSpeed = () => {
