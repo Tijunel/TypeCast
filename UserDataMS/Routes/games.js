@@ -42,7 +42,7 @@ games.get('/:id', async (req, res) => {
             else if (b.date > a.date) return 1;
             else return 0;
         });
-        res.sendStatus(200).json({ lpm: 0, games: games }).end(); // TODO: Compute lpm in utilites
+        res.status(200).json({ lpm: 0, games: games }).end();
     } catch (error) {
         res.sendStatus(500).end();
     }

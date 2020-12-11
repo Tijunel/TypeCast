@@ -1,8 +1,4 @@
 'use strict';
-// page for viewing user's profile
-
-// todo: fill in the 'todo' methods with the appropriate calls to the middleware
-//       ... to get and send the user data.
 
 import React from 'react';
 import Cookies from 'js-cookie';
@@ -12,68 +8,119 @@ import './_styling/profile.css';
 class Profile extends React.Component {
 	constructor() {
 		super();
+		this.newUsername = React.createRef();
+		this.currentPassword = React.createRef();
+		this.newPassword1 = React.createRef();
+		this.newPassword2 = React.createRef();
 		this.state = {
 			username: "",
-			userID: "",
 			password: "",
-			pastGames: [],
+			pastGamesUI: [],
+			LPM: 0.0,
 			changeUNVisible: false,
 			changePWVisible: false,
-			delAcctVisible: false,
-			newUsername: "",      // used when user changes their username
-			currentPassword: "",  // used when user changes their password
-			newPassword: "",      // ^
-			newPassword2: "",     // ^
+			delAcctVisible: false
 		}
 	}
 
 	componentDidMount = () => {
 		this.loadUserData();
-		// document.querySelector(".link-5").style.background = "black";  << improve this
 		const tableWidth = document.querySelector("#past-games").offsetWidth;
 		let tableContainer = document.querySelector("#table-container");
 		tableContainer.style.width = tableWidth + "px";
-		// set the height of the extended footer so it fills all available window space
 		this.sizeTheExtendedFooter("initial load");
 	}
 
-
 	loadUserData = () => {
-		// todo: load the username, password, and data from their past games from the db
-		//       instead of using the hardcoded values below
-
-		//How to get current logged in user?
-		userID = JSON.parse(Cookies.get('userData').split('j:')[1]).userID;
-		username = JSON.parse(Cookies.get('userData').split('j:')[0]).username;
+		const username = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
 		fetch('/userData/games', {
 			method: 'GET',
 			credentials: "include",
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then(async res => {
+				if (res.status === 200) {
+					res = await res.json();
+					const pastGamesUI = this.generatePastGamesUI();
+					this.setState({ LPM: res.lpm, pastGamesUI: res.games, username: username });
+				} else alert("An error occured while finding your past games");
+			})
+			.catch(err => {
+				alert("An error occured while finding your past games");
+			});
+	}
+
+	clearHistory = () => {
+		fetch('/userData/games', {
+			method: 'DELETE',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then(res => {
+				if (res.status === 200) this.setState({ pastGames: [], LPM: 0 });
+				else alert("Game data reset was unsuccessful.");
+			})
+			.catch(err => {
+				alert("Game data reset was unsucessful.");
+			});
+	}
+
+	updateUsernameHandler = (event) => {
+		event.preventDefault();
+		fetch('/users/', {
+			method: 'PUT',
+			credentials: "include",
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				username: this.username.current.value,
-				userID: this.userID.current.value
+				newUsername: this.state.newUsername,
+				oldPassword: this.password.current.value,
+				newPassword: this.password.current.value
 			})
 		})
-		.then(res => {
-			if (res.status === 200) pastGames = res; //Not sure if this is right?
-			else pastGames = [];
+			.then(res => {
+				if (res.status === 200) alert("Username successfully changed.");
+				else alert("Username change was unsucessful.");
+			})
+			.catch(err => {
+				alert("Username change was unsucessful.");
+			});
+	}
+
+	updatePasswordHandler = (event) => {
+		event.preventDefault();
+		if (!this.newPasswordInfoChecksOut()) return;
+		fetch('/users/', {
+			method: 'PUT',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				newUsername: this.username.current.value,
+				oldPassword: this.password.current.value,
+				newPassword: this.state.newPassword
+			})
 		})
-		.catch(err => {
-			alert("An error occured while finding your past games");
-		});
+			.then(res => {
+				if (res.status === 200) alert("Password successfully changed.");
+				else alert("Password change was unsucessful.");
+			})
+			.catch(err => {
+				alert("Password change was unsucessful.");
+			});
+	}
 
-
-		const username = "Thiccboi McGee";
-		const password = "123123";
-		const pastGames = [{ position: 1, lpm: 12, time: "0:25.16", date: "2020/10/28" },
-		{ position: 3, lpm: 9, time: "0:36.72", date: "2020/10/28" },
-		{ position: 1, lpm: 14, time: "0:23.11", date: "2020/10/28" },
-		{ position: 2, lpm: 10, time: "0:33.16", date: "2020/10/28" }];
-
-		this.setState({
-			username: username, password: password, pastGames: pastGames,
-			newUsername: username
-		});
+	deleteAccountHandler = () => {
+		fetch('/users/', {
+			method: 'DELETE',
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then(res => {
+				if (res.status === 200) window.location.href = '/login'; //Send to login page
+				else alert("Could not delete account.");
+			})
+			.catch(err => {
+				alert("An error has occured. Could not delete account.");
+			});
 	}
 
 	sizeTheExtendedFooter = (situation) => {
@@ -92,29 +139,6 @@ class Profile extends React.Component {
 		}
 	}
 
-	resetScore = () => {
-		// todo: not sure what exactly this is supposed to do...
-		//       Clear their LPM? Or whipe out their entire race history?
-		
-		fetch('/userData/games', {
-			method: 'DELETE',
-			credentials: "include",
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				username: this.username.current.value,
-				userID: this.userID.current.value
-			})
-		})
-		.then(res => {
-			if (res.status === 200) alert("Game data successfully reset.");
-			else alert("Game data reset was unsucessful.");
-		})
-		.catch(err => {
-			alert("Game data reset was unsucessful.");
-		});
-
-	}
-
 	showChangeUsername = () => {
 		this.setState({ changeUNVisible: true, changePWVisible: false, delAcctVisible: false });
 	}
@@ -125,86 +149,6 @@ class Profile extends React.Component {
 
 	showDeleteAccount = () => {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: true });
-	}
-
-	updateUsernameHandler = (event) => {		
-		// todo: connect to db and update this user's username
-		
-		fetch('/users/', {
-			method: 'PUT',
-			credentials: "include",
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				userID: this.userID.current.value,
-				newUsername: this.state.newUsername,
-           		oldPassword: this.password.current.value,
-          		newPassword: this.password.current.value
-			})
-		})
-		.then(res => {
-			if (res.status === 200) alert("Username successfully changed.");
-			else alert("Username change was unsucessful.");
-		})
-		.catch(err => {
-			alert("Username change was unsucessful.");
-		});
-
-		this.setState({ username: this.state.newUsername });
-		setTimeout(() => {
-			alert("Username changed!");
-			//this.setState({changeUNVisible: false});
-		}, 500);
-
-
-		// setTimeout(() => {
-		// 	alert("todo: implement the rest of this " +
-		// 		"updateUsernameHandler() method")
-		// }, 700);
-
-		event.preventDefault();  // prevent page reload
-	}
-
-	updatePasswordHandler = (event) => {
-		if (!this.newPasswordInfoChecksOut()) {
-			event.preventDefault(); // prevent page reload
-			return;                 // user made mistake(s), so stop here
-		}
-// todo: connect to db and update user's password
-		fetch('/users/', {
-			method: 'PUT',
-			credentials: "include",
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				userID: this.userID.current.value,
-				newUsername: this.username.current.value,
-           		oldPassword: this.password.current.value,
-          		newPassword: this.state.newPassword
-			})
-		})
-		.then(res => {
-			if (res.status === 200) alert("Password successfully changed.");
-			else alert("Password change was unsucessful.");
-		})
-		.catch(err => {
-			alert("Password change was unsucessful.");
-		});
-
-		this.setState({
-			password: this.state.newPassword,
-			currentPassword: '',
-			newPassword: '',
-			newPassword2: '',
-			//changePWVisible: false
-		});
-		alert("Password changed!");
-
-		
-		// setTimeout(() => {
-		// 	alert("todo: implement the rest of this " +
-		// 		"updatePasswordHandler() method")
-		// }, 1000);
-
-		event.preventDefault();  // prevent page reload
 	}
 
 	newPasswordInfoChecksOut = () => {
@@ -220,54 +164,10 @@ class Profile extends React.Component {
 			alert("Sorry, but you need to have a password (you can't set an empty password.)");
 		}
 		else return true;
-
 		return false;
 	}
 
-	deleteAccountHandler = () => {
-
-// todo: remove the user from the db and logout the user
-		fetch('/users/', {
-			method: 'DELETE',
-			credentials: "include",
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				username: this.username.current.value,
-           		userID: this.userID.current.value,
-			})
-		})
-		.then(res => {
-			if (res.status === 200) window.location.href = '/login'; //Send to login page
-			else alert("Could not delete account.");
-		})
-		.catch(err => {
-			alert("An error has occured. Could not delete account.");
-		});
-
-		this.setState({
-			username: '',
-			password: '',
-			pastGames: [],
-			delAcctVisible: false,
-			newUsername: ''
-		});
-		this.sizeTheExtendedFooter("after deletion"); // resize the footer
-
-		
-		// setTimeout(() => alert("todo: implement the rest of this deleteAccount() method"), 500);
-	}
-
-	getAverageSpeed = () => {
-		// returns a float with one decimal digit
-		let total = 0.0;
-		for (let game of this.state.pastGames)
-			total += game.lpm;
-		if (total === 0) return "";
-		const avg = Math.round(total * 100.0 / this.state.pastGames.length) / 100;
-		return avg;
-	}
-
-	closePannel = () => {
+	closePanel = () => {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false });
 	}
 
@@ -279,16 +179,15 @@ class Profile extends React.Component {
 
 	getFormattedPos = (pos) => {
 		switch (pos) {
-			case (1): return "1st"; //break;  ... console says don't need break? wth?
-			case (2): return "2nd"; //break;
-			case (3): return "3rd"; //break;
+			case (1): return "1st";
+			case (2): return "2nd"; 
+			case (3): return "3rd"; 
 			default: return pos + "th";
 		}
 	}
 
-	getPastGamesTable = () => {
+	generatePastGamesUI = () => {
 		let pastGamesTable = [];
-		// table headings
 		pastGamesTable.push(
 			<tr key="headings">
 				<td className="position">Result</td>
@@ -297,14 +196,12 @@ class Profile extends React.Component {
 				<td className="date">Date</td>
 			</tr>
 		);
-		// rest of the table, from user's data
 		for (let i = 0; i < this.state.pastGames.length; i++) {
 			pastGamesTable.push(
 				<tr key={"game" + (i + 1)}>
 					<td className="position">
 						{this.getFormattedPos(this.state.pastGames[i].position)}
 					</td>
-
 					<td className="speed">
 						<pre>
 							{this.state.pastGames[i].lpm > 9 ?
@@ -312,13 +209,12 @@ class Profile extends React.Component {
 								: " " + this.state.pastGames[i].lpm}
 						</pre> <span className="lpm">LPM</span>
 					</td>
-
 					<td className="time">{this.state.pastGames[i].time}</td>
 					<td className="date">{this.state.pastGames[i].date}</td>
 				</tr>
-			); // pastGamesTable.push
+			); 
 		}
-		return pastGamesTable;
+		this.setState({ pastGamesUI: pastGamesTable });
 	}
 
 	render = () => {
@@ -328,12 +224,12 @@ class Profile extends React.Component {
 					<div id="profile-heading"><h1>{this.state.username}</h1></div>
 					<div id="table-container">
 						<div id="table-forehead">Your Race Results</div>
-						<table id="past-games"><tbody>{this.getPastGamesTable()}</tbody></table>
+						<table id="past-games"><tbody>{this.state.pastGamesUI}</tbody></table>
 						<div id="table-chin">
 							<div id="avg-speed">
-								Average LPM: <div id="avg-speed-nbr">{this.getAverageSpeed()}</div>
+								Average LPM: <div id="avg-speed-nbr">{this.state.LPM}</div>
 							</div>
-							<button onClick={() => this.resetScore()}
+							<button onClick={() => this.clearHistory()}
 								className="text-btn">Reset Score?</button>
 						</div>
 					</div>
@@ -406,7 +302,7 @@ class Profile extends React.Component {
 								YES, PERMANENTLY DELETE MY ACCOUNT
               				</button>
 							<br />
-							<button onClick={() => this.closePannel()} className="changed-my-mind">
+							<button onClick={() => this.closePanel()} className="changed-my-mind">
 								No! Get me out of here!
               				</button>
 						</div>
@@ -414,9 +310,8 @@ class Profile extends React.Component {
 						<p></p>
 					}
 					{this.state.changeUNVisible || this.state.changePWVisible ?
-
 						<div id="close-pannel-container">
-							<button onClick={() => this.closePannel()} className="text-btn">close pannel</button>
+							<button onClick={() => this.closePanel()} className="text-btn">close pannel</button>
 						</div>
 						:
 						<p></p>

@@ -12,13 +12,13 @@ firebaseAPI.setPrefixURL('http://localhost:8000');
 
 // Register
 user.post('/register', async (req, res) => {
-    console.log(req.body)
     const response = await api.call('user/register/', 'POST', { json: req.body });
     if (response.status !== 200) return res.sendStatus(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
             if (err) return res.sendStatus(500).end();
             res.cookie('token', token, { httpOnly: true });
+            res.cookie('userData', { username: req.body.username });
             res.sendStatus(200).end();
         });
     }
@@ -32,6 +32,7 @@ user.post('/login', async (req, res) => {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
             if (err) return res.sendStatus(500).end();
             res.cookie('token', token, { httpOnly: true });
+            res.cookie('userData', { username: req.body.username });
             res.sendStatus(200).end();
         });
     }
@@ -63,6 +64,7 @@ user.delete('/', withAuth, async (req, res) => {
         const payload = {};
         const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
         res.cookie('token', token, { httpOnly: true });
+        res.cookie('userData', { username: req.user.username });
         res.sendStatus(200).end();
     }
 });
