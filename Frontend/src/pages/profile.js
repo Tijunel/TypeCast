@@ -176,7 +176,7 @@ class Profile extends React.Component {
 		this.setState({ [name]: val });
 	}
 
-	getFormattedPos = (pos) => {
+	formatPosition = (pos) => {
 		switch (pos) {
 			case (1): return "1st"; //break;  ... console says don't need break? wth?
 			case (2): return "2nd"; //break;
@@ -201,7 +201,7 @@ class Profile extends React.Component {
 			pastGamesTable.push(
 				<tr key={"game" + (i + 1)}>
 					<td className="position">
-						{this.getFormattedPos(this.state.pastGames[i].position)}
+						{this.formatPosition(this.state.pastGames[i].position)}
 					</td>
 
 					<td className="speed">
