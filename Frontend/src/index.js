@@ -1,4 +1,4 @@
-'use strict';  // <-- console warming "unneccessary inside of modules" ?
+'use strict';
 
 // Module imports
 import React from 'react';
@@ -16,7 +16,6 @@ import Lobby from './pages/lobby';
 import Profile from './pages/profile';
 import Game from './pages/game';
 
-// Navigation imports
 import TopNav from './components/navigation/topNav';
 import Footer from './components/navigation/footer';
 
@@ -57,10 +56,10 @@ class App extends React.Component {
             <Route path="/" component={() => <Home />} />
           </Switch>
         </Router>
-        <Footer />
+        <Footer/>
       </React.Fragment>
     );
   }
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<App/>, document.getElementById("root"));
