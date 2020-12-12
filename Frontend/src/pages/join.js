@@ -34,7 +34,8 @@ class Join extends React.Component {
              {lobbyCode: "WOOT", name: "SENG 513", numPlayers: 4, public: false}, 
              {lobbyCode: "IJKL", name: "Nice Polite People Only", numPlayers: 1, public: true},
              {lobbyCode: "RUOK", name: "nastY SHIZZZZ", numPlayers: 5, public: true},
-             {lobbyCode: "ECMA", name: "idk whatever", numPlayers: 3, public: true}, ];
+             {lobbyCode: "ECMA", name: "idk whatever", numPlayers: 3, public: true}
+            ];
   }
 
 
