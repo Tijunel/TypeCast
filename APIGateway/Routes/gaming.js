@@ -3,33 +3,67 @@
 const express = require('express');
 const withAuth = require('../Middleware/auth');
 const MSCall = require('../Utilities/MSCall');
-const api = new MSCall();
-const prefix = 'http://localhost:7000';
+var api = new MSCall();
+api.setPrefixURL('http://localhost:7000');
 const gaming = express.Router();
 
+// Lobby Endpoints -----
 // Get all lobbies
 gaming.get('/lobbies', withAuth, async(req, res) => {
-
+    const response = await api.call('lobby/lobbies/', 'GET', {});
+    if (response.status === 200) res.status(200).json(response.body).end();
+    else res.sendStatus(response.status).end();
+    // Response:
+    // {
+    //    lobbies: [{
+    //      lobbyCode: String,
+    //      name: String,
+    //      numPlayers: Integer
+    //    },...]
+    // }
+    // Or Error
 });
 
 // Create lobby
 gaming.post('/create', withAuth, async(req, res) => {
-
+    const response = await api.call('lobby/create/', 'POST', {});
+    if (response.status === 200) res.status(200).json(response.body).end();
+    else res.sendStatus(response.status).end();
+    // Response
+    // {
+    //      lobbyCode: String
+    // }
+    // Or Error
 });
 
-// Join a specific by code
+// Ready or un-ready up
+gaming.post('/readyup', withAuth, async(req, res) => {
+    const response = await api.call('lobby/readyup/', 'POST', {
+        json: {
+            ready: req.body.ready
+        }
+    });
+    if (response.status === 200) res.sendStatus(200).end();
+    else res.sendStatus(response.status).end();
+    // Response: Success or error
+});
+// ---------------------
+
+// Join Endpoints ------
 gaming.post('/join', withAuth, async(req, res) => {
-
+    const response = await api.call('join/', 'POST', {
+        json: {
+            username: req.user.username,
+            lobbyCode: req.body.lobbyCode
+        }
+    });
+    res.sendStatus(response.status).end();
+    // Response: Success or Failure (200 or not 200)
 });
+// ---------------------
 
-// Join a random lobby in the join screen
-gaming.post('/matchmake', withAuth, async(req, res) => {
+// Game Endpoints ------
 
-});
-
-// Join by specific code or a random lobby
-// When entering a lobby, get a list of current users
-// When a new user joins, then send a socket message updating people in the same lobby
-// Update users on each users progress
+// ---------------------
 
 module.exports = gaming;
