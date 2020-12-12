@@ -34,6 +34,7 @@ class Game extends React.Component {
     this.cw = "";                     // current 'word' the player is working on (can be a chunk of whitespace)
     this.numCompletedChars = 0;       // number of characters user has successfully typed
     this.numTypedChars = 0;           // number of characters users has typed (inc. mistakes) - use for accuracy
+    this.myTimeHasBeenCalcd = false;  // how long it took this user to finish the race
     this.mistakesPresent = false;
     this.tabPressed = false;
     this.undetectableBackspacePressed = false;
@@ -48,9 +49,9 @@ class Game extends React.Component {
     this.interval = 0;
     this.interval2 = 0;
     this.lastUpdateTime = null;
-    this.serverUpdateInterval = 2000;  // how often to share player's data with the server
+    this.serverUpdateInterval = 1000;  // how often to share player's data with the server
     
-    this.COUNTDOWN_TIME = 5;
+    this.COUNTDOWN_TIME = 3;
     this.TAB = '  ';                 // 
     this.DEBUG = true;                 // debug mode (lots of console output)
   }
@@ -90,13 +91,12 @@ class Game extends React.Component {
 
     // the string of code that will be used for the race
     this.raceCodeStr =
-`buildRaceCodeHTML = (raceCode) => {
-  let raceCodeHTML = [];
-  for (let i = 0; i < raceCode.length; i++) {
-    for (let j = 0; j < raceCode[i].length; j++)
-      raceCodeHTML.push(<p className={'w'+i+' c'+j}>{raceCode[i][j]}</p>);
-  }
-  this.setState({raceCodeHTML: raceCodeHTML});
+`#include <iostream>
+using namespace std; // because I'm lazy
+
+int main() {
+  cout << "Hello, world!" << endl;
+  return 0;
 }`;
 
     // the time limit for the race
@@ -480,8 +480,21 @@ class Game extends React.Component {
   calcMyResults = () => {
     let players = this.state.players;
     let me = players[this.myPlayerIndex];
+
     // calc my race completion time
-    me.time = this.userFinishedRace ? this.calcMyTime() : this.timeLimit;    
+    if (this.userFinishedRace) {
+      if (! this.myTimeHasBeenCalcd) {
+        me.time = this.calcMyTime();
+        this.myTimeHasBeenCalcd = true;
+      }
+    }
+    else { // user hasn't finished race yet
+      if (this.raceHasEnded)
+        me.time = this.timeLimit;
+      else
+        me.time = this.calcMyTime();
+    }
+
     // calc lpm (speed)
     me.lpm = this.userFinishedRace ?
              Math.round((this.raceCodeStr.length / 80.0) * 100 / (me.time / 60.0)) / 100 :
@@ -582,6 +595,7 @@ class Game extends React.Component {
     timerReadout = this.formatTime(elapsed);
     this.setState({timeElapsed: elapsed});
     this.lastUpdateTime = now;
+
     if (timerReadout === ':00') {
       this.stopTimer();
       // if the countdown timer reached :00, now start the real timer
@@ -592,11 +606,16 @@ class Game extends React.Component {
         this.setState({raceHasEnded: true});
       }
     }
+    else if (this.userFinishedRace) {
+      // for refreshing player stats
+      clearInterval(this.interval2);
+      this.interval2 = 0;
+    }
   }
 
   startTimer = (isCountdown) => {
   // isCountdown: true for countdown timer, false for race timer
-    if(!this.interval) {
+    if (!this.interval) {
       if (isCountdown) {
         this.lastUpdateTime = new Date().getTime();
         this.setState({timeElapsed: this.COUNTDOWN_TIME});
