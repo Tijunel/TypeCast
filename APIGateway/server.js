@@ -44,4 +44,7 @@ app.get('*', (req, res) => {
 });
 
 // Configure our server to listen on the port defiend by our port variable
-app.listen(port, () => console.log(`Server running on port ${port}...`));
+const server = require('http').createServer(app);
+server.listen(port, () => console.log(`Server running on port ${port}...`));
+
+module.exports = server;

@@ -7,6 +7,16 @@ var api = new MSCall();
 api.setPrefixURL('http://localhost:7000');
 const gaming = express.Router();
 
+// Set up socket.io
+const server = require('../server');
+const io = require('socket.io')(server);
+io.on('connection', (socket) => {
+    const userData = cookieParser.JSONCookie(cookie.parse(socket.handshake.headers.cookie).userData);
+    socket.on('disconnect', () => {
+        io.emit('disconnect', { username: userData.username });
+    })
+});
+
 // Lobby Endpoints -----
 // Get all lobbies
 gaming.get('/lobbies', withAuth, async(req, res) => {
@@ -25,10 +35,43 @@ gaming.get('/lobbies', withAuth, async(req, res) => {
 });
 
 // Create lobby
-gaming.post('/create', withAuth, async(req, res) => {
-    const response = await api.call('lobby/create/', 'POST', {});
-    if (response.status === 200) res.status(200).json(response.body).end();
-    else res.sendStatus(response.status).end();
+gaming.post('/createLobby', withAuth, async(req, res) => {
+    const response = await api.call('lobby/create/', 'POST', {
+        json: {
+            timeLimit: req.body.timeLimit,
+            public: req.body.public
+        }
+    });
+    if (response.status === 200) {
+        io.emit('new lobby', {
+            lobbyCode: response.body.lobbyCode,
+            numPlayers: 1,
+            timeLimit: req.body.timeLimit
+        });
+        res.status(200).json(response.body).end();
+    } else res.sendStatus(response.status).end();
+    // Response
+    // {
+    //      lobbyCode: String
+    // }
+    // Or Error
+});
+
+// Delete lobby
+gaming.post('/deleteLobby', withAuth, async(req, res) => {
+    const response = await api.call('lobby/delete/', 'POST', {
+        json: {
+            lobbyCode: req.body.lobbyCode
+        }
+    });
+    if (response.status === 200) {
+        if (response.body.public) {
+            io.emit('delete lobby', {
+                lobbyCode: req.body.lobbyCode
+            });
+        }
+        res.sendStatus(200).end();
+    } else res.sendStatus(response.status).end();
     // Response
     // {
     //      lobbyCode: String
@@ -43,8 +86,12 @@ gaming.post('/readyup', withAuth, async(req, res) => {
             ready: req.body.ready
         }
     });
-    if (response.status === 200) res.sendStatus(200).end();
-    else res.sendStatus(response.status).end();
+    if (response.status === 200) {
+        io.emit('readyup', {
+            ready: req.body.ready
+        });
+        res.sendStatus(200).end();
+    } else res.sendStatus(response.status).end();
     // Response: Success or error
 });
 // ---------------------
@@ -57,6 +104,31 @@ gaming.post('/join', withAuth, async(req, res) => {
             lobbyCode: req.body.lobbyCode
         }
     });
+    if(response.status === 200) {
+        io.emit('join', {
+            username: req.user.username,
+            lobbyCode: req.body.lobbyCode,
+            numPlayers: response.body.numPlayers
+        });
+    }
+    res.sendStatus(response.status).end();
+    // Response: Success or Failure (200 or not 200)
+});
+
+gaming.post('/leave', withAuth, async(req, res) => {
+    const response = await api.call('leave/', 'POST', {
+        json: {
+            username: req.user.username,
+            lobbyCode: req.body.lobbyCode
+        }
+    });
+    if(response.status === 200) {
+        io.emit('leave', {
+            username: req.user.username,
+            lobbyCode: req.body.lobbyCode,
+            numPlayers: response.body.numPlayers
+        });
+    }
     res.sendStatus(response.status).end();
     // Response: Success or Failure (200 or not 200)
 });
