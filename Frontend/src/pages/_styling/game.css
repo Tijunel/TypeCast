@@ -26,19 +26,26 @@
   background: #373a4a;
   width: 100%;
   margin-bottom: 20px;
-  padding: 0 20px 1px;
+  padding: 0 20px;
 }
 .playerdata {  /* the row */
   display: flex;
   padding: 0 5px;
 }
+.playerdata:first-child {
+  margin-top: 10px;
+}
+.playerdata:last-child {
+  margin-bottom: 20px;
+}
 .playerdata td {
-  padding: 15px 0;
+  padding: 5px 0;
 }
 .vis-playername {  /* 1st column */
   flex: 88;
   border-bottom: 3px dashed #888;
   text-align: left;
+  padding-top: 17px !important;
 }
 .vis-playerstats {  /* 2nd column */
   flex: 12;
@@ -47,7 +54,6 @@
 .vis-playerstats .player-pos {
 }
 .vis-playerstats .player-lpm {
-
 }
 #codebox {
   background: #1c1f2b;

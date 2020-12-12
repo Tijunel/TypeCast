@@ -75,6 +75,7 @@ class Game extends React.Component {
     //   isHost:  true for host, false for everyone else
     // charsFin:  number of characters user has finished so far
     //      lpm:  current speed in lines per minute (lpm) of player
+    // accuracy:  % of correct character presses
     // position:  position the player is in (a derived quantity, but might be convenient to just store)
     //     time:  time taken to complete race (finish time, calculated at end)
     let players = [ 
@@ -91,10 +92,14 @@ class Game extends React.Component {
 
     // the string of code that will be used for the race
     this.raceCodeStr =
-`#include <iostream>
-using namespace std; // because I'm lazy
+// `#include <iostream>
+// using namespace std; // because I'm lazy
 
-int main() {
+// int main() {
+//   cout << "Hello, world!" << endl;
+//   return 0;
+// }`;
+`int main() {
   cout << "Hello, world!" << endl;
   return 0;
 }`;
@@ -341,11 +346,18 @@ int main() {
   
     // ----- in ALL cases -------------------------
     this.setState({typed: text});
-    if ( !this.mistakesPresent && !lastPressWasBackspace)  this.numCompletedChars++;
+    if (!lastPressWasBackspace) {
+      this.numTypedChars++
+      if (!this.mistakesPresent)
+        this.numCompletedChars++;
+    }
     // tabs account for > 1 character (spaces)
-    if (this.tabPressed)  this.numCompletedChars += (this.TAB.length - 1)
+    if (this.tabPressed) {
+      this.numCompletedChars += (this.TAB.length - 1);
+      this.numTypedChars += (this.TAB.length - 1);
+      this.tabPressed = false;
+    }
 
-    if (this.tabPressed)  this.tabPressed = false;
 
     // move the cursor 
     // This is just a hack: I made it async to delay execution, as it depends
@@ -500,8 +512,13 @@ int main() {
              Math.round((this.raceCodeStr.length / 80.0) * 100 / (me.time / 60.0)) / 100 :
              Math.round((this.numCompletedChars / 80.0) * 100 / (me.time / 60.0)) / 100;
 
+    // calc accuracy
+    me.accuracy = this.numCompletedChars / this.numTypedChars * 100.0
+
     // report progress (number of characters finished)
     me.charsFin = this.userFinishedRace ? this.raceCodeStr.length : this.numCompletedChars;
+
+    
 
 
     // Todo: DELETE THIS NEXT PART ONCE SERVER CODE IS BEING USED:
@@ -724,7 +741,7 @@ formatPosition = (pos) => {
             <div className="flex">
               <div className="res-att">Accuracy:</div>
               <div className="res-data">
-                {this.state.players[this.myPlayerIndex].lpm} <span className="units">LPM</span>
+                {(this.state.players[this.myPlayerIndex].accuracy).toFixed(2)}<span className="units">%</span>
               </div>
             </div>
 
