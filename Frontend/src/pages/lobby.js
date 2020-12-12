@@ -29,23 +29,33 @@ class Lobby extends React.Component {
       players: [],
       myPlayerIndex: 0,
       iAmHost: this.determineIfIAmHost(),
+      lobbyPosted: false
     };
     this.DEBUG = true;  // for console debug info
     this.alreadyToggledReady = false;
     this.readyFlashedAlready = false;
   }
 
-
   componentDidMount = () => {
-    this.loadLobbyDataFromDB();
-
-    setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 500);
-    setTimeout(()=> this.resizeTableForAdmins(this.state.lobbyName), 500);
-    setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 10000);
+    this.getLobby();
+    // setTimeout(()=> this.resizeNameBox(this.state.lobbyName), 500);
+    // setTimeout(()=> this.resizeTableForAdmins(this.state.lobbyName), 500);
+    // setTimeout(()=> this.flashVisualIndicatorForReadyButton(), 10000);
   }
 
+  getLobby = async () => {
+    let res = await fetch('/gaming/lobby/' + this.state.lobbyCode, {
+      method: 'GET',
+			credentials: "include",
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (res.status === 200) {
+      res = await res.json();
+      this.setState({ lobbyName: res.body.name, iAmHost: false, lobbyPosted: true });
+    } else this.setState({ lobbyName: '(EDIT NAME)', iAmHost: true });
+  }
 
-  loadLobbyDataFromDB = () => {
+  loadLobbyDataFromDB = () => { 
     // todo: replace the hardcoded lobby data below with actual data from our DB.
     //       Fetch the lobby data from the db using this.state.lobbyCode as the key,
     //       -and then use it to setState() for this lobby.      
@@ -385,13 +395,16 @@ class Lobby extends React.Component {
             </div>
           }
         </div>
-
         { this.state.iAmHost && // only show start button to Host
           <button className="start-btn" onClick={()=>this.startGame()}>
+          CREATE LOBBY
+          </button>
+        }
+        { this.state.iAmHost && this.state.lobbyPosted && // only show start button to Host
+          <button className="start-btn" onClick={()=>this.createLobby()}>
           START GAME
           </button>
         }
-          
       </div>
     );
   }

@@ -13,8 +13,18 @@ const io = require('socket.io')(server);
 io.on('connection', (socket) => {
     const userData = cookieParser.JSONCookie(cookie.parse(socket.handshake.headers.cookie).userData);
     socket.on('disconnect', () => {
-        io.emit('disconnect', { username: userData.username });
-    })
+        const response = await api.call('leave/', 'POST', {
+            json: {
+                username: userData.username
+            }
+        });
+        if(response.status === 200) {
+            io.emit('lobby update', {
+                lobbyCode: req.body.lobbyCode,
+                players: response.body.players
+            });
+        }
+    });
 });
 
 // Lobby Endpoints -----
@@ -33,6 +43,21 @@ gaming.get('/lobbies', withAuth, async(req, res) => {
     // }
     // Or Error
 });
+
+// Get Lobby Info
+gaming.get('/lobby/:id', withAuth, async(req, res) => {
+    const response = await api.call('lobby/' + req.params.id, 'GET', {});
+    if (response.status === 200) res.status(200).json(response.body).end();
+    else res.sendStatus(response.status).end();
+    // Response:
+    // {
+    //      lobby: {
+    //          players: []
+    //      }
+    // }
+    // Or Error
+});
+
 
 // Create lobby
 gaming.post('/createLobby', withAuth, async(req, res) => {
@@ -105,10 +130,9 @@ gaming.post('/join', withAuth, async(req, res) => {
         }
     });
     if(response.status === 200) {
-        io.emit('join', {
-            username: req.user.username,
+        io.emit('lobby update', {
             lobbyCode: req.body.lobbyCode,
-            numPlayers: response.body.numPlayers
+            players: response.body.players
         });
     }
     res.sendStatus(response.status).end();
@@ -118,15 +142,13 @@ gaming.post('/join', withAuth, async(req, res) => {
 gaming.post('/leave', withAuth, async(req, res) => {
     const response = await api.call('leave/', 'POST', {
         json: {
-            username: req.user.username,
-            lobbyCode: req.body.lobbyCode
+            username: req.user.username
         }
     });
     if(response.status === 200) {
-        io.emit('leave', {
-            username: req.user.username,
+        io.emit('lobby update', {
             lobbyCode: req.body.lobbyCode,
-            numPlayers: response.body.numPlayers
+            players: response.body.players
         });
     }
     res.sendStatus(response.status).end();
