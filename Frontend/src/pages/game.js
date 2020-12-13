@@ -1,11 +1,6 @@
-// Todo: 
-
-
-
-// Note:  to start the race, call 'this.startTimer(true)'
-
 import React, { Children } from 'react';
 import WithAuth from './withAuth';
+import Cookies from 'js-cookie';
 import './_styling/game.css';
 
 class Game extends React.Component {
@@ -22,13 +17,15 @@ class Game extends React.Component {
       redraw: true                        // toggle this to force redraw (b/c many variables displayed are not in state)
     }
 
-    // THESE THREE ARE RECEIVED FROM SERVER BEFORE RACE STARTS ------------------------------------
+    // THESE ARE RECEIVED FROM SERVER BEFORE RACE STARTS ------------------------------------
     this.playerNames = [];                // list of player names
     this.raceCodeStr = "";                // a string of the entire code
     this.timeLimit = null;                // time limit for this race
+    this.lobbyCode = null;                // I guess we need this? It uniquely identifies this lobby.
+    this.lobbyName = null;                // not really needed, I think
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
-    this.SERVER_UPDATE_INTERVAL = 1000;   // how often (ms) user updates server with his race data (todo: make it 2000)
+    this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
@@ -64,7 +61,7 @@ class Game extends React.Component {
 
 
   componentDidMount = () => {
-    this.receive_initial_data_from_server();
+    this.get_initial_data_from_server();
     this.initializeVars();
     this.inputSetup();
 
@@ -73,9 +70,29 @@ class Game extends React.Component {
   }
 
 
-  receive_initial_data_from_server = () => {
+  // ------------------- server request/response methods ----------------------
+  get_initial_data_from_server = () => {
     // todo: Receive these 3 from the server instead of using these hardcoded values
-    this.playerNames = ["Sarah W.", "Navjeet Pravdaal", "Chloe Salzar", "ThiccBoi McGee", "Mr. McChungus"];
+
+    // REQUEST: send this to the server:  this.lobbyCode  , to request the needed game data
+    // ...
+
+    
+
+    // RESPONSE: server should respond with something structured like this:
+
+    //              {lobbyName: _ ,  raceCodeString: _ , time: _ , playerNames: _ }
+
+    // ...and assuming that is now stored in a variable 'response', do this:
+
+    // this.lobbyName = response.lobbyName;
+    // this.playerNames = response.playerNames;
+    // this.raceCodeStr = response.reaceCodeStr;
+    // this.timeLimit = response.time;
+
+    // ...and delete the below hardcoded values:
+
+    this.playerNames = ["Sarah W.", "Navjeet Pravdaal", "Chloe Salzar", "Test", "Tijunel"];
     
     this.raceCodeStr =
 `getIndentOf = (word) => {
@@ -90,12 +107,64 @@ class Game extends React.Component {
     return indent;
 }`
 
-
     this.timeLimit = 60;
+
   }
 
 
+
+  tell_server_im_ready = () => {
+    // todo
+    // Tell the server this player has finished setting things up and is ready.
+
+    // REQUEST:  let the server know that I am ready
+    // send this to the server:  this.myName
+
+
+    // RESPONSE: when server responds with {start: true}, 
+    // just start the race by calling this:  this.startTimer(true)
+
+
+  }
+
+
+
+  send_receive_updated_player_data = () => {
+    // todo: update with code to send and receive player data to/from the server.
+    //       The game is already set up to call this method every 2 seconds.
+
+    // REQUEST:
+    // send this to the server:  {this.players[0].charsFin, this.players[0].time}
+    //    not sure: do we also need to send the player's name (this.players[0].name)
+    //    ...so the server can identify who tf is sending this stuff?
+
+
+    // RESPONSE:
+    // should receive an array of player entries, each looking like:  {name: _ , charsFin: _, time: _ }
+
+
+    // THEN, use that data to update this.players[]
+    // Assuming the received data is now stored in an array called 'response', do this:
+
+    // for (let pServer of response) {
+    //   if (pServer.name !== this.myName) { // don't update my data with stale server data
+    //     for (let pLocal of this.players) {
+    //       if (pServer.name === pLocal.name) { 
+    //         pLocal.charsFin = pServer.charsFin;
+    //         pLocal.time = pServer.time;
+    //         break;
+    //       }
+    //     }
+    //   }
+    // }
+
+
+  }
+// ------------------ /server request/response methods ------------------------
+
+
   initializeVars = () => {
+    this.myName = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
     this.buildPlayerArray();
     this.raceCode = this.raceCodeStr.split(/(\s+)/);
     this.buildRaceCodeHTML(this.raceCode);
@@ -116,13 +185,10 @@ class Game extends React.Component {
     //              time:   is sent to the server once this player is finished the race and received 
     //                        -for the other players when they have finished the race.
     //  position and lpm:   are calculated locally for visual display of the race stats
-
-    // todo: need to figure out how to get my own user name. For now, I use a hardcoded value:
-    let myName = "ThiccBoi McGee";
-    this.players.push({name: myName, charsFin: 0, time: null,   position: 0, lpm: 0});
+    this.players.push({name: this.myName, charsFin: 0, time: null,   position: 0, lpm: 0});
 
     for (let name of this.playerNames) {
-      if (name === myName) continue;
+      if (name === this.myName) continue;
       this.players.push({name: name, charsFin: 0, time: null,   position: 0, lpm: 0});
     }
   }
@@ -168,61 +234,13 @@ class Game extends React.Component {
   }
 
 
-// ------------------- server communication methods ---------------------------
-  tell_server_im_ready = () => {
-    // todo
-    // Tell the server this player has finished setting things up and is ready.
-
-    // ...code that sends the "I'm ready" message to the server
-
-  }
-
-
-  start_race_listener = () => {
-    // todo
-    // Listen for message from server telling us to start the race.
-    // Call 'this.startTimer(true)' to start everything up.
-    // Until this is implemented, a simple 'Start Race' button on the page starts the race.
-    
-
-    // ...code that listens for the message
-
-    // this.startTimer(true)    <-- call this once the 'start game' message is received 
-  }
-
-
-  request_player_data_update_from_server = () => {
-    // todo
-    // Request the 
-
-
-  }
-
-
-  send_my_data_to_server = () => {
-    // todo: send needed bits of this.players[0] (my player data) to the server
-
-    if (! this.userFinishedRace) {  // or sb !this.players[0].time ?
-      // report my number of characters finished (this.players[0].charsFin) to server: 
-      console.log("characters finished: " + this.players[0].charsFin); // replace this with the code that sends this.players[0].charsFin to sever
-
-    }
-
-    else {  
-      // report my final race time (this.players[0].time) to the server
-      console.log("my finish time: " + this.players[0].time); // replace this with code that sends this.players[0].time to server
-
-    }
-  }
-// ------------------ /server communication methods ---------------------------
-
   calcStatsAndSendMyData = () => {
 
     // If I'm not done the race, calc my progress send that data to the server
     if (!this.players[0].time) {
       this.players[0].charsFin = this.userFinishedRace ? this.raceCodeStr.length : this.numCompletedChars;
       this.calcMyFinalTime();
-      // this.send_my_data_to_server();  // todo: uncomment when server code is in place
+      this.send_receive_updated_player_data();
     }
 
     // Now calculate the stats for all players
@@ -232,19 +250,9 @@ class Game extends React.Component {
       userTime = this.players[i].time ? this.players[i].time : this.calcElapsedTime();
       // calc speed
       this.players[i].lpm = this.calcLPM(userTime, i);
-
       // calc position
       this.players[i].position = this.calcPositionOfPlayer(i);
-
-      // // calc rough (approx) position of each player (not definitive - the server ultimately decides)
-      // this.players[i].roughPosition = 1;
-      // for (let j = 0; j < this.players.length; j++) {
-      //   if (j !== i) {
-      //     if (this.players[j].charsFin > this.players[i].charsFin)
-      //       this.players[i].roughPosition++;
-      //   }
-      // } // for j
-    } // for i
+    }
     
     this.updateCarPositions();
     this.buildVisualPlayerTable();
@@ -285,7 +293,7 @@ class Game extends React.Component {
 
 
   updateCarPositions = () => {
-    // move the cars -------
+    // move the cars to show players' progress, woohoo
     let progress;
     for (let i = 0; i < this.players.length; i++) {
       progress = (this.players[i].charsFin * 10.0) / (this.raceCodeStr.length * 10.0);
