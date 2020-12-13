@@ -42,10 +42,19 @@ user.post('/login', async (req, res) => {
 });
 
 // Change username and/or password
-user.put('/', (req, res) => {
-    const { ID, newUsername, oldPassword, newPassword } = req.body;
+user.put('/', async(req, res) => {
+    const { ID, newUsername, currentPassword, newPass } = req.body;
     try {
-
+        let user = await User.findOne({_id: ID});
+        if (!user) return res.sendStatus(400).end();
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) return res.status(400).end();
+        user.username = newUsername;
+        user.password = newPass;
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPass, salt);
+        await user.save();
+        res.status(200).json(payload).end();
     } catch (error) {
         res.sendStatus(500).end();
     }
