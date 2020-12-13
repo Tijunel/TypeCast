@@ -28,7 +28,7 @@ class App extends React.Component {
     return (
       <React.Fragment>
         <TopNav />
-        <Router>
+        <Router history={this.browserHistory}>
           <Switch>
             <Route path="/home" component={() => <Home />} />
             <Route path="/login" component={() => <Login />} />

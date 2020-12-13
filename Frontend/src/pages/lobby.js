@@ -3,6 +3,7 @@
 import React from 'react';
 import Cookies from 'js-cookie';
 import WithAuth from './withAuth';
+import SocketManager from '../socket';
 import './_styling/lobby.css';
 
 class Lobby extends React.Component {
@@ -40,7 +41,18 @@ class Lobby extends React.Component {
       res = await res.json();
       let playerUI = this.generatePlayerUI(res.players);
       this.setState({ lobbyName: res.lobbyName, iAmHost: false, lobbyPosted: true, timeLimit: res.timeLimit, private: !res.public, playerUI: playerUI, loading: false });
-      // Join lobby
+      this.listenOnSockets();
+      let player = {
+        username: JSON.parse(Cookies.get('userData').split('j:')[1]).username,
+        isHost: false,
+        isReady: false
+      };
+      await fetch('/gaming/join', {
+        method: 'POST',
+			  credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lobbyCode: this.state.lobbyCode, player: player })
+      });
     } else {
       this.setState({ 
         lobbyName: JSON.parse(Cookies.get('userData').split('j:')[1]).username + "'s Lobby", 
@@ -72,10 +84,18 @@ class Lobby extends React.Component {
     if(res.status === 200) {
       let playerUI = this.generatePlayerUI([player]);
       this.setState({lobbyPosted: true, playerUI: playerUI});
-    } else {
-      let playerUI = this.generatePlayerUI([player]);
-      this.setState({lobbyPosted: true, playerUI: playerUI});
-    }
+      this.listenOnSockets();
+    } else alert("Something went wrong, try again.");
+  }
+
+  listenOnSockets = () => {
+    const socket = SocketManager.getInstance().getSocket();
+    socket.on('lobby update', (data) => {
+      if(data.lobbyCode === this.state.lobbyCode) {
+        let playerUI = this.generatePlayerUI(data.players);
+        this.setState({ playerUI: playerUI });
+      }
+    });
   }
 
   toggleReady = (i) => {
