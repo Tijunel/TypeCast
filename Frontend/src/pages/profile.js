@@ -24,7 +24,6 @@ class Profile extends React.Component {
 	}
 
 	componentDidMount = () => {
-		console.log('hey')
 		this.loadUserData();
 		// const tableWidth = document.querySelector("#past-games").offsetWidth;
 		// let tableContainer = document.querySelector("#table-container");

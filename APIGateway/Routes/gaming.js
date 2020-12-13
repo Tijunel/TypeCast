@@ -81,7 +81,7 @@ gaming.post('/readyup', withAuth, async(req, res) => {
 
 // Join Endpoints ------
 gaming.post('/join', withAuth, async(req, res) => {
-    const response = await api.call('join/', 'POST', {
+    const response = await api.call('lobby/join/', 'POST', {
         json: {
             player: req.body.player,
             lobbyCode: req.body.lobbyCode
@@ -98,7 +98,7 @@ gaming.post('/join', withAuth, async(req, res) => {
 });
 
 gaming.post('/leave', withAuth, async(req, res) => {
-    const response = await api.call('leave/', 'POST', {
+    const response = await api.call('lobby/leave/', 'POST', {
         json: {
             username: req.user.username
         }

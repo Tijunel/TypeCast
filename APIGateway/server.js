@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
     const userData = cookieParser.JSONCookie(cookie.parse(socket.handshake.headers.cookie).userData);
     socket.on('disconnect', async() => {
         console.log("Player disconnected");
-        const response = await api.call('leave/', 'POST', {
+        const response = await api.call('lobby/leave/', 'POST', {
             json: {
                 username: userData['username']
             }
