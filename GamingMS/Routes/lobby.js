@@ -25,8 +25,8 @@ lobby.get('/:id', async(req, res) => {
     var value = await asyncRedis.get(req.params.id).then(value => {
         return JSON.parse(value);
     });
-    console.log(value)
-    res.status(200).json(value).end();
+    if(value !== null) res.status(200).json(value).end();
+    else res.sendStatus(500).end();
 });
 
 lobby.post('/create', (req, res) => {
