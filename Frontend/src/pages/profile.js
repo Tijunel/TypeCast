@@ -58,11 +58,14 @@ class Profile extends React.Component {
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then(res => {
-				if (res.status === 200) this.setState({ pastGames: [], typingSpeed: 0 });
-				else alert("Game data reset was unsuccessful.");
+				if (res.status === 200) {
+					this.setState({ pastGames: [], typingSpeed: 0 });
+					alert("Game data reset was successfuly.");
+				} 
+				else alert("Game data reset was successfully.");
 			})
 			.catch(err => {
-				alert("Game data reset was unsucessful.");
+				alert("Error. Game data reset was unsucessful.");
 			});
 	}
 
