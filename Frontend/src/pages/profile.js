@@ -9,12 +9,15 @@ class Profile extends React.Component {
 	constructor() {
 		super();
 		this.newUsername = React.createRef();
+		this.password = React.createRef();
 		this.currentPassword = React.createRef();
+		this.currPassword = React.createRef();
+		this.newPassword = React.createRef();
 		this.newPassword1 = React.createRef();
 		this.newPassword2 = React.createRef();
+		this.username = React.createRef();
 		this.state = {
 			username: "",
-			password: "",
 			pastGamesUI: [],
 			typingSpeed: 0.0,
 			changeUNVisible: false,
@@ -70,60 +73,89 @@ class Profile extends React.Component {
 
 	updateUsernameHandler = (event) => {
 		event.preventDefault();
-		fetch('/users/', {
+		fetch('/user/', {
 			method: 'PUT',
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				newUsername: this.state.newUsername,
-				oldPassword: this.password.current.value,
-				newPassword: this.password.current.value
+				newUsername: this.username.current.value,
+				currPassword: this.currentPassword.current.value,
+				newPassword: this.currentPassword.current.value
 			})
 		})
 			.then(res => {
-				if (res.status === 200) alert("Username successfully changed.");
-				else alert("Username change was unsucessful.");
+				if (res.status === 200) {
+					this.setState({username: JSON.parse(Cookies.get('userData').split('j:')[1]).username});
+					alert("Username successfully changed.");	
+					this.username.current.value = "";
+					this.currentPassword.current.value = "";
+				} 
+				else   {
+					alert("Username change was unsucessful.");
+					this.username.current.value = "";
+					this.currentPassword.current.value = "";
+				}
 			})
 			.catch(err => {
-				alert("Username change was unsucessful.");
+				alert("Username change was unsucessful...");
+				this.username.current.value = "";
+				this.currentPassword.current.value = "";
 			});
 	}
 
 	updatePasswordHandler = (event) => {
 		event.preventDefault();
 		if (!this.newPasswordInfoChecksOut()) return;
-		fetch('/users/', {
+		fetch('/user/', {
 			method: 'PUT',
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				newUsername: this.username.current.value,
-				oldPassword: this.password.current.value,
-				newPassword: this.state.newPassword
+				newUsername: JSON.parse(Cookies.get('userData').split('j:')[1]).username,
+				currPassword: this.password.current.value,
+				newPassword: this.newPassword1.current.value
 			})
 		})
 			.then(res => {
-				if (res.status === 200) alert("Password successfully changed.");
-				else alert("Password change was unsucessful.");
+				if (res.status === 200) {
+					alert("Password successfully changed.");
+					this.password.current.value = "";
+					this.newPassword1.current.value = "";
+					this.newPassword2.current.value = "";
+				} 
+				else {
+					alert("Password change was unsucessful...");
+					this.password.current.value = "";
+					this.newPassword1.current.value = "";
+					this.newPassword2.current.value = "";
+				}
 			})
 			.catch(err => {
 				alert("Password change was unsucessful.");
+				this.password.current.value = "";
+				this.newPassword1.current.value = "";
+				this.newPassword2.current.value = "";
 			});
 	}
 
 	deleteAccountHandler = () => {
-		fetch('/users/', {
+		fetch('/user/', {
 			method: 'DELETE',
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then(res => {
 				if (res.status === 200) window.location.href = '/login'; //Send to login page
-				else alert("Could not delete account.");
+				else  {
+					alert("Could not delete account.");
+					return;
+				} 	
 			})
 			.catch(err => {
-				alert("An error has occured. Could not delete account.");
+				//Goes into here again after pressing the button. It works but still throws an error.
+				return;
 			});
+			window.location.href = '/login';
 	}
 
 	sizeTheExtendedFooter = (situation) => {
@@ -155,15 +187,11 @@ class Profile extends React.Component {
 	}
 
 	newPasswordInfoChecksOut = () => {
-		if (this.state.currentPassword !== this.state.password) {
-			alert("Oops! You entered your current password incorrectly. Try again.");
-			this.setState({ currentPassword: '' });
-		}
-		else if (this.state.newPassword !== this.state.newPassword2) {
+		if (this.newPassword1.current.value !== this.newPassword2.current.value) {
 			alert("Woops: your new passwords don't match! Please re-enter them.");
-			this.setState({ newPassword: '', newPassword2: '' });
+			this.setState({ newPassword1: '', newPassword2: '' });
 		}
-		else if (this.state.newPassword === '') {
+		else if (this.newPassword1.current.value === '') {
 			alert("Sorry, but you need to have a password (you can't set an empty password.)");
 		}
 		else return true;
@@ -232,10 +260,18 @@ class Profile extends React.Component {
 					{this.state.changeUNVisible ?
 						<div id="change-username-box">
 							<form onSubmit={this.updateUsernameHandler}>
-								<label>Username &nbsp;</label>
+								<label>New Username &nbsp;</label>
 								<input
 									type="text"
+									ref={this.username}
 								/>
+								<br></br><br></br>
+								<label>Password &nbsp;</label>
+								<input
+									type="password"
+									ref={this.currentPassword}
+								/>
+								<br></br><br></br>
 								<input type='submit' value='Change' />
 							</form>
 						</div>
@@ -249,18 +285,21 @@ class Profile extends React.Component {
 									<label>Current password &nbsp;</label>
 									<input
 										type="password"
+										ref={this.password}
 									/>
 								</div>
 								<div className="flex-container">
 									<label>New password &nbsp;</label>
 									<input
 										type="password"
+										ref={this.newPassword1}
 									/>
 								</div>
 								<div className="flex-container">
 									<label>Confirm &nbsp;</label>
 									<input
 										type="password"
+										ref={this.newPassword2}
 									/>
 								</div>
 								<input type='submit' value='Change' />
