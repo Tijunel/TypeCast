@@ -21,6 +21,7 @@
 } */
 #game-status {
   margin: 20px 0;
+  font-size: 1.2rem;
 }
 #race-visualization {  /* table's container */
   background: #373a4a;

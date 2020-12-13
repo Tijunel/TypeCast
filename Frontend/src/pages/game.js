@@ -14,24 +14,25 @@ class Game extends React.Component {
     super();
 
     this.state = {
-      players: [],                    // COMES FROM THE SERVER - holds the players' data for the race
+      players: [],                        // COMES FROM THE SERVER - holds the players' data for the race
 
-      raceCodeHTML: [],               // styled raceCode html, reflecting what the player has typed
-      typed: "",                      // what has been typed into the text box for the current 'word' so far
-      raceStarted: false,             // race has started?
-      raceHasEnded: false,            // true when the time runs out or when all players have finished race
-      timeElapsed: -1                 // amount of time (seconds) that have passed since start of race
+      raceCodeHTML: [],                   // styled raceCode html, reflecting what the player has typed
+      typed: "",                          // what has been typed into the text box for the current 'word' so far
+      raceStarted: false,                 // race has started?
+      raceHasEnded: false,                // true when the time runs out or when all players have finished race
+      timeElapsed: -1                     // amount of time (seconds) that have passed since start of race
     }
     // THESE THREE COME FROM THE SERVER -----------------------------------------------------------
-    this.myPlayerIndex = 0;           // this user's index in players[]
-    this.raceCodeStr = "";            // a string of the entire code
-    this.timeLimit = null;            // time limit for this race
+    this.myPlayerIndex = 0;               // this user's index in players[]
+    this.raceCodeStr = "";                // a string of the entire code
+    this.timeLimit = null;                // time limit for this race
 
     // "CONSTANTS" we may want to adjust  ---------------------------------------------------------
-    this.SERVER_UPDATE_INTERVAL = 1000;  // how often to share player's data with the server
-    this.COUNTDOWN_TIME = 1;             // seconds of countdown before the actual race starts
-    this.TAB = '  ';                     // what gets typed when player hits the Tab key in game
-    this.DEBUG = true;                   // debug mode (lots of console output)
+    this.SERVER_UPDATE_INTERVAL = 1000;   // how often to share player's data with the server
+    this.COUNTDOWN_TIME = 1;              // seconds of countdown before the actual race starts
+    this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
+    this.AUTO_INDENT = true;              // (self explanitory)
+    this.DEBUG = true;                    // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
     this.raceCode = [];               // array of 'words' parsed from raceCodeStr
@@ -48,15 +49,17 @@ class Game extends React.Component {
     this.tabPressed = false;                     // allows keyup event listener to communicate tab presses 
     this.enterPressed = false;        // allows keyup event listener to communicate Enter presses
     this.wordWithEnters = "";         // used for handling Enter key presses (newlines)
-    this.wordChanged = false;
+    this.wordChanged = false;         // used to assist in detecting backspaces under different conditions
     this.cursorLocation = '.w0.c0';   // used for moving the blinking cursor around
     this.prevCursorType = 'cursor';   // used for moving the blinking cursor around
     this.userFinishedRace = false;    // user has finished the race?
     this.raceStartTime = null;        // used for the game timer
     this.currentTime = 0;             // used for the game timer
+    this.lastUpdateTime = null;       // used for the game timer
     this.interval = 0;                // used for updating game timer
     this.interval2 = 0;               // used for updating user's own data
-    this.lastUpdateTime = null;
+    this.prevLineIndent = 0;          // used for auto-indent feature
+    this.moreIndendation = false;
   }
 
 
@@ -95,17 +98,39 @@ class Game extends React.Component {
 
     // the string of code that will be used for the race
     this.raceCodeStr =
-`#include <iostream>
-using namespace std;
 
-int main() {
-  cout << "Hello, world!" << endl;
-  return 0;
+// `getIndentOf = (word) => {
+//   let indent = 0;
+//   for (let ch of word) {
+//     if (ch === '\\n')
+//       indent = 0;
+//     else if (ch === ' ')
+//       indent++;
+//     else
+//       break;
+//   }
+//   return indent;
+// }`
+
+`getIndentOf = (word) => {
+    let indent = 0;
+    for (let ch of word) {
+        if (ch === '\\n')
+            indent = 0;
+        else if (ch === ' ')
+            indent++;
+        else
+            break;
+    }
+    return indent;
 }`
 
 
+  
+
+
     // the time limit for the race
-    this.timeLimit = 180;
+    this.timeLimit = 1120;
   }
 
 
@@ -114,9 +139,10 @@ int main() {
     this.buildRaceCodeHTML(this.raceCode);
     this.cw = this.raceCode[0];
     this.whitespaceAtStart = (this.cw === ' ' || this.cw === '\n' || !this.cw);
-    if (this.whitespaceAtStart) {
+    if (this.whitespaceAtStart)
       this.cursorLocation = '.w1.c0';
-    }
+    if (this.AUTO_INDENT)
+      this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
   }
 
 
@@ -136,6 +162,23 @@ int main() {
   }
 
 
+  getIndentationOf = (word) => {
+  // checks a word for the amount of indentation present.
+  // This is intended for use on 'words' that are the chunk of
+  // whitespace between the end of a line and the beginning of a new one
+    let indent = 0;
+    for (let ch of word) {
+      if (ch === '\n')
+        indent = 0;
+      else if (ch === ' ')
+        indent++;
+      else
+        break;
+    }
+    return indent;
+  }
+
+
   tellServerImReady = () => {
     // todo
     // lets the server know that this player is ready.
@@ -144,6 +187,13 @@ int main() {
     // Also: once the server essentially says "GO!" to everyone to start the race,
     // call 'this.startTimer(true)' to begin the coundown and start the race.
     // For now, a simple 'Start Race' button triggers this call.
+  }
+
+
+  serverSaysRaceIsOver = () => {
+    //  todo 
+
+    this.setState({raceHasEnded: true});
   }
 
 
@@ -161,12 +211,9 @@ int main() {
 
 
   inputSetup = () => {
+  // handles Enter and Tab (+ Backspace when nothing is present in the .typingbox)
     const typingBox = document.querySelector(".typingbox");
     typingBox.addEventListener("keyup", (event) => {
-
-      // if (! this.raceStarted) {
-      //   this.startTimer(false);
-      // }
       
       if (event.key === "Enter") {
         event.preventDefault();
@@ -192,14 +239,14 @@ int main() {
         if (this.state.typed[0] === '\n' && this.wordWithEnters !== '') {
           this.printDebug("              < Backspace >  (otherwise undetectable)");
           this.undetectableBackspacePressed = true;
-          //this.wordWithEnters = this.wordWithEnters.substring(0, this.wordWithEnters.length-1);
           this.typingHandler();
         }
       }
     });
 
     document.querySelector('#game').addEventListener("keyup", (event) => {
-      if (event.keyCode == 9) { // Tab
+      if (event.key === "Tab") { // Tab
+
         event.preventDefault();
         this.printDebug("                               < Tab >");
         this.tabPressed = true;
@@ -212,14 +259,32 @@ int main() {
 
   // --------------------- the main game engine -------------------------------
   typingHandler = (event) => {
-    let text = '';
-    let lastPressWasBackspace = false;
+    let text = '',
+        lastPressWasBackspace = false,
+        autoIndentThisLine = false,  // if gets flipped, auto indent by this.prevLineIndent amount
+        prevLineIndentBackup = this.prevLineIndent,
+        indent = -1;
 
     // ------ Enter presses (newlines) part of cw -------
     if (this.wordWithEnters !== '') {
-      if (this.enterPressed)
+      if (this.enterPressed) {
         this.enterPressed = false;
-      else {
+        if (this.AUTO_INDENT) {
+          let wordIndex = (this.wordWithEnters === this.cw+'\n') ? this.cwi+1 : this.cwi;
+          indent = this.getIndentationOf(this.raceCode[wordIndex]);
+          if (indent >= this.prevLineIndent && this.prevLineIndent > 0)
+            autoIndentThisLine = true;
+          else {
+            if (!this.prevLineIndent == 0) {
+              this.prevLineIndent = indent; //(this.prevLineIndent - this.TAB.length >= 0) ? this.prevLineIndent - this.TAB.length : 0;
+              autoIndentThisLine = true;
+            // will screw up if user presses Enter mid-word somewhere (a mistake)
+            // ... so we check for this at the end of this method and correct if nec.
+            }
+          }
+        }
+      }
+      else { // not Enter for last press, but one already pressed for current word:
         lastPressWasBackspace = 
           (!this.wordChanged && !this.tabPressed && 
           (this.undetectableBackspacePressed || event.target.value.length < this.state.typed.length) );
@@ -233,17 +298,21 @@ int main() {
           if (this.wordWithEnters !== '')
             this.wordWithEnters += this.TAB;
         }
-        else {
+        else { // space pressed? Not sure. landing here on 'need to indent more' cases...
           let lastChar = event.target.value[event.target.value.length - 1];
-          // in an edge case involving Tabs actually being captured by the typingbox, sometimes lastChar = undefined
-          // Check to ensure lastChar is defined. If it isn't, completely ignore it.
-          if (lastChar)
+          if (lastChar) {
             this.wordWithEnters += lastChar;
-          else
-            console.log("\n\n    U N D E F I N E D  'lastChar' discarded\n\n")
+          }
+          // if (this.prevLineIndent > 0 && this.getIndentationOf(this.raceCode[this.cwi]) > 0) {
+          //   haveToIndentFurther = true;
+          else {
+          // In an edge case involving Tabs actually being captured by the typingbox, sometimes lastChar = undefined.
+          // Check to ensure lastChar is defined. If it isn't, completely ignore it.
+            this.printDebug("\n\n    U N D E F I N E D  'lastChar' discarded\n\n");
+          }
         }
       }
-      text = this.wordWithEnters;  // BLAH: ok, so this is where it all goes wrong...
+      text = this.wordWithEnters;
     }
     // ------ backspace pressed in an empty textbox -----
     else if (this.undetectableBackspacePressed) {
@@ -251,7 +320,7 @@ int main() {
       text = this.wordWithEnters;
       this.undetectableBackspacePressed = false;
     }
-    // ------ Tab presses (for indentation) -------------
+    // ------ Tab presses -------------------------------
     else if (this.tabPressed)
       text = this.state.typed + this.TAB;
 
@@ -285,6 +354,8 @@ int main() {
           this.underlineHelper(this.cwi, false); // refactor: shouldn't call this directly
           this.makeLastCharTypedGreen(text, this.cwi);
         }
+        this.numTypedChars++;
+        this.numCompletedChars++;
         return;
       }
       else  this.styleAnyMistakes(text, cw);
@@ -297,7 +368,8 @@ int main() {
       // Whitespace chunks complete on their final character (don't require the next word's 1st chracter).
       const actualWordFinished = (text === cw + nw[0]);
       const whitespaceFinished = (!this.whitespaceAtStart && this.cwi % 2 === 1 && text === cw) ||
-                                 (this.whitespaceAtStart && this.cwi % 2 === 0 && text === cw) ;
+                                 (this.whitespaceAtStart && this.cwi % 2 === 0 && text === cw)  ||
+                                 (this.tabPressed && text === this.cw + ' ');
       const finishedCW = actualWordFinished || whitespaceFinished;
 
       // ---------- cw has just been finished ----------------
@@ -313,31 +385,42 @@ int main() {
           let endingWS = text[text.length-1]; // delineating whitespace character that ended the word
         
           // check the delineating character
-          //if (endingWS === ' ' || endingWS === '\n' ) { // won't this always fire?...    // BLAH can prob delete
           if (endingWS === '\n')
             this.wordWithEnters = '\n';
           else                                    // BLAH DONT THINK THIS IS NEEDED. I COULD BE WRONG.
-            this.wordWithEnters = '';
+            this.wordWithEnters = ''
           this.makeLastCharTypedGreen(text.substring(0, text.length-1), this.cwi);
-          //}
           text = endingWS;
 
+          // add the auto-indent, if applicable
+          if (autoIndentThisLine)
+            text += " ".repeat(this.prevLineIndent);
+
           // the last character typed was whitespace; see if that character IS
-          // the entire next 'word' of whitespace (of length = 1)
-          if (endingWS === nw) {
-            text = '';
+          // the entire next 'word' of whitespace (including cases where auto-indent is involved)
+          if (endingWS === nw || (autoIndentThisLine && text === nw) ) { // BLAH: don't think I need that autoIndentThisLine && first part
+            text = '';                                                   // just having || text === nw  should do it
             this.wordWithEnters = '';
             nwi++;
             nw = this.raceCode[nwi];
             //this.makeLastCharTypedGreen(nw[0], nwi);      // MIGHT HAVE TO MOD THE GREEN METHOD NOW   BLAH can probably del
             this.printDebug(` finished: '${endingWS}'\nnext word: '${nw}'\n----------------------------\n\n\n\n\n`);
           }
+          else if (autoIndentThisLine && text !== '') {  // auto-indented but didn't finish the whitespace 'word'
+            this.wordWithEnters = text;
+          }
         }
-        // whitespace chunk finished (with length > 1)
-        else {  // THIS IS WHERE I THINK IT NEEDS WORK
-
+        // !actualWordFinished (ie: whitespace chunk finished (with length > 1)
+        else {
+          // to correct the Tab glitch
+          if (this.tabPressed && text === this.cw + ' ') {
+            this.numTypedChars--;
+            this.numCompletedChars--;
+          }
           text = '';
           this.wordWithEnters = '';
+
+
         }
 
         // in either case (finished an actual word OR a chunk of whitespace)
@@ -358,34 +441,48 @@ int main() {
     // ----- in ALL cases -------------------------
     this.setState({typed: text}); // BLAH: I guess in this particular case, THIS is where it hits the fan...
 
-    if (lastPressWasBackspace) {  // case: xY how to tell if just reaching back to neutral or eating away?
-      if (!this.mistakesPresent && !this.mistakePresentOnLastType)
+    // was the indentation data recorded over by a mistake?
+    if (this.mistakesPresent)
+      this.prevLineIndent = prevLineIndentBackup; // correct it
+
+    // update character counts
+    if (lastPressWasBackspace) {
+      if (!this.mistakesPresent && !this.mistakePresentOnLastType) 
         this.numCompletedChars--;
-    }
-    else { // not backspace pressed
+    } 
+    else {
       this.numTypedChars++
-      
-      if (!this.mistakesPresent)
-        this.numCompletedChars++;
+      if (!this.mistakesPresent)  this.numCompletedChars++;
     }
 
-    this.mistakePresentOnLastType = this.mistakesPresent; // update it for next key press
+    // update mistake history (used for keeping correct count 
+    // of this.numCompletedChars when backspacing involved)
+    this.mistakePresentOnLastType = this.mistakesPresent;
 
-    // tabs account for > 1 character (spaces)
+    // account for tab characters (spaces)
     if (this.tabPressed) {
       this.numTypedChars += (this.TAB.length - 1); // -1 because we already added one
       this.tabPressed = false;
-
       if (!this.mistakesPresent)
         this.numCompletedChars += (this.TAB.length - 1);
     }
+    
+    // account for auto-indent characters (spaces)
+    if (autoIndentThisLine) {
+      this.numTypedChars += (this.prevLineIndent);
+      this.numCompletedChars += (this.prevLineIndent);
+      // this.numTypedChars += (this.prevLineIndent - 1);    //was this, before
+      // this.numCompletedChars += (this.prevLineIndent - 1)
+    }
 
+    // record the indentation level
+    if (indent > -1 && !this.mistakesPresent)  
+    this.prevLineIndent = indent;
 
-    // move the cursor 
-    // This is just a hack: I made it async to delay execution, as it depends
+    // move the cursor --------------------------------------------------------
+    // BLAH: this is just a hack: I made it async to delay execution, as it depends
     // on values that have been setState()-ed, above.
     // TODO: refactor this so it executes synchronously, time permitting
-    
     setTimeout(()=> {
       let cursorType = 'cursor';
       let cursorWI = this.cwi;
@@ -584,7 +681,6 @@ int main() {
     this.calcMyResults();
     this.sendMyDataToServer();
     this.finishedStyling();
-    this.setState({raceHasEnded: true});
     
     // todo: remove this once server is starting the game
     document.querySelector('#testStartBtn').style.display = 'none';
@@ -718,6 +814,7 @@ formatPosition = (pos) => {
   render = () => {
     return (
       <div id='game'>
+
         <div id='timer'>
           { this.state.raceStarted ?  
               this.formatTime(this.state.timeElapsed)
@@ -754,7 +851,7 @@ formatPosition = (pos) => {
           <pre>{this.state.raceCodeHTML}</pre>
         </div>
 
-        { this.state.raceHasEnded ?
+        { this.state.raceHasEnded || this.userFinishedRace ?
 
           <div id="race-results">
             <div id="result-heading">Your Results</div>
@@ -806,12 +903,12 @@ formatPosition = (pos) => {
           />
         }
 
-          <div id="testStartBtn">
-            <br/><br/>
-            <button onClick={() => this.startTimer(true)} 
-                    style={{marginBottom: "20px"}}>Start Race</button>
-            <span>&nbsp; {'<--'} Just for testing; server should actually trigger the start of the race...</span>
-          </div>
+        <div id="testStartBtn">
+          <br/><br/>
+          <button onClick={() => this.startTimer(true)} 
+                  style={{marginBottom: "20px"}}>Start Race</button>
+          <span>&nbsp; {'<--'} Just for testing; server should actually trigger the start of the race...</span>
+        </div>
 
       </div>
     );
