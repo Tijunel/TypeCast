@@ -8,16 +8,18 @@
 #top-section {
   display: flex;
   min-height: 120px;
+  margin: auto;
   margin-bottom: 40px;
   width: 90%;
 }
 #lobby-name {
-  font-size: 50px;
+  font-size: 30px;
   text-transform: uppercase;
+  text-align: center;
   flex: 7;
   overflow: hidden;
-  padding: 10px 0;
-  margin-top: 15px;
+  padding: 10px 0px;
+  margin-top: 20px;
 }
 .editable-name, .fixed-name {
   background: #7c9fc250;
@@ -41,11 +43,10 @@
 }
 #lobby-code-section{
   flex: 3;
-  padding-left: 20px;
+  text-align: center;
   color: white;
 }
 #code-heading {
-  padding-left: 22px;
   margin-bottom: 4px;
 }
 #code {
@@ -53,14 +54,12 @@
   font-weight: 900;
   padding: 10px 25px;
   text-transform: uppercase;
-  float: right;
 }
 .copy-btn {
   padding: 8px 16px;
   background: #5490CC;
   color: white;
   border: 2px solid #000;
-  float: right;
 }
 .copy-btn:hover {
   background: #3d6892;

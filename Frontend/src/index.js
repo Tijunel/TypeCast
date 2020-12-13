@@ -22,31 +22,15 @@ import Footer from './components/navigation/footer';
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {
-      signedIn: false
-    }
-  }
-
-  componentDidMount = () => {
-    fetch('/user/validate', {
-      method: 'GET',
-      credentials: "include",
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(res => {
-        if (res.status === 200) this.setState({ signedIn: true });
-        else this.setState({ signedIn: false });
-      })
-      .catch(err => { this.setState({ signedIn: false }); });
   }
 
   render = () => {
     return (
       <React.Fragment>
-        <TopNav signedIn={this.state.signedIn} />
+        <TopNav />
         <Router>
           <Switch>
-            <Route path="/home" component={() => <Home signedIn={this.state.signedIn}/>} />
+            <Route path="/home" component={() => <Home />} />
             <Route path="/login" component={() => <Login />} />
             <Route path="/register" component={() => <Register />} />
             <Route path="/join" component={() => <Join />} />

@@ -24,11 +24,12 @@ class Profile extends React.Component {
 	}
 
 	componentDidMount = () => {
+		console.log('hey')
 		this.loadUserData();
-		const tableWidth = document.querySelector("#past-games").offsetWidth;
-		let tableContainer = document.querySelector("#table-container");
-		tableContainer.style.width = tableWidth + "px";
-		this.sizeTheExtendedFooter("initial load");
+		// const tableWidth = document.querySelector("#past-games").offsetWidth;
+		// let tableContainer = document.querySelector("#table-container");
+		// tableContainer.style.width = tableWidth + "px";
+		// this.sizeTheExtendedFooter("initial load");
 	}
 
 	loadUserData = () => {
@@ -41,12 +42,12 @@ class Profile extends React.Component {
 			.then(async res => {
 				if (res.status === 200) {
 					res = await res.json();
-					const pastGamesUI = this.generatePastGamesUI();
-					this.setState({ LPM: res.lpm, pastGamesUI: res.games, username: username });
-				} else alert("An error occured while finding your past games");
+					const pastGamesUI = this.generatePastGamesUI(res.games);
+					this.setState({ LPM: res.lpm, pastGamesUI: pastGamesUI, username: username });
+				} 
 			})
 			.catch(err => {
-				alert("An error occured while finding your past games");
+				
 			});
 	}
 
@@ -171,22 +172,7 @@ class Profile extends React.Component {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false });
 	}
 
-	myChangeHandler = (event) => {
-		let name = event.target.name;
-		let val = event.target.value;
-		this.setState({ [name]: val });
-	}
-
-	formatPosition = (pos) => {
-		switch (pos) {
-			case (1): return "1st";
-			case (2): return "2nd"; 
-			case (3): return "3rd"; 
-			default: return pos + "th";
-		}
-	}
-
-	generatePastGamesUI = () => {
+	generatePastGamesUI = (pastGames) => {
 		let pastGamesTable = [];
 		pastGamesTable.push(
 			<tr key="headings">
@@ -196,25 +182,25 @@ class Profile extends React.Component {
 				<td className="date">Date</td>
 			</tr>
 		);
-		for (let i = 0; i < this.state.pastGames.length; i++) {
+		for (let i = 0; i < pastGames.length; i++) {
 			pastGamesTable.push(
 				<tr key={"game" + (i + 1)}>
 					<td className="position">
-						{this.formatPosition(this.state.pastGames[i].position)}
+						{pastGames[i].position}
 					</td>
 					<td className="speed">
 						<pre>
-							{this.state.pastGames[i].lpm > 9 ?
-								this.state.pastGames[i].lpm
-								: " " + this.state.pastGames[i].lpm}
+							{pastGames[i].lpm > 9 ?
+								pastGames[i].lpm
+								: " " + pastGames[i].lpm}
 						</pre> <span className="lpm">LPM</span>
 					</td>
-					<td className="time">{this.state.pastGames[i].time}</td>
-					<td className="date">{this.state.pastGames[i].date}</td>
+					<td className="time">{pastGames[i].time}</td>
+					<td className="date">{pastGames[i].date}</td>
 				</tr>
 			); 
 		}
-		this.setState({ pastGamesUI: pastGamesTable });
+		return pastGamesTable;
 	}
 
 	render = () => {
@@ -247,9 +233,6 @@ class Profile extends React.Component {
 								<label>Username &nbsp;</label>
 								<input
 									type="text"
-									name="newUsername"
-									value={this.state.newUsername}
-									onChange={this.myChangeHandler}
 								/>
 								<input type='submit' value='Change' />
 							</form>
@@ -264,27 +247,18 @@ class Profile extends React.Component {
 									<label>Current password &nbsp;</label>
 									<input
 										type="password"
-										name="currentPassword"
-										value={this.state.currentPassword}
-										onChange={this.myChangeHandler}
 									/>
 								</div>
 								<div className="flex-container">
 									<label>New password &nbsp;</label>
 									<input
 										type="password"
-										name="newPassword"
-										value={this.state.newPassword}
-										onChange={this.myChangeHandler}
 									/>
 								</div>
 								<div className="flex-container">
 									<label>Confirm &nbsp;</label>
 									<input
 										type="password"
-										name="newPassword2"
-										value={this.state.newPassword2}
-										onChange={this.myChangeHandler}
 									/>
 								</div>
 								<input type='submit' value='Change' />
@@ -293,7 +267,7 @@ class Profile extends React.Component {
 						:
 						<p></p>
 					}
-					{this.state.delAcctVisible ?
+					{this.state.delAcctVisible &&
 						<div id="delete-account-box">
 							Are you SURE you want to delete your account?<br />
               				It will be gone forever.<br />
@@ -306,15 +280,11 @@ class Profile extends React.Component {
 								No! Get me out of here!
               				</button>
 						</div>
-						:
-						<p></p>
 					}
-					{this.state.changeUNVisible || this.state.changePWVisible ?
+					{(this.state.changeUNVisible || this.state.changePWVisible) &&
 						<div id="close-pannel-container">
 							<button onClick={() => this.closePanel()} className="text-btn">close pannel</button>
 						</div>
-						:
-						<p></p>
 					}
 				</div>
 			</div>
