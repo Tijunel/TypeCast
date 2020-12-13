@@ -16,7 +16,7 @@ class Profile extends React.Component {
 			username: "",
 			password: "",
 			pastGamesUI: [],
-			LPM: 0.0,
+			typingSpeed: 0.0,
 			changeUNVisible: false,
 			changePWVisible: false,
 			delAcctVisible: false
@@ -43,7 +43,7 @@ class Profile extends React.Component {
 				if (res.status === 200) {
 					res = await res.json();
 					const pastGamesUI = this.generatePastGamesUI(res.games);
-					this.setState({ LPM: res.lpm, pastGamesUI: pastGamesUI, username: username });
+					this.setState({ typingSpeed: res.typingSpeed, pastGamesUI: pastGamesUI, username: username });
 				} 
 			})
 			.catch(err => {
@@ -58,11 +58,14 @@ class Profile extends React.Component {
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then(res => {
-				if (res.status === 200) this.setState({ pastGames: [], LPM: 0 });
-				else alert("Game data reset was unsuccessful.");
+				if (res.status === 200) {
+					this.setState({ pastGames: [], typingSpeed: 0 });
+					alert("Game data reset was successfuly.");
+				} 
+				else alert("Game data reset was successfully.");
 			})
 			.catch(err => {
-				alert("Game data reset was unsucessful.");
+				alert("Error. Game data reset was unsucessful.");
 			});
 	}
 
@@ -186,14 +189,14 @@ class Profile extends React.Component {
 			pastGamesTable.push(
 				<tr key={"game" + (i + 1)}>
 					<td className="position">
-						{pastGames[i].position}
+						{pastGames[i].placement}
 					</td>
 					<td className="speed">
 						<pre>
-							{pastGames[i].lpm > 9 ?
-								pastGames[i].lpm
-								: " " + pastGames[i].lpm}
-						</pre> <span className="lpm">LPM</span>
+							{pastGames[i].typingSpeed > 9 ?
+								pastGames[i].typingSpeed
+								: " " + pastGames[i].typingSpeed}
+						</pre> <span className="typingSpeed">LPM</span>
 					</td>
 					<td className="time">{pastGames[i].time}</td>
 					<td className="date">{pastGames[i].date}</td>
@@ -210,13 +213,11 @@ class Profile extends React.Component {
 					<div id="profile-heading"><h1>{this.state.username}</h1></div>
 					<div id="table-container">
 						<div id="table-forehead">Your Race Results</div>
-						<table id="past-games"><tbody>{this.state.pastGamesUI}</tbody></table>
+						<table class="center-table" id="past-games"><tbody>{this.state.pastGamesUI}</tbody></table>
 						<div id="table-chin">
 							<div id="avg-speed">
-								Average LPM: <div id="avg-speed-nbr">{this.state.LPM}</div>
+								Average Typing Speed: <div id="avg-speed-nbr">{this.state.typingSpeed}</div>
 							</div>
-							<button onClick={() => this.clearHistory()}
-								className="text-btn">Reset Score?</button>
 						</div>
 					</div>
 				</div>
@@ -224,6 +225,8 @@ class Profile extends React.Component {
 					<div id="user-menu">
 						<button onClick={() => this.showChangeUsername()}>Change UserName</button>
 						<button onClick={() => this.showChangePassword()}>Change Password</button>
+						<button onClick={() => this.clearHistory()}
+								className="text-btn">Reset Score</button>
 						<button onClick={() => this.showDeleteAccount()}
 							className="del-acct-btn">Delete Account</button>
 					</div>

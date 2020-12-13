@@ -11,7 +11,7 @@ const userData = express.Router();
 userData.get('/games', withAuth, async (req, res) => {
     const response = await api.call('games/' + req.user.ID, 'GET', {});
     if (response.status === 200) 
-        res.status(200).json({ lpm: response.body.lpm, games: response.body.games }).end();
+        res.status(200).json({ typingSpeed: response.body.typingSpeed, games: response.body.games }).end();
     else res.sendStatus(response.status).end();
 });
 
