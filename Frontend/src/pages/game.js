@@ -29,7 +29,7 @@ class Game extends React.Component {
 
     // "CONSTANTS" we may want to adjust  ---------------------------------------------------------
     this.SERVER_UPDATE_INTERVAL = 1000;   // how often to share player's data with the server
-    this.COUNTDOWN_TIME = 1;              // seconds of countdown before the actual race starts
+    this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
     this.DEBUG = true;                    // debug mode (lots of console output)
@@ -130,7 +130,7 @@ class Game extends React.Component {
 
 
     // the time limit for the race
-    this.timeLimit = 1120;
+    this.timeLimit = 60;
   }
 
 
