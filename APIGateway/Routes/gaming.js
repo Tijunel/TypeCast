@@ -12,7 +12,7 @@ const server = require('../server');
 const io = require('socket.io')(server);
 io.on('connection', (socket) => {
     const userData = cookieParser.JSONCookie(cookie.parse(socket.handshake.headers.cookie).userData);
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async() => {
         const response = await api.call('leave/', 'POST', {
             json: {
                 username: userData.username
@@ -44,42 +44,31 @@ gaming.get('/lobbies', withAuth, async(req, res) => {
     // Or Error
 });
 
-// Get Lobby Info
+// Get Lobby Info 
 gaming.get('/lobby/:id', withAuth, async(req, res) => {
     const response = await api.call('lobby/' + req.params.id, 'GET', {});
     if (response.status === 200) res.status(200).json(response.body).end();
     else res.sendStatus(response.status).end();
-    // Response:
-    // {
-    //      lobby: {
-    //          players: []
-    //      }
-    // }
-    // Or Error
 });
-
 
 // Create lobby
 gaming.post('/createLobby', withAuth, async(req, res) => {
     const response = await api.call('lobby/create/', 'POST', {
         json: {
+            lobbyCode: req.body.lobbyCode,
+            lobbyName: req.body.lobbyName,
             timeLimit: req.body.timeLimit,
-            public: req.body.public
+            public: req.body.public, 
+            player: req.body.player
         }
     });
-    if (response.status === 200) {
+    if (response.status === 200 && req.body.public) { // Emit event for people in join page
         io.emit('new lobby', {
-            lobbyCode: response.body.lobbyCode,
-            numPlayers: 1,
-            timeLimit: req.body.timeLimit
+            lobbyCode: req.body.lobbyCode,
+            lobbyName: req.body.lobbyName
         });
-        res.status(200).json(response.body).end();
-    } else res.sendStatus(response.status).end();
-    // Response
-    // {
-    //      lobbyCode: String
-    // }
-    // Or Error
+    } 
+    res.sendStatus(response.status).end();
 });
 
 // Delete lobby
@@ -97,11 +86,6 @@ gaming.post('/deleteLobby', withAuth, async(req, res) => {
         }
         res.sendStatus(200).end();
     } else res.sendStatus(response.status).end();
-    // Response
-    // {
-    //      lobbyCode: String
-    // }
-    // Or Error
 });
 
 // Ready or un-ready up
@@ -117,7 +101,6 @@ gaming.post('/readyup', withAuth, async(req, res) => {
         });
         res.sendStatus(200).end();
     } else res.sendStatus(response.status).end();
-    // Response: Success or error
 });
 // ---------------------
 
@@ -136,7 +119,6 @@ gaming.post('/join', withAuth, async(req, res) => {
         });
     }
     res.sendStatus(response.status).end();
-    // Response: Success or Failure (200 or not 200)
 });
 
 gaming.post('/leave', withAuth, async(req, res) => {
@@ -152,7 +134,6 @@ gaming.post('/leave', withAuth, async(req, res) => {
         });
     }
     res.sendStatus(response.status).end();
-    // Response: Success or Failure (200 or not 200)
 });
 // ---------------------
 

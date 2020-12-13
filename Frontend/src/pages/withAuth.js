@@ -20,7 +20,7 @@ export default function WithAuth(ComponentToProtect) {
                 headers: { 'Content-Type': 'application/json' }
             })
                 .then(res => {
-                    if (res.status === 200) this.setState({ loading: false });
+                    if (res.status === 200) this.setState({ loading: false, redirect: false });
                     else this.setState({ loading: false, redirect: true });
                 })
                 .catch(err => { this.setState({ loading: false, redirect: true }); });
@@ -28,8 +28,7 @@ export default function WithAuth(ComponentToProtect) {
 
         componentDidMount = () => {
             this.checkToken();
-            this.timerID = setInterval(() => this.checkToken(), 30000);
-            this.forceUpdate();
+            this.timer = setInterval(() => this.checkToken(), 30000);
         }
 
         render = () => {

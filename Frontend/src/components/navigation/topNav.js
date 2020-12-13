@@ -5,11 +5,36 @@ import './_styling/topNav.css';
 export default class TopNav extends React.Component {
     constructor() {
         super();
+        this.state = {
+            signedIn: false
+        }
+    }
+
+    componentDidMount = () => {
+        fetch('/user/validate', {
+            method: 'GET',
+            credentials: "include",
+            headers: { 'Content-Type': 'application/json' }
+          })
+            .then(res => {
+              if (res.status === 200) this.setState({ signedIn: true });
+              else this.setState({ signedIn: false });
+            })
+            .catch(err => { this.setState({ signedIn: false }); });
     }
 
     handleAuth = () => {
-        //window.location.href="../"
-        // Handle sign in or sign out button
+        if(this.state.signedIn) {
+            fetch('/user/invalidate', {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' }
+              })
+                .then(res => {
+                  if (res.status === 200) this.setState({ signedIn: false });
+                })
+                .catch(err => {  });
+        }
     }
 
     render = () => {
@@ -26,7 +51,7 @@ export default class TopNav extends React.Component {
                         </Nav>
                         <Nav className='log'>
                             <Nav.Link className="link-4" href="/login" onClick={this.handleAuth}>
-                                {this.props.signedIn ? "Log Out" : "Log In"}
+                                {this.state.signedIn ? "Log Out" : "Log In"}
                             </Nav.Link>
                             <Nav.Link className="link-5" href="/profile" onClick={this.handleClick}>Profile</Nav.Link>
                         </Nav>
