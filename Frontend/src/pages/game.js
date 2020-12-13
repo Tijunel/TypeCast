@@ -1,7 +1,6 @@
-// Todo: - replace hardcoded data with data from DB
-//       - add all the calls to the game ms middleware
-//       - fix bug: sometimes the '.typingbox' selector isn't 
-//                  found on tab press. Should check first before calling .focus()
+// Todo: 
+
+
 
 // Note:  to start the race, call 'this.startTimer(true)'
 
@@ -14,35 +13,38 @@ class Game extends React.Component {
     super();
 
     this.state = {
-      players: [],                        // COMES FROM THE SERVER - holds the players' data for the race
-
       raceCodeHTML: [],                   // styled raceCode html, reflecting what the player has typed
       typed: "",                          // what has been typed into the text box for the current 'word' so far
       raceStarted: false,                 // race has started?
       raceHasEnded: false,                // true when the time runs out or when all players have finished race
-      timeElapsed: -1                     // amount of time (seconds) that have passed since start of race
+      timeElapsed: -1,                    // seconds passed since start of race, used for page's visual timer
+      visualizedPlayerStatus: [],         // html table displaying player status in a visual readout
+      redraw: true                        // toggle this to force redraw (b/c many variables displayed are not in state)
     }
-    // THESE THREE COME FROM THE SERVER -----------------------------------------------------------
-    this.myPlayerIndex = 0;               // this user's index in players[]
+
+    // THESE THREE ARE RECEIVED FROM SERVER BEFORE RACE STARTS ------------------------------------
+    this.playerNames = [];                // list of player names
     this.raceCodeStr = "";                // a string of the entire code
     this.timeLimit = null;                // time limit for this race
 
-    // "CONSTANTS" we may want to adjust  ---------------------------------------------------------
-    this.SERVER_UPDATE_INTERVAL = 1000;   // how often to share player's data with the server
+    // CONSTANTS we may want to adjust  -----------------------------------------------------------
+    this.SERVER_UPDATE_INTERVAL = 1000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
     this.DEBUG = true;                    // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
+    this.players = [];                // holds the players' race data. Not in state b/c needs to update fast.
     this.raceCode = [];               // array of 'words' parsed from raceCodeStr
+    this.userFinishedRace = false;    // user has finished the race?
     this.whitespaceAtStart = false;   // helps the game with formatting
     this.charLastWord = false;        // lets game algorithm know when last word of raceCode is a single letter
     this.cwi = 0;                     // current word index 
     this.cw = "";                     // current 'word' the player is working on (can be a chunk of whitespace)
+    this.myAccuracy = 0.0;            // user's typing accuracy
     this.numCompletedChars = 0;       // number of characters user has successfully typed
     this.numTypedChars = 0;           // number of characters users has typed (inc. mistakes) - use for accuracy
-    this.myTimeHasBeenCalcd = false;  // flag that becomes true once this user's final race time has been calc'd
     this.mistakesPresent = false;                // true when user types wrong key, false otherwise
     this.mistakePresentOnLastType = false;       // true when a mistake was present on user's previous key press
     this.undetectableBackspacePressed = false;   // allows keyup event listener to communicate backspace presses
@@ -52,66 +54,30 @@ class Game extends React.Component {
     this.wordChanged = false;         // used to assist in detecting backspaces under different conditions
     this.cursorLocation = '.w0.c0';   // used for moving the blinking cursor around
     this.prevCursorType = 'cursor';   // used for moving the blinking cursor around
-    this.userFinishedRace = false;    // user has finished the race?
     this.raceStartTime = null;        // used for the game timer
     this.currentTime = 0;             // used for the game timer
     this.lastUpdateTime = null;       // used for the game timer
     this.interval = 0;                // used for updating game timer
     this.interval2 = 0;               // used for updating user's own data
     this.prevLineIndent = 0;          // used for auto-indent feature
-    this.moreIndendation = false;
   }
 
 
   componentDidMount = () => {
-    this.loadGameDataFromDB();
-    this.initializeVals();
+    this.receive_initial_data_from_server();
+    this.initializeVars();
     this.inputSetup();
 
-    // no idea how this should work, but here's an idea:
-    this.tellServerImReady();
+    // and finally...
+    this.tell_server_im_ready();
   }
 
 
-  loadGameDataFromDB = () => {
-    // todo: Instead of using these 4 hardcoded values below, load them from our DB
-
-    // ----- Explanation of attributes stored in players[] --------------------
-    //     name:  (duh)
-    //   isHost:  true for host, false for everyone else
-    // charsFin:  number of characters user has finished so far
-    //      lpm:  current speed in lines per minute (lpm) of player
-    // accuracy:  % of correct character presses
-    // position:  position the player is in (a derived quantity, but might be convenient to just store)
-    //     time:  time taken to complete race (finish time, calculated at end)
-    let players = [ 
-      {name: "Sarah W.", isHost: true, charsFin: 0, lpm: '', position: '', time: ''},
-      {name: "Navjeet Pravdaal", isHost: false, charsFin: 0, lpm: '', position: '', time: ''}, 
-      {name: "Chloe Salzar", isHost: false, charsFin: 0, lpm: '', position: '', time: ''},
-      {name: "ThiccBoi McGee", isHost: false, charsFin: 0, lpm: '', position: '', time: ''},
-      {name: "Mr. McChungus", isHost: false, charsFin: 0, lpm: '', position: '', time: ''} 
-    ];
-    this.setState({players: players});
-
-    // the index of this player in the player data array (this.state.players)
-    this.myPlayerIndex = 0;
-
-    // the string of code that will be used for the race
+  receive_initial_data_from_server = () => {
+    // todo: Receive these 3 from the server instead of using these hardcoded values
+    this.playerNames = ["Sarah W.", "Navjeet Pravdaal", "Chloe Salzar", "ThiccBoi McGee", "Mr. McChungus"];
+    
     this.raceCodeStr =
-
-// `getIndentOf = (word) => {
-//   let indent = 0;
-//   for (let ch of word) {
-//     if (ch === '\\n')
-//       indent = 0;
-//     else if (ch === ' ')
-//       indent++;
-//     else
-//       break;
-//   }
-//   return indent;
-// }`
-
 `getIndentOf = (word) => {
     let indent = 0;
     for (let ch of word) {
@@ -119,30 +85,46 @@ class Game extends React.Component {
             indent = 0;
         else if (ch === ' ')
             indent++;
-        else
-            break;
+        else break;
     }
     return indent;
 }`
 
 
-  
-
-
-    // the time limit for the race
     this.timeLimit = 60;
   }
 
 
-  initializeVals = () => {
+  initializeVars = () => {
+    this.buildPlayerArray();
     this.raceCode = this.raceCodeStr.split(/(\s+)/);
     this.buildRaceCodeHTML(this.raceCode);
+    this.buildVisualPlayerTable();
     this.cw = this.raceCode[0];
     this.whitespaceAtStart = (this.cw === ' ' || this.cw === '\n' || !this.cw);
-    if (this.whitespaceAtStart)
-      this.cursorLocation = '.w1.c0';
-    if (this.AUTO_INDENT)
-      this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
+    if (this.whitespaceAtStart)  this.cursorLocation = '.w1.c0'; // todo: test if this works
+    if (this.AUTO_INDENT)  this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
+  }
+
+
+  buildPlayerArray = () => {
+    // builds a player array that out of the names provided by the server.
+    // NOTE: the user places himself at position '0' in the this array.
+
+    // NOTE:        name:   comes from the server.
+    //          charsFin:   is shared back and forth with the server.
+    //              time:   is sent to the server once this player is finished the race and received 
+    //                        -for the other players when they have finished the race.
+    //  position and lpm:   are calculated locally for visual display of the race stats
+
+    // todo: need to figure out how to get my own user name. For now, I use a hardcoded value:
+    let myName = "ThiccBoi McGee";
+    this.players.push({name: myName, charsFin: 0, time: null,   position: 0, lpm: 0});
+
+    for (let name of this.playerNames) {
+      if (name === myName) continue;
+      this.players.push({name: name, charsFin: 0, time: null,   position: 0, lpm: 0});
+    }
   }
 
 
@@ -156,62 +138,170 @@ class Game extends React.Component {
   }
 
 
-  applyInitialStyling = () => {
-    this.underlineWord(0);
-    document.querySelector(this.cursorLocation).classList.add('cursor');
-  }
+  buildVisualPlayerTable = () => {
+    let visualData = [];
+    for (let i = 0; i < this.players.length; i++) {
+      visualData.push( 
+        <tr key={"player"+(i+1)} className={"player"+i+"data playerdata"}>
+          <td className="vis-player-lane">
+            <div className={'vis-player-box p'+i}>
+              <div className={i === 0 ? 
+                              "vis-player-name vis-my-name" : "vis-player-name"}>
+                {this.players[i].name} {i === 0 ? '(you)' : ''}
+              </div>
+              <div className={i === 0 ? 
+                              "vis-player-car vis-my-car" : "vis-player-car"}>[==])</div>
+            </div>
+          </td>
 
-
-  getIndentationOf = (word) => {
-  // checks a word for the amount of indentation present.
-  // This is intended for use on 'words' that are the chunk of
-  // whitespace between the end of a line and the beginning of a new one
-    let indent = 0;
-    for (let ch of word) {
-      if (ch === '\n')
-        indent = 0;
-      else if (ch === ' ')
-        indent++;
-      else
-        break;
+          <td className="vis-playerstats">
+            <div className='player-pos'>
+              &nbsp;{ this.players[i].position ? this.formatPosition(this.players[i].position) + " place" : ""} 
+            </div>
+            <div className='player-lpm'>{this.players[i].lpm} LPM</div>
+          </td>
+        </tr>
+      ); // pastGamesTable.push
     }
-    return indent;
+
+    this.setState({visualizedPlayerStatus: visualData});
   }
 
 
-  tellServerImReady = () => {
+// ------------------- server communication methods ---------------------------
+  tell_server_im_ready = () => {
     // todo
-    // lets the server know that this player is ready.
-    // Not sure if this is necessary...
+    // Tell the server this player has finished setting things up and is ready.
 
-    // Also: once the server essentially says "GO!" to everyone to start the race,
-    // call 'this.startTimer(true)' to begin the coundown and start the race.
-    // For now, a simple 'Start Race' button triggers this call.
+    // ...code that sends the "I'm ready" message to the server
+
   }
 
 
-  serverSaysRaceIsOver = () => {
-    //  todo 
-
-    this.setState({raceHasEnded: true});
-  }
-
-
-  updateHandler = () => {
+  start_race_listener = () => {
     // todo
-    // Updates the on-screen timer and, if enough time has passed (based on 
-    // -the interval we set), sends this player's data with the server
+    // Listen for message from server telling us to start the race.
+    // Call 'this.startTimer(true)' to start everything up.
+    // Until this is implemented, a simple 'Start Race' button on the page starts the race.
+    
 
-    // update screen timer
-    // ...
+    // ...code that listens for the message
 
-    // if (timePassed > this.SERVER_UPDATE_INTERVAL)
-    //   this.sendMyDataToServer();  // <-- this method needs to be updated!!
+    // this.startTimer(true)    <-- call this once the 'start game' message is received 
   }
 
 
+  request_player_data_update_from_server = () => {
+    // todo
+    // Request the 
+
+
+  }
+
+
+  send_my_data_to_server = () => {
+    // todo: send needed bits of this.players[0] (my player data) to the server
+
+    if (! this.userFinishedRace) {  // or sb !this.players[0].time ?
+      // report my number of characters finished (this.players[0].charsFin) to server: 
+      console.log("characters finished: " + this.players[0].charsFin); // replace this with the code that sends this.players[0].charsFin to sever
+
+    }
+
+    else {  
+      // report my final race time (this.players[0].time) to the server
+      console.log("my finish time: " + this.players[0].time); // replace this with code that sends this.players[0].time to server
+
+    }
+  }
+// ------------------ /server communication methods ---------------------------
+
+  calcStatsAndSendMyData = () => {
+
+    // If I'm not done the race, calc my progress send that data to the server
+    if (!this.players[0].time) {
+      this.players[0].charsFin = this.userFinishedRace ? this.raceCodeStr.length : this.numCompletedChars;
+      this.calcMyFinalTime();
+      // this.send_my_data_to_server();  // todo: uncomment when server code is in place
+    }
+
+    // Now calculate the stats for all players
+    let userTime;
+    for (let i = 0; i < this.players.length; i++) {
+      // calc elapsed time
+      userTime = this.players[i].time ? this.players[i].time : this.calcElapsedTime();
+      // calc speed
+      this.players[i].lpm = this.calcLPM(userTime, i);
+
+      // calc position
+      this.players[i].position = this.calcPositionOfPlayer(i);
+
+      // // calc rough (approx) position of each player (not definitive - the server ultimately decides)
+      // this.players[i].roughPosition = 1;
+      // for (let j = 0; j < this.players.length; j++) {
+      //   if (j !== i) {
+      //     if (this.players[j].charsFin > this.players[i].charsFin)
+      //       this.players[i].roughPosition++;
+      //   }
+      // } // for j
+    } // for i
+    
+    this.updateCarPositions();
+    this.buildVisualPlayerTable();
+  }
+
+
+  calcMyFinalTime = () => {
+    if (this.userFinishedRace || this.raceHasEnded) {
+      if (! this.players[0].time)
+        this.players[0].time = this.calcElapsedTime();
+    }
+  }
+
+
+  calcLPM = (time, userIndex) => {
+    // calc lpm (speed)
+    let lpm = this.players[userIndex].time ?  // has this user finished the race yet?
+      Math.round((this.raceCodeStr.length / 80.0) * 100 / (time / 60.0)) / 100 :
+      Math.round((this.players[userIndex].charsFin / 80.0) * 100 / (time / 60.0)) / 100;
+    return lpm;
+  }
+
+
+  calcPositionOfPlayer = (i) => {
+    let pos = 1;  // position of player[i]
+    for (let j = 0; j < this.players.length; j++) {
+      if (j !== i) {
+        if (!this.players[i].time && this.players[j].time)
+          pos++;
+        else if (this.players[i].time && this.players[j].time)
+          pos += (this.players[i].time > this.players[j].time) ? 1 : 0;
+        else 
+          pos += (this.players[i].charsFin < this.players[j].charsFin) ? 1 : 0;
+      }
+    }
+    return pos;
+  }
+
+
+  updateCarPositions = () => {
+    // move the cars -------
+    let progress;
+    for (let i = 0; i < this.players.length; i++) {
+      progress = (this.players[i].charsFin * 10.0) / (this.raceCodeStr.length * 10.0);
+      document.querySelector('.vis-player-box.p'+i).style.left = `calc(${progress} * (100% - 160px))`;
+    }
+  }
+
+
+  calcAccuracy = () => {
+    // calc typing accuracy
+    this.myAccuracy = this.numCompletedChars / this.numTypedChars * 100.0;
+  }
+
+  
   inputSetup = () => {
-  // handles Enter and Tab (+ Backspace when nothing is present in the .typingbox)
+  // sets up listeners for Enter, Tab, and Backspace key presses (they require special care)
     const typingBox = document.querySelector(".typingbox");
     typingBox.addEventListener("keyup", (event) => {
       
@@ -257,7 +347,7 @@ class Game extends React.Component {
   }
 
 
-  // --------------------- the main game engine -------------------------------
+  // ===================== the main game engine ===============================
   typingHandler = (event) => {
     let text = '',
         lastPressWasBackspace = false,
@@ -345,7 +435,7 @@ class Game extends React.Component {
       // finished the race?
       if ( text === cw || (this.charLastWord && text[text.length-1] === this.raceCode[this.raceCode.length-1]) ) {
         this.userFinishedRace = true;
-        this.finalizeGame();
+        this.finalizeRace();
         if (this.charLastWord) {
           this.underlineHelper(this.raceCode.length-1, false); // refactor: shouldn't call this directly
           this.makeLastCharTypedGreen(text[text.length-1], this.raceCode.length-1);
@@ -419,8 +509,6 @@ class Game extends React.Component {
           }
           text = '';
           this.wordWithEnters = '';
-
-
         }
 
         // in either case (finished an actual word OR a chunk of whitespace)
@@ -519,12 +607,29 @@ class Game extends React.Component {
       document.querySelector(this.cursorLocation).classList.add(cursorType);
     }, 0);
   }
-  // --------------------- / main game engine ---------------------------------
+  // ===================== / main game engine =================================
 
 
   printDebug = (st) => {
     if (this.DEBUG) console.log(st);
   }
+
+
+  getIndentationOf = (word) => {
+    // checks a word for the amount of indentation present.
+    // This is intended for use on 'words' that are the chunk of
+    // whitespace between the end of a line and the beginning of a new one
+      let indent = 0;
+      for (let ch of word) {
+        if (ch === '\n')
+          indent = 0;
+        else if (ch === ' ')
+          indent++;
+        else
+          break;
+      }
+      return indent;
+    }
 
 
   styleAnyMistakes = (text, cw) => {
@@ -602,121 +707,35 @@ class Game extends React.Component {
   }
 
 
-  finishedStyling = () => {
+  applyInitialStyling = () => {
+    this.underlineWord(0);
+    document.querySelector(this.cursorLocation).classList.add('cursor');
+    // and make it possible to type
+    document.querySelector(".typingbox").disabled = false;
+    document.querySelector(".typingbox").focus();
+  }
+
+
+  applyFinishedStyling = () => {
     // stop the cursor
     document.querySelector(this.cursorLocation).classList.remove('cursor');
-  }
-
-
-  calcMyResults = () => {
-    let players = this.state.players;
-    let me = players[this.myPlayerIndex];
-
-    // calc my race completion time
-    if (this.userFinishedRace) {
-      if (! this.myTimeHasBeenCalcd) {
-        me.time = this.calcMyTime();
-        this.myTimeHasBeenCalcd = true;
-      }
-    }
-    else { // user hasn't finished race yet
-      if (this.raceHasEnded)
-        me.time = this.timeLimit;
-      else
-        me.time = this.calcMyTime();
-    }
-
-    // calc lpm (speed)
-    me.lpm = this.userFinishedRace ?
-             Math.round((this.raceCodeStr.length / 80.0) * 100 / (me.time / 60.0)) / 100 :
-             Math.round((this.numCompletedChars / 80.0) * 100 / (me.time / 60.0)) / 100;
-
-    // calc accuracy
-    me.accuracy = this.numCompletedChars / this.numTypedChars * 100.0
-
-    // report progress (number of characters finished)
-    me.charsFin = this.userFinishedRace ? this.raceCodeStr.length : this.numCompletedChars;
-
-    
-
-
-    // Todo: DELETE THIS NEXT PART ONCE SERVER CODE IS BEING USED:
-    //       player should not update his own .position property in the player data
-    //       This is only being used for demo purposes.
-    me.position = 1;
-    for (let i = 0; i < players.length; i++) {
-      if (i !== this.myPlayerIndex) {
-        if (players[i].charsFin > me.charsFin)
-          me.position++;
-      }
-    }
-
-    // move the cars -------
-    let progress;
-    for (let i = 0; i < players.length; i++) {
-      progress = (players[i].charsFin * 10.0) / (this.raceCodeStr.length * 10.0);
-      document.querySelector('.vis-player-box.p'+i).style.left = `calc(${progress} * (100% - 160px))`;
-    }
-
-    this.setState({players: players});
-  }
-
-
-  sendMyDataToServer = () => {
-    // todo: send myData to the server instead of just logging it to console
-    const myData = this.state.players[this.myPlayerIndex];
-    console.log("\n\n\n\n\n\nYour race data:\n" + myData);
+    // todo: remove the below two lines once server is starting the game
+    if (document.querySelector('#testStartBtn'))
+      document.querySelector('#testStartBtn').style.display = 'none';
   }
 
 
   startRace = () => {
     this.setState({raceStarted: true});
     this.applyInitialStyling(); // style the raceCode for playing the game
-    document.querySelector(".typingbox").disabled = false;
-    document.querySelector(".typingbox").focus();
   }
 
 
-  finalizeGame = () => {
-    this.calcMyResults();
-    this.sendMyDataToServer();
-    this.finishedStyling();
-    
-    // todo: remove this once server is starting the game
-    document.querySelector('#testStartBtn').style.display = 'none';
-  }
-
-
-  visualizePlayerData = () => {
-    let visualData = [];
-    for (let i = 0; i < this.state.players.length; i++) {
-      visualData.push( 
-        <tr key={"player"+(i+1)} className={"player"+i+"data playerdata"}>
-          <td className="vis-player-lane">
-            <div className={'vis-player-box p'+i}>
-              <div className={i === this.myPlayerIndex ? 
-                              "vis-player-name vis-my-name" : "vis-player-name"}>
-                {this.state.players[i].name} {this.myPlayerIndex === i ? '(you)' : ''}
-              </div>
-              <div className={i === this.myPlayerIndex ? 
-                              "vis-player-car vis-my-car" : "vis-player-car"}>[==])</div>
-            </div>
-          </td>
-
-          <td className="vis-playerstats">
-            <div className='player-pos'>
-              { this.state.players[i].position !== '' ?
-                <span>{this.formatPosition(this.state.players[i].position)} place</span>
-              : 
-                <span> &nbsp;</span>
-              }
-            </div>
-            <div className='player-lpm'>{this.state.players[i].lpm} LPM</div>
-          </td>
-        </tr>
-      ); // pastGamesTable.push
-    }
-    return visualData;
+  finalizeRace = () => {
+    this.calcStatsAndSendMyData();
+    this.calcAccuracy();
+    this.setState({redraw: !this.state.redraw});
+    this.applyFinishedStyling();
   }
 
 
@@ -752,14 +771,14 @@ class Game extends React.Component {
       if (!isCountdown) {
         this.setState({raceHasEnded: true});
         if (!this.userFinishedRace)
-          this.finalizeGame();
+          this.finalizeRace();
       }
     }
-    else if (this.userFinishedRace) {
-      // for refreshing player stats
-      clearInterval(this.interval2);
-      this.interval2 = 0;
-    }
+    // else if (this.userFinishedRace) {  // BLAH: don't think this is needed now
+    //   // for refreshing player stats
+    //   clearInterval(this.interval2);
+    //   this.interval2 = 0;
+    // }
   }
 
   startTimer = (isCountdown) => {
@@ -778,7 +797,7 @@ class Game extends React.Component {
         this.setState({timeElapsed: this.timeLimit});
         this.interval = setInterval(this.update, 1000, false, this.timeLimit);
         // todo: make next line call method that refreshes ALL player data, not just mine (need server code first)
-        this.interval2 = setInterval(this.calcMyResults, this.SERVER_UPDATE_INTERVAL); 
+        this.interval2 = setInterval(this.calcStatsAndSendMyData, this.SERVER_UPDATE_INTERVAL); 
         this.currentTime = 0;
       }
     }
@@ -787,29 +806,28 @@ class Game extends React.Component {
   stopTimer = () => {
     clearInterval(this.interval);
     this.interval = 0;
-
-    // for refreshing player stats
     clearInterval(this.interval2);
     this.interval2 = 0;
   }
 
-  calcMyTime = () => {
+  calcElapsedTime = () => {
     let now = new Date().getTime();
-    let myTime = now - this.raceStartTime;
-    return myTime / 1000.0;
+    let elapsed = now - this.raceStartTime;
+    return elapsed / 1000.0;
   }
+  // --------- /timer -----------------------------------------------------------
 
-// --------- /timer -----------------------------------------------------------
 
-
-formatPosition = (pos) => {
-  switch (pos) {
-    case (1): return "1st"; //break;  ... console says don't need break?
-    case (2): return "2nd"; //break;
-    case (3): return "3rd"; //break;
-    default: return pos + "th";
+  formatPosition = (pos, withSauce) => {
+    switch (pos) {
+      case (1): return withSauce ? "1st. Woohoo!" : "1st"; //break;  ... console says don't need break?
+      case (2): return withSauce ? "2nd. Close!" : "2nd";
+      case (3): return withSauce ? "3rd. Not bad :)" : "3rd";
+      case (4): return withSauce ? "4th. Meh." : "4th"; 
+      case (5): return withSauce ? "5th. Oof." : "5th"; 
+      default: return pos + "th";
+    }
   }
-}
 
 
   render = () => {
@@ -832,7 +850,7 @@ formatPosition = (pos) => {
             : 
               this.userFinishedRace ?
                 <span>
-                  You finished {this.formatPosition(this.state.players[this.myPlayerIndex].position)}
+                  You finished { this.formatPosition(this.players[0].position, true) }
                 </span>
               :
                 this.state.raceStarted ?
@@ -844,7 +862,7 @@ formatPosition = (pos) => {
         
         <div id="race-visualization">
           <table id="race-visualization">
-            <tbody>{this.visualizePlayerData()}</tbody>
+            <tbody>{this.state.visualizedPlayerStatus}</tbody>
           </table>
         </div>
 
@@ -860,21 +878,21 @@ formatPosition = (pos) => {
             <div className="flex">
               <div className="res-att">Position:</div>
               <div className="res-data"> 
-                {this.formatPosition(this.state.players[this.myPlayerIndex].position)}
+              { this.formatPosition(this.players[0].position) }
               </div>
             </div>
 
             <div className="flex">
               <div className="res-att">Speed:</div>
               <div className="res-data">
-                {this.state.players[this.myPlayerIndex].lpm} <span className="units">LPM</span>
+                {this.players[0].lpm} <span className="units">LPM</span>
               </div>
             </div>
 
             <div className="flex">
               <div className="res-att">Accuracy:</div>
               <div className="res-data">
-                {(this.state.players[this.myPlayerIndex].accuracy).toFixed(2)}<span className="units">%</span>
+                {this.myAccuracy.toFixed(2)}<span className="units">%</span>
               </div>
             </div>
 
@@ -882,7 +900,7 @@ formatPosition = (pos) => {
               <div className="res-att">Time:</div>
               <div className="res-data">
                 { this.userFinishedRace ? 
-                <span>{Math.round(this.state.players[this.myPlayerIndex].time * 10.0) / 10.0}
+                <span>{Math.round(this.players[0].time * 10.0) / 10.0}
                 <span className="units"> s</span></span>
                 :
                   <span>(DNF)</span>
@@ -908,7 +926,7 @@ formatPosition = (pos) => {
           <br/><br/>
           <button onClick={() => this.startTimer(true)} 
                   style={{marginBottom: "20px"}}>Start Race</button>
-          <span>&nbsp; {'<--'} Just for testing; server should actually trigger the start of the race...</span>
+          <span>&nbsp; {'<--'} Just for testing</span>
         </div>
 
       </div>
