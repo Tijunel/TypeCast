@@ -749,9 +749,10 @@ class Game extends React.Component {
       // if the countdown timer reached :00, now start the real timer
       if (isCountdown)  this.startTimer(false); 
       // if time runs out on the actual race, stop the game
-      if (!isCountdown && !this.userFinishedRace) {
-        this.finalizeGame();
+      if (!isCountdown) {
         this.setState({raceHasEnded: true});
+        if (!this.userFinishedRace)
+          this.finalizeGame();
       }
     }
     else if (this.userFinishedRace) {
