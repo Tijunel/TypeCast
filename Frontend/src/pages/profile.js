@@ -175,15 +175,19 @@ class Profile extends React.Component {
 	}
 
 	showChangeUsername = () => {
-		this.setState({ changeUNVisible: true, changePWVisible: false, delAcctVisible: false });
+		this.setState({ changeUNVisible: true, changePWVisible: false, delAcctVisible: false , clearHistoryVisible: false});
 	}
 
 	showChangePassword = () => {
-		this.setState({ changeUNVisible: false, changePWVisible: true, delAcctVisible: false });
+		this.setState({ changeUNVisible: false, changePWVisible: true, delAcctVisible: false , clearHistoryVisible: false});
 	}
 
 	showDeleteAccount = () => {
-		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: true });
+		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: true, clearHistoryVisible: false});
+	}
+
+	showClearHistory = () => {
+		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false, clearHistoryVisible: true });
 	}
 
 	newPasswordInfoChecksOut = () => {
@@ -199,7 +203,7 @@ class Profile extends React.Component {
 	}
 
 	closePanel = () => {
-		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false });
+		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false, clearHistoryVisible: false});
 	}
 
 	generatePastGamesUI = (pastGames) => {
@@ -252,7 +256,7 @@ class Profile extends React.Component {
 					<div id="user-menu">
 						<button onClick={() => this.showChangeUsername()}>Change UserName</button>
 						<button onClick={() => this.showChangePassword()}>Change Password</button>
-						<button onClick={() => this.clearHistory()}
+						<button onClick={() => this.showClearHistory()}
 								className="text-btn">Reset Score</button>
 						<button onClick={() => this.showDeleteAccount()}
 							className="del-acct-btn">Delete Account</button>
@@ -315,6 +319,20 @@ class Profile extends React.Component {
 							<button onClick={() => this.deleteAccountHandler()}
 								className="delete-acct-button">
 								YES, PERMANENTLY DELETE MY ACCOUNT
+              				</button>
+							<br />
+							<button onClick={() => this.closePanel()} className="changed-my-mind">
+								No! Get me out of here!
+              				</button>
+						</div>
+					}
+					{this.state.clearHistoryVisible &&
+						<div id="delete-account-box">
+							Are you SURE you want to reset your account history?<br />
+              				It will be gone forever.<br />
+							<button onClick={() => this.clearHistory()}
+								className="delete-acct-button">
+								YES, PERMANENTLY DELETE MY HISTORY
               				</button>
 							<br />
 							<button onClick={() => this.closePanel()} className="changed-my-mind">
