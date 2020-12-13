@@ -3,6 +3,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cookie = require('cookie');
 const cors = require('cors');
 const path = require('path');
 const app = express();
@@ -14,15 +15,14 @@ app.use((req, res, next) => {
 });
 
 // Configure the bodyParser middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // This middleware informs the express application to serve our compiled React files
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     app.use(express.static(path.join(__dirname, '../Frontend/build')));
-
     app.get('*', function (req, res) {
         res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
     });
@@ -47,4 +47,26 @@ app.get('*', (req, res) => {
 const server = require('http').createServer(app);
 server.listen(port, () => console.log(`Server running on port ${port}...`));
 
-module.exports = server;
+const MSCall = require('./Utilities/MSCall');
+var api = new MSCall();
+api.setPrefixURL('http://localhost:7000');
+const io = require('socket.io')(server);
+io.on('connection', (socket) => {
+    const userData = cookieParser.JSONCookie(cookie.parse(socket.handshake.headers.cookie).userData);
+    socket.on('disconnect', async() => {
+        console.log("Player disconnected");
+        const response = await api.call('leave/', 'POST', {
+            json: {
+                username: userData['username']
+            }
+        });
+        if(response.status === 200) {
+            io.emit('lobby update', {
+                lobbyCode: response.body.lobbyCode,
+                players: response.body.players
+            });
+        }
+    });
+});
+
+module.exports = [io];
