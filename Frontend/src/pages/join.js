@@ -6,12 +6,13 @@
 import React from 'react';
 import WithAuth from './withAuth';
 import './_styling/join.css';
+import SocketManager from "../socket";
 
 class Join extends React.Component {
   constructor() {
     super();
     this.state = {
-      games: this.getGames(),  // todo (returns hardcoded game array rn)
+      games: [],  // todo (returns hardcoded game array rn)
       typedJoinCode: ""
     }
     this.MAX_PLAYERS_PER_GAME = 5;
@@ -23,19 +24,54 @@ class Join extends React.Component {
     const tableWidth = document.querySelector("#games").offsetWidth;
     let title = document.querySelector("#join-heading");
     title.style.marginLeft = ((900 - tableWidth - 60) / 2) + "px";
-  } 
+    // API call
+    this.listenOnSockets();
+    this.getGames();
+  }
 
+  // Get existing lobbies from redis database
+  getGames = async () => {
+    let res = await fetch('/gaming/lobbies', {
+      method: 'GET',
+      credentials: "include",
+      headers: {'Content-Type': 'application/json'}
+    });
+    let lobbies = [];
+    if (res.status === 200) {
+      // return structure of lobbies
+      res = await res.json();
+      for (let i = 0; i < res.lobbies.length; i++) {
+        lobbies[i] = {lobbyCode: res.lobbies[i].lobbyCode, name: res.lobbies[i].lobbyName, numPlayers: res.lobbies[i].players.length, public: true};
+      }
+      this.setState( { games: lobbies});
+      this.listenOnSockets();
+    }
+  }
 
-  getGames = () => {
-    // todo: get the ACTUAL games data from somewhere else/via some process
-    // just returning a hardcoded list for now:
-    return [ {lobbyCode: "ASDF", name: "Herbert's Super Cool Game", numPlayers: 1, public: true},
-             {lobbyCode: "XYZC", name: "THICCness", numPlayers: 4, public: true},
-             {lobbyCode: "WOOT", name: "SENG 513", numPlayers: 4, public: false}, 
-             {lobbyCode: "IJKL", name: "Nice Polite People Only", numPlayers: 1, public: true},
-             {lobbyCode: "RUOK", name: "nastY SHIZZZZ", numPlayers: 5, public: true},
-             {lobbyCode: "ECMA", name: "idk whatever", numPlayers: 3, public: true}
-            ];
+  listenOnSockets = () => {
+    const socket = SocketManager.getInstance().getSocket();
+    socket.on('lobby update', (data) => {
+      if(this.gameSpecifiedExists(data.lobbyCode)) {
+        let gameIndex = this.getGameIndexFromLobbyCode(data.lobbyCode);
+        let lobbies = this.state.games;
+        if(data.players.length !== 0) {
+          lobbies[gameIndex].numPlayers = data.players.length;
+        } else {
+          lobbies.splice(gameIndex, 1);
+        }
+        this.setState({games: lobbies});
+      }
+    });
+    socket.on('new lobby', (data) => {
+      if (!this.gameSpecifiedExists(data.lobbyCode)) {
+        let newLobby = {lobbyCode: data.lobbyCode, name: data.lobbyName, numPlayers: data.players.length, public: data.public};
+        // TODO check for private games
+        //      note: are private game updates being emitted?
+        let lobbies = this.state.games;
+        lobbies.push(newLobby);
+        this.setState( { games: lobbies});
+      }
+    });
   }
 
 

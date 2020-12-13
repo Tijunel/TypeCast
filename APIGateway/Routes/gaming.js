@@ -37,7 +37,10 @@ gaming.post('/createLobby', withAuth, async (req, res) => {
         const io = require('../server')[0];
         io.emit('new lobby', {
             lobbyCode: req.body.lobbyCode,
-            lobbyName: req.body.lobbyName
+            lobbyName: req.body.lobbyName,
+            timeLimit: req.body.timeLimit,
+            public: req.body.public,
+            players: [req.body.player]
         });
     }
     res.status(response.status).end();
