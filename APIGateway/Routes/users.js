@@ -69,12 +69,15 @@ user.delete('/', withAuth, async (req, res) => {
     if (response.status !== 200) res.status(response.status).end();
     else {
         // Delete from Firebase
-        response = await firebaseAPI.call('users/' + req.user.ID, 'DELETE', {});
-        const payload = {};
-        const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
-        res.cookie('token', token, { httpOnly: true });
-        res.cookie('userData', { username: req.user.username });
-        res.status(200).end();
+        // response = await firebaseAPI.call('users/' + req.user.ID, 'DELETE', {});
+        // const payload = {};
+        // const token = jwt.sign(payload, 'Secret', { expiresIn: '1' });
+        jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
+            if (err) return res.sendStatus(500).end();
+            res.cookie('token', token, { httpOnly: true });
+            res.cookie('userData', { username: req.body.newUsername });
+            res.status(200).end();
+        });
     }
 });
 

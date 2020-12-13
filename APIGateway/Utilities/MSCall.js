@@ -29,7 +29,6 @@ class MSCall {
                 json                            // Translates to req.body
             });
         } catch (error) {
-            console.log(error);
             return { status: 500 };
         }
         res = { status: res.statusCode, body: res.body };
