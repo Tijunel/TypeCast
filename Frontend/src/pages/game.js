@@ -72,25 +72,23 @@ class Game extends React.Component {
 
   // ------------------- server request/response methods ----------------------
   get_initial_data_from_server = () => {
-    // todo: Receive these 3 from the server instead of using these hardcoded values
+    // todo: Receive these from the server instead of using these hardcoded values
 
-    // REQUEST: send this to the server:  this.lobbyCode  , to request the needed game data
-    // ...
-
-    
+    // REQUEST: send this to the server:  this.lobbyCode
+      
 
     // RESPONSE: server should respond with something structured like this:
 
     //              {lobbyName: _ ,  raceCodeString: _ , time: _ , playerNames: _ }
 
-    // ...and assuming that is now stored in a variable 'response', do this:
+    // ...and assuming that stuff is now stored in a variable 'response', do this:
 
-    // this.lobbyName = response.lobbyName;
+    // this.lobbyName = response.lobbyName;  // <-- don't think we need this
     // this.playerNames = response.playerNames;
     // this.raceCodeStr = response.reaceCodeStr;
     // this.timeLimit = response.time;
 
-    // ...and delete the below hardcoded values:
+    // ...and delete these three hardcoded values, below:
 
     this.playerNames = ["Sarah W.", "Navjeet Pravdaal", "Chloe Salzar", "Test", "Tijunel"];
     
