@@ -74,6 +74,18 @@ class Join extends React.Component {
     });
   }
 
+  hostNewGame = () => {
+    // same code as in home.js
+    // generate a random 4 digit room code / lobby code
+    let roomCode = "";
+    let menu = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var menuLength = 26;
+    for (let i = 0; i < 4; i++)
+      roomCode += menu.charAt(Math.floor(Math.random() * menuLength));
+
+    // load lobby page. Not sure how else to do it. This is not very React-y
+    window.location.href = "/lobby/:" + roomCode;
+  }
 
   // ----- These are all closely related --------------------------------------
   joinGame = (i) => {
@@ -135,41 +147,53 @@ class Join extends React.Component {
 
   getGameTable = () => {
     let gameTable = [];
-    gameTable.push( // table headings
-      <tr key="headings">
-        <td className="game-name">Name</td>
-        <td className="player-count">Players</td>
-        <td className="join-game">&nbsp;</td>
-      </tr>
-    );
-    // rest of the table, from the list of games
-    for (let i = 0; i < this.state.games.length; i++) {
-      if ( this.state.games[i].public ) {  // render only public games
-        gameTable.push( 
-          <tr key={"game"+(i+1)}>
-            <td className="game-name">
-              {this.state.games[i].name}
-            </td>
-
-            <td className="player-count">
-              {this.state.games[i].numPlayers}/{this.MAX_PLAYERS_PER_GAME}
-            </td>
-
-            <td className="join-game">
-              { this.gameIsFull( this.state.games[i].lobbyCode ) ?
-                <div className="not-joinable">
-                  Full
-                </div>  
-              :
-                <button onClick={ () => this.joinGame(i) }>Join</button>
-              }
-              
-            </td>
-          
+    if (this.state.games.length === 0) {
+      // If there are no games available
+      gameTable.push(
+          <td className="no-games-available">
+            <h1 onClick={ () => this.hostNewGame() }>No games available... Click to host one!</h1>
+            {/*<button onClick={() => window.location.href = "/join"}>Host Game</button>*/}
+            <button onClick={ () => this.hostNewGame() }>Host Game</button>
+          </td>
+      )
+    } else {
+      // If there are games available
+      gameTable.push( // table headings
+          <tr key="headings">
+            <td className="game-name">Name</td>
+            <td className="player-count">Players</td>
+            <td className="join-game">&nbsp;</td>
           </tr>
-        ); // playerTable.push
-      } // if
-    } // for
+      );
+      // rest of the table, from the list of games
+      for (let i = 0; i < this.state.games.length; i++) {
+        if (this.state.games[i].public) {  // render only public games
+          gameTable.push(
+              <tr key={"game" + (i + 1)}>
+                <td className="game-name">
+                  {this.state.games[i].name}
+                </td>
+
+                <td className="player-count">
+                  {this.state.games[i].numPlayers}/{this.MAX_PLAYERS_PER_GAME}
+                </td>
+
+                <td className="join-game">
+                  {this.gameIsFull(this.state.games[i].lobbyCode) ?
+                      <div className="not-joinable">
+                        Full
+                      </div>
+                      :
+                      <button onClick={() => this.joinGame(i)}>Join</button>
+                  }
+
+                </td>
+
+              </tr>
+          ); // playerTable.push
+        } // if
+      } // for
+    }
     return gameTable;
   }
 
