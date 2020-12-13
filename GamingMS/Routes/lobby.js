@@ -14,6 +14,7 @@ lobby.get('/lobbies', async(req, res) => {
                 var value = await asyncRedis.get(key).then(value => {
                     return JSON.parse(value);
                 });
+                
                 values.push(value);
             }
         }
@@ -35,7 +36,7 @@ lobby.post('/create', (req, res) => {
 });
 
 lobby.delete('/delete', (req, res) => {
-    client.del(req.body.lobbyCode);
+    redis.del(req.body.lobbyCode);
     res.status(200).end();
 });
 
@@ -44,18 +45,50 @@ lobby.post('/readyup', (req, res) => {
 });
 
 lobby.post('/join', async(req, res) => {
-    var value = await asyncRedis.get(req.params.id).then(value => {
+    var value = await asyncRedis.get(req.body.lobbyCode).then(value => {
         return JSON.parse(value);
     });
     if(value !== null) {
+        for(let player of value.players) 
+            if(player.username === req.body.player.username)
+                return res.sendStatus(500).end();
         value.players.push(req.body.player);
         redis.set(req.body.lobbyCode, JSON.stringify(value));
-        res.sendStatus(200).end();
+        res.status(200).json({ players: value.players }).end();
     } else res.sendStatus(500).end();
 });
 
 lobby.post('/leave', (req, res) => {
-
+    redis.keys('*', async (err, keys) => {
+        let values = [];
+        if (err) return res.sendStatus(500).end();
+        if (keys) {
+            for(let key of keys) {
+                var value = await asyncRedis.get(key).then(value => {
+                    return JSON.parse(value);
+                });
+                values.push(value);
+            }
+        }
+        let target = null;
+        for (let value of values) {
+            for (let player of value.players) {
+                if (player.username === req.body.username) {
+                    target = value;
+                    if (player.isHost) target.players = [];
+                    else {
+                        const index = value.players.indexOf(player);
+                        target.players.splice(index, 1);
+                    }
+                    if (target.players.length === 0) redis.del(target.lobbyCode);
+                    else redis.set(target.lobbyCode, JSON.stringify(target));
+                    break;
+                }
+            }
+        }
+        if (target === null) return res.status(500).end();
+        res.status(200).json({ lobbyCode: target.lobbyCode, players: target.players}).end();
+    });
 });
 
 module.exports = lobby;

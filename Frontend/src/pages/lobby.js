@@ -27,6 +27,7 @@ class Lobby extends React.Component {
   }
 
   componentDidMount = () => {
+    this.listenOnSockets();
     this.getLobby();
   }
 
@@ -84,7 +85,6 @@ class Lobby extends React.Component {
     if(res.status === 200) {
       let playerUI = this.generatePlayerUI([player]);
       this.setState({lobbyPosted: true, playerUI: playerUI});
-      this.listenOnSockets();
     } else alert("Something went wrong, try again.");
   }
 
@@ -92,8 +92,13 @@ class Lobby extends React.Component {
     const socket = SocketManager.getInstance().getSocket();
     socket.on('lobby update', (data) => {
       if(data.lobbyCode === this.state.lobbyCode) {
-        let playerUI = this.generatePlayerUI(data.players);
-        this.setState({ playerUI: playerUI });
+        if(data.players.length === 0) {
+          alert('Lobby no longer exists...');
+          window.location.href = "/home";
+        } else {
+          let playerUI = this.generatePlayerUI(data.players);
+          this.setState({ playerUI: playerUI });
+        }
       }
     });
   }
