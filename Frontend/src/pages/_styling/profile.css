@@ -133,6 +133,13 @@
   margin-right: 14px;
   border-radius: 50px;
 }
+#change-username-box input[type="password"] {
+  background: #3E6C99;
+  color: white;
+  padding: 2px 12px;
+  margin-right: 14px;
+  border-radius: 50px;
+}
 #change-username-box input[type="submit"] {
   background: #3E6C99;
   color: white;

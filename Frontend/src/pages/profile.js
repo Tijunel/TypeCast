@@ -86,14 +86,21 @@ class Profile extends React.Component {
 		})
 			.then(res => {
 				if (res.status === 200) {
+					this.setState({username: JSON.parse(Cookies.get('userData').split('j:')[1]).username});
 					alert("Username successfully changed.");	
+					this.username.current.value = "";
+					this.currentPassword.current.value = "";
 				} 
 				else   {
 					alert("Username change was unsucessful.");
+					this.username.current.value = "";
+					this.currentPassword.current.value = "";
 				}
 			})
 			.catch(err => {
 				alert("Username change was unsucessful...");
+				this.username.current.value = "";
+				this.currentPassword.current.value = "";
 			});
 	}
 
@@ -113,13 +120,22 @@ class Profile extends React.Component {
 			.then(res => {
 				if (res.status === 200) {
 					alert("Password successfully changed.");
+					this.password.current.value = "";
+					this.newPassword1.current.value = "";
+					this.newPassword2.current.value = "";
 				} 
 				else {
 					alert("Password change was unsucessful...");
+					this.password.current.value = "";
+					this.newPassword1.current.value = "";
+					this.newPassword2.current.value = "";
 				}
 			})
 			.catch(err => {
 				alert("Password change was unsucessful.");
+				this.password.current.value = "";
+				this.newPassword1.current.value = "";
+				this.newPassword2.current.value = "";
 			});
 	}
 
@@ -245,7 +261,7 @@ class Profile extends React.Component {
 					{this.state.changeUNVisible ?
 						<div id="change-username-box">
 							<form onSubmit={this.updateUsernameHandler}>
-								<label>Username &nbsp;</label>
+								<label>New Username &nbsp;</label>
 								<input
 									type="text"
 									ref={this.username}

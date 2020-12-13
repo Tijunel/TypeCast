@@ -48,12 +48,13 @@ user.put('/', withAuth, async (req, res) => {
             newPass: req.body.newPassword
         }
     });
+    console.log(response);
     if (response.status !== 200) return res.status(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {
             if (err) return res.sendStatus(500).end();
             res.cookie('token', token, { httpOnly: true });
-            res.cookie('userData', { username: req.body.username });
+            res.cookie('userData', { username: req.body.newUsername });
             res.status(200).end();
         });
     }

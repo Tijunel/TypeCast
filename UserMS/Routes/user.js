@@ -10,7 +10,7 @@ user.post('/register', async (req, res) => {
     const { username, password } = req.body;
     try {
         let user = await User.findOne({ username });
-        if (user) return res.sendStatus(400).end();
+        if (user) return res.status(400).end();
         user = new User({ username, password });
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
@@ -20,7 +20,7 @@ user.post('/register', async (req, res) => {
         }
         res.status(200).json(payload).end();
     } catch (error) {
-        res.sendStatus(500).end();
+        res.status(500).end();
     }
 });
 
@@ -29,7 +29,7 @@ user.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
         let user = await User.findOne({ username });
-        if (!user) return res.sendStatus(400).end();
+        if (!user) return res.status(400).end();
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).end();
         const payload = {
@@ -46,13 +46,16 @@ user.put('/', async(req, res) => {
     const { ID, newUsername, currentPassword, newPass } = req.body;
     try {
         let user = await User.findOne({_id: ID});
-        if (!user) return res.sendStatus(400).end();
+        if (!user) return res.status(400).end();
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) return res.status(400).end();
         user.username = newUsername;
         user.password = newPass;
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPass, salt);
+        const payload = {
+            user: { ID: user.id, username: user.username }
+        }
         await user.save();
         res.status(200).json(payload).end();
     } catch (error) {
@@ -65,10 +68,10 @@ user.delete('/', async (req, res) => {
     const username = req.body.username;
     try {
         let deleted = await User.findOneAndDelete({ username: username });
-        if (deleted === null) return res.sendStatus(400).end();
+        if (deleted === null) return res.status(400).end();
         else return res.status(200).json({}).end();
     } catch (error) {
-        res.sendStatus(500).end();
+        res.status(500).end();
     }
 });
 
