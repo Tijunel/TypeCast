@@ -33,15 +33,6 @@ gaming.get('/lobbies', withAuth, async(req, res) => {
     const response = await api.call('lobby/lobbies/', 'GET', {});
     if (response.status === 200) res.status(200).json(response.body).end();
     else res.sendStatus(response.status).end();
-    // Response:
-    // {
-    //    lobbies: [{
-    //      lobbyCode: String,
-    //      name: String,
-    //      numPlayers: Integer
-    //    },...]
-    // }
-    // Or Error
 });
 
 // Get Lobby Info 
@@ -59,7 +50,7 @@ gaming.post('/createLobby', withAuth, async(req, res) => {
             lobbyName: req.body.lobbyName,
             timeLimit: req.body.timeLimit,
             public: req.body.public, 
-            player: req.body.player
+            players: [req.body.player]
         }
     });
     if (response.status === 200 && req.body.public) { // Emit event for people in join page
@@ -72,7 +63,7 @@ gaming.post('/createLobby', withAuth, async(req, res) => {
 });
 
 // Delete lobby
-gaming.post('/deleteLobby', withAuth, async(req, res) => {
+gaming.delete('/deleteLobby', withAuth, async(req, res) => {
     const response = await api.call('lobby/delete/', 'POST', {
         json: {
             lobbyCode: req.body.lobbyCode

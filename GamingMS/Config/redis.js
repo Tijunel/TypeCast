@@ -1,8 +1,9 @@
 'use strict';
 
 const redis = require("redis");
+const asyncRedis = require("async-redis");
 const PORT = 6379;
-const HOST = "http://localhost";
+const HOST = "localhost";
 
 // Sync Client
 const client = redis.createClient({
@@ -18,4 +19,18 @@ client.on('error', () => {
     console.log('Sync Client Connection Failed!');
 });
 
-module.exports = client;
+// Async Client
+const asyncClient = asyncRedis.createClient({
+    port: PORT,
+    host: HOST
+});
+
+asyncClient.on("connect", () => {
+    console.log("Async Redis client connected");
+});
+
+asyncClient.on("error", (err) => {
+    console.log("Async Redis client could NOT connect: \n" + err);
+});
+
+module.exports = [client, asyncClient];
