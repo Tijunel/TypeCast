@@ -10,6 +10,10 @@
 }
 
 /* --- table ------------- */
+.center-table  {
+  margin-left: auto;
+  margin-right: auto;
+}
 #table-container {
   margin: 0 auto 100px auto;
   font-size: 1.2rem;
@@ -51,8 +55,8 @@
   display: inline;
   font-size: 1.2rem;
 }
-.lpm {
-  font-size: 0.9rem;
+.typingSpeed {
+  font-size: 1.0rem;
 }
 #past-games tr:nth-child(1) td {
   background: rgba(0, 0, 0, 0.27) !important;
