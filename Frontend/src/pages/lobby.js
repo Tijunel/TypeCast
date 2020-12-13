@@ -18,12 +18,13 @@ class Lobby extends React.Component {
       myPlayerIndex: 0,
       iAmHost: false,
       lobbyPosted: false,
-      private: false, 
+      private: false,
       timeLimit: 60,
-      loading: true
+      loading: true,
+      ready: false,
+      gameReady: false, 
+      redirected: false
     };
-    this.alreadyToggledReady = false;
-    this.readyFlashedAlready = false;
   }
 
   componentDidMount = () => {
@@ -35,7 +36,7 @@ class Lobby extends React.Component {
   getLobby = async () => {
     let res = await fetch('/gaming/lobby/' + this.state.lobbyCode, {
       method: 'GET',
-			credentials: "include",
+      credentials: "include",
       headers: { 'Content-Type': 'application/json' }
     });
     if (res.status === 200) {
@@ -50,15 +51,15 @@ class Lobby extends React.Component {
       };
       await fetch('/gaming/join', {
         method: 'POST',
-			  credentials: "include",
+        credentials: "include",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lobbyCode: this.state.lobbyCode, player: player })
       });
     } else {
-      this.setState({ 
-        lobbyName: JSON.parse(Cookies.get('userData').split('j:')[1]).username + "'s Lobby", 
+      this.setState({
+        lobbyName: JSON.parse(Cookies.get('userData').split('j:')[1]).username + "'s Lobby",
         iAmHost: true,
-        lobbyPosted: false, 
+        lobbyPosted: false,
         loading: false
       });
     }
@@ -72,57 +73,90 @@ class Lobby extends React.Component {
     };
     let res = await fetch('/gaming/createLobby', {
       method: 'POST',
-			credentials: "include",
+      credentials: "include",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lobbyCode: this.getLobbyCode(),
         lobbyName: this.state.lobbyName,
         timeLimit: this.timeLimit.current.value,
-        public: !this.isPrivate.current.checked, 
+        public: !this.isPrivate.current.checked,
         player: player
       })
     });
-    if(res.status === 200) {
+    if (res.status === 200) {
       let playerUI = this.generatePlayerUI([player]);
-      this.setState({lobbyPosted: true, playerUI: playerUI});
+      this.setState({ lobbyPosted: true, playerUI: playerUI });
+      this.resizeTableForAdmins();
     } else alert("Something went wrong, try again.");
   }
 
   listenOnSockets = () => {
     const socket = SocketManager.getInstance().getSocket();
     socket.on('lobby update', (data) => {
-      if(data.lobbyCode === this.state.lobbyCode) {
-        if(data.players.length === 0) {
+      if (data.lobbyCode === this.state.lobbyCode) {
+        if (data.players.length === 0 && !this.state.redirected) {
           alert('Lobby no longer exists...');
+          this.setState({redirected: true});
           window.location.href = "/home";
         } else {
+          this.kickSelf(data.players);
           let playerUI = this.generatePlayerUI(data.players);
-          this.setState({ playerUI: playerUI });
+          let ready = this.isGameReady(data.players);
+          this.setState({ playerUI: playerUI, gameReady: ready });
+          this.resizeTableForAdmins();
         }
       }
     });
   }
 
-  toggleReady = (i) => {
-    if (!this.alreadyToggledReady && this.readyFlashedAlready) {
-      const myReadyButton = document.querySelector(".myReadyBtn");
-      myReadyButton.classList.remove("flashReady");
-      myReadyButton.classList.remove("not-ready");
-      myReadyButton.classList.add("ready");
+  kickSelf = (players) => {
+    let stillPlaying = false;
+    for(let player of players) 
+      if(player.username === JSON.parse(Cookies.get('userData').split('j:')[1]).username) 
+        stillPlaying = true;
+    if(!stillPlaying && !this.state.redirected) {
+      alert('You have been kicked from the lobby...');
+      this.setState({redirected: true});
+      window.location.href = "/home";
     }
-    let toggled = this.state.players;
-    toggled[i].isReady = !toggled[i].isReady;
-    this.setState({ players: toggled });
-    this.alreadyToggledReady = true;
+  }
+
+  isGameReady = (players) => {
+    let ready = true;
+    for (let player of players)
+      if (!player.isReady) ready = false;
+    return ready;
+  }
+
+  toggleReady = async (username) => {
+    if (username !== JSON.parse(Cookies.get('userData').split('j:')[1]).username)
+      return;
+    const res = await fetch('/gaming/readyup/', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isReady: !this.state.isReady,
+        lobbyCode: this.state.lobbyCode
+      })
+    });
+    if (res.status === 200) this.setState({ isReady: !this.state.isReady });
   }
 
   startGame = () => {
-    alert("todo: implement this startGame() method properly");
     window.location.href = "/game/:" + this.state.lobbyCode;
   }
 
-  removePlayer = (playerIndex) => {
-    alert("todo: implement this removePlayer() method");
+  removePlayer = (username) => {
+    fetch('/gaming/remove/', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lobbyCode: this.state.lobbyCode,
+        username: username
+      })
+    });
   }
 
   getLobbyCode = () => {
@@ -138,46 +172,46 @@ class Lobby extends React.Component {
   // UI Helpers
   generatePlayerUI = (players) => {
     let playerTable = [];
-    playerTable.push(  
+    playerTable.push(
       <tr key="headings">
         <td className="player-name">Players</td>
         <td className="is-ready">Status</td>
-        { this.state.iAmHost ? 
+        {this.state.iAmHost ?
           <td className="remove-player">Remove?</td>
-        :  
+          :
           <td className="inviz"> &nbsp;</td>
         }
       </tr>
     );
     for (let i = 0; i < players.length; i++) {
-      playerTable.push( 
-        <tr key={"player"+(i+1)}>
+      playerTable.push(
+        <tr key={"player" + (i + 1)}>
           <td className="player-name">
-            {players[i].username} 
+            {players[i].username}
             {players[i].isHost ? " (Host)" : ""}
           </td>
           <td className="is-ready">
-            { i === this.state.myPlayerIndex ?
-              <button 
+            {players[i].username === JSON.parse(Cookies.get('userData').split('j:')[1]).username ?
+              <button
                 className={players[i].isReady ? "ready myReadyBtn" : "not-ready myReadyBtn"}
-                onClick={ () => this.toggleReady(i) } >
+                onClick={() => this.toggleReady(players[i].username)} >
                 Ready
               </button>
-            : 
-              <div className ={players[i].isReady ? "ready" : "not-ready"}>
+              :
+              <div className={players[i].isReady ? "ready" : "not-ready"}>
                 Ready
-              </div>  
+              </div>
             }
           </td>
-          { this.state.iAmHost && i !== this.state.myPlayerIndex  ?
+          {this.state.iAmHost ? (players[i].username !== JSON.parse(Cookies.get('userData').split('j:')[1]).username) &&
             <td className="remove-player">
-              <button onClick={ () => this.removePlayer(i) }>X</button>
+              <button onClick={() => this.removePlayer(players[i].username)}>X</button>
             </td>
-          :
-            <td className="inviz">&nbsp;</td> 
+            :
+            <td className="inviz">&nbsp;</td>
           }
         </tr>
-      ); 
+      );
     }
     return playerTable;
   }
@@ -187,7 +221,7 @@ class Lobby extends React.Component {
     this.readyFlashedAlready = true;
     document.querySelector('.myReadyBtn').classList.add('flashReady');
   }
-  
+
   resizeTableForAdmins = () => {
     if (this.state.iAmHost) {
       let elements = document.querySelectorAll("#players td:nth-child(3)");
@@ -196,92 +230,94 @@ class Lobby extends React.Component {
       for (let x of elements) x.style.flex = "60";
       elements = document.querySelectorAll(".is-ready");
       for (let x of elements) x.style.flex = "25";
-      document.querySelector('#lobby table').style.width = '100%';
+      //document.querySelector('#players').style.width = '100%';
     }
   }
-  
+
   render = () => {
     return (
       <div>
-      {!this.state.loading ?
-        <div id='lobby'>
+        {!this.state.loading ?
+          <div id='lobby'>
             <div id="lobby-name">
               {this.state.lobbyName}
             </div>
             <div id="lobby-code-section">
               <div id="code-heading">Lobby Code:</div>
             </div>
-            <div style={{height: '80px'}}>
+            <div style={{ height: '80px' }}>
               <div class='row'>
-                <div class='col' style={{padding: '0'}}>
-                <div id="code" style={{width: '110px', marginRight: '0',float: 'right'}}>{this.state.lobbyCode}</div>
+                <div class='col' style={{ padding: '0' }}>
+                  <div id="code" style={{ width: '110px', marginRight: '0', float: 'right' }}>{this.state.lobbyCode}</div>
                 </div>
-                <div class='col' style={{padding: '0'}}>
-                <button className="copy-btn" onClick={() => this.copyLobbyCode()} style={{width: '110px'}}>
-                  Copy
+                <div class='col' style={{ padding: '0' }}>
+                  <button className="copy-btn" onClick={() => this.copyLobbyCode()} style={{ width: '110px' }}>
+                    Copy
                 </button>
                 </div>
               </div>
             </div>
-            { this.state.lobbyPosted &&
-                <table id="players">
-                  <tbody>{this.state.playerUI}</tbody>
-                </table>
+            {this.state.lobbyPosted &&
+              <table id="players">
+                <tbody>{this.state.playerUI}</tbody>
+              </table>
             }
-            { this.state.iAmHost ? !this.state.lobbyPosted &&
-            <div id="settings">
-              <form>
-                <div className="setting">
-                  <div className="labl">
-                    Time Limit <span className="seconds">(seconds)</span>&nbsp;
+            {this.state.iAmHost && !this.state.lobbyPosted ?
+              <div id="settings">
+                <form>
+                  <div className="setting">
+                    <div className="labl">
+                      Time Limit <span className="seconds">(seconds)</span>&nbsp;
                   </div>
-                  <div className="inpt">
-                    <input 
-                      type='number'
-                      max={120}
-                      className='timefield'
-                      defaultValue={60}
-                      ref={this.timeLimit}
-                    />
+                    <div className="inpt">
+                      <input
+                        type='number'
+                        max={120}
+                        className='timefield'
+                        defaultValue={60}
+                        ref={this.timeLimit}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="setting">
-                  <div className="labl">Private Lobby?&nbsp;</div> 
-                  <div className="inpt">
-                    <input 
-                    type='checkbox' 
-                    className='checkbox'
-                    ref={this.isPrivate}
-                    />
+                  <div className="setting">
+                    <div className="labl">Private Lobby?&nbsp;</div>
+                    <div className="inpt">
+                      <input
+                        type='checkbox'
+                        className='checkbox'
+                        ref={this.isPrivate}
+                      />
+                    </div>
                   </div>
-                </div>
-              </form>
-            </div>
-            :
-            <div id="settings">
-              <div id="lobby-settings-fixed">
-                <p>Time Limit: <span className="time-digits">
-                  {this.state.timeLimit}</span> seconds</p>
-                <p>{!this.state.private ? 
-                  <span className="public">Public</span> : 
-                  <span className="private">Private</span>} lobby</p>
+                </form>
               </div>
-            </div>
+              :
+              <div id="settings">
+                <div id="lobby-settings-fixed">
+                  <p>Time Limit: <span className="time-digits">
+                    {this.state.timeLimit}</span> seconds</p>
+                  <p>{!this.state.private ?
+                    <span className="public">Public</span> :
+                    <span className="private">Private</span>} lobby</p>
+                </div>
+              </div>
             }
-          { this.state.iAmHost && !this.state.lobbyPosted && 
-            <button className="start-btn" onClick={()=>this.createLobby()}>
-            CREATE LOBBY
+            {this.state.iAmHost && !this.state.lobbyPosted &&
+              <button className="start-btn" onClick={() => this.createLobby()}>
+                CREATE LOBBY
             </button>
-          }
-          { this.state.iAmHost && this.state.lobbyPosted &&
-            <button className="start-btn" onClick={()=>this.startGame()}>
-            START GAME
-            </button>
-          }
-        </div>
-        :
-        <div id='lobby' style={{textAlign: 'center'}}>
-          Loading...
+            }
+            {this.state.iAmHost && this.state.lobbyPosted && this.state.gameReady ?
+              <button className="start-btn" onClick={() => this.startGame()}>
+                START GAME
+              </button>
+              :
+              this.state.lobbyPosted && this.state.gameReady && <div style={{textAlign: 'center'}}>Waiting for host to start the game...</div>
+            }
+          </div>
+          :
+          <div id='lobby' style={{ textAlign: 'center' }}>
+            Loading...
         </div>
         }
       </div>

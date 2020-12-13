@@ -5,16 +5,15 @@ const lobby = express.Router();
 const redis = require('../Config/redis')[0];
 const asyncRedis = require('../Config/redis')[1];
 
-lobby.get('/lobbies', async(req, res) => {
+lobby.get('/lobbies', async (req, res) => {
     redis.keys('*', async (err, keys) => {
         let values = [];
         if (err) return res.sendStatus(500).end();
         if (keys) {
-            for(let key of keys) {
+            for (let key of keys) {
                 var value = await asyncRedis.get(key).then(value => {
                     return JSON.parse(value);
                 });
-                
                 values.push(value);
             }
         }
@@ -22,11 +21,11 @@ lobby.get('/lobbies', async(req, res) => {
     });
 });
 
-lobby.get('/:id', async(req, res) => {
+lobby.get('/:id', async (req, res) => {
     var value = await asyncRedis.get(req.params.id).then(value => {
         return JSON.parse(value);
     });
-    if(value !== null) res.status(200).json(value).end();
+    if (value !== null) res.status(200).json(value).end();
     else res.status(500).end();
 });
 
@@ -40,22 +39,31 @@ lobby.delete('/delete', (req, res) => {
     res.status(200).end();
 });
 
-lobby.post('/readyup', (req, res) => {
-
-});
-
-lobby.post('/join', async(req, res) => {
+lobby.post('/readyup', async (req, res) => {
     var value = await asyncRedis.get(req.body.lobbyCode).then(value => {
         return JSON.parse(value);
     });
-    if(value !== null) {
-        for(let player of value.players) 
-            if(player.username === req.body.player.username)
+    if (value !== null) {
+        for (let player of value.players) 
+            if (player.username === req.body.username) 
+                player.isReady = req.body.isReady;
+        redis.set(value.lobbyCode, JSON.stringify(value));
+        res.status(200).json({ players: value.players }).end();
+    } else res.status(500).end();
+});
+
+lobby.post('/join', async (req, res) => {
+    var value = await asyncRedis.get(req.body.lobbyCode).then(value => {
+        return JSON.parse(value);
+    });
+    if (value !== null) {
+        for (let player of value.players)
+            if (player.username === req.body.player.username)
                 return res.sendStatus(500).end();
         value.players.push(req.body.player);
         redis.set(req.body.lobbyCode, JSON.stringify(value));
         res.status(200).json({ players: value.players }).end();
-    } else res.sendStatus(500).end();
+    } else res.status(500).end();
 });
 
 lobby.post('/leave', (req, res) => {
@@ -63,7 +71,7 @@ lobby.post('/leave', (req, res) => {
         let values = [];
         if (err) return res.sendStatus(500).end();
         if (keys) {
-            for(let key of keys) {
+            for (let key of keys) {
                 var value = await asyncRedis.get(key).then(value => {
                     return JSON.parse(value);
                 });
@@ -87,7 +95,7 @@ lobby.post('/leave', (req, res) => {
             }
         }
         if (target === null) return res.status(500).end();
-        res.status(200).json({ lobbyCode: target.lobbyCode, players: target.players}).end();
+        res.status(200).json({ lobbyCode: target.lobbyCode, players: target.players }).end();
     });
 });
 
