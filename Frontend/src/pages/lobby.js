@@ -16,7 +16,9 @@ class Lobby extends React.Component {
       playerUI: [],
       myPlayerIndex: 0,
       iAmHost: false,
-      lobbyPosted: false
+      lobbyPosted: false,
+      private: false, 
+      timeLimit: 60
     };
     this.alreadyToggledReady = false;
     this.readyFlashedAlready = false;
@@ -35,12 +37,14 @@ class Lobby extends React.Component {
     });
     if (res.status === 200) {
       res = await res.json();
-      this.setState({ lobbyName: res.body.name, iAmHost: false, lobbyPosted: true });
+      let playerUI = this.generatePlayerUI(res.players);
+      this.setState({ lobbyName: res.lobbyName, iAmHost: false, lobbyPosted: true, timeLimit: res.timeLimit, private: !res.public, playerUI: playerUI });
       // Join lobby
     } else {
       this.setState({ 
         lobbyName: JSON.parse(Cookies.get('userData').split('j:')[1]).username + "'s Lobby", 
-        iAmHost: true
+        iAmHost: true,
+        lobbyPosted: true
       });
     }
   }
@@ -87,6 +91,7 @@ class Lobby extends React.Component {
 
   startGame = () => {
     alert("todo: implement this startGame() method properly");
+
     window.location.href = "/game/:" + this.state.lobbyCode;
   }
 
@@ -190,16 +195,13 @@ class Lobby extends React.Component {
               </div>
             </div>
           </div>
-        {
-          this.state.lobbyPosted ?
-            <table id="players">
-              <tbody>{this.state.playerUI}</tbody>
-            </table>
-            : 
-            ""
-        }
-        <div id="settings">
-          { this.state.iAmHost ?
+          { this.state.lobbyPosted &&
+              <table id="players">
+                <tbody>{this.state.playerUI}</tbody>
+              </table>
+          }
+          { this.state.iAmHost ? !this.state.lobbyPosted &&
+          <div id="settings">
             <form>
               <div className="setting">
                 <div className="labl">
@@ -226,22 +228,24 @@ class Lobby extends React.Component {
                 </div>
               </div>
             </form>
+          </div>
           :
+          <div id="settings">
             <div id="lobby-settings-fixed">
-              <p>time: <span className="time-digits">
+              <p>Time Limit: <span className="time-digits">
                 {this.state.timeLimit}</span> seconds</p>
-              <p>{this.isPrivate.current !== null && !this.isPrivate.current.checked ? 
-                <span className="public">public</span> : 
-                <span className="private">private</span>} lobby</p>
+              <p>{!this.state.private ? 
+                <span className="public">Public</span> : 
+                <span className="private">Private</span>} lobby</p>
             </div>
+          </div>
           }
-        </div>
-        { this.state.iAmHost && !this.state.lobbyPosted && // only show start button to Host
+        { this.state.iAmHost && !this.state.lobbyPosted && 
           <button className="start-btn" onClick={()=>this.createLobby()}>
           CREATE LOBBY
           </button>
         }
-        { this.state.iAmHost && this.state.lobbyPosted && // only show start button to Host
+        { this.state.iAmHost && this.state.lobbyPosted &&
           <button className="start-btn" onClick={()=>this.startGame()}>
           START GAME
           </button>

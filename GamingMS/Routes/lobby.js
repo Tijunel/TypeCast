@@ -21,6 +21,14 @@ lobby.get('/lobbies', async(req, res) => {
     });
 });
 
+lobby.get('/:id', async(req, res) => {
+    var value = await asyncRedis.get(req.params.id).then(value => {
+        return JSON.parse(value);
+    });
+    console.log(value)
+    res.status(200).json(value).end();
+});
+
 lobby.post('/create', (req, res) => {
     redis.set(req.body.lobbyCode, JSON.stringify(req.body));
     res.sendStatus(200).end();
