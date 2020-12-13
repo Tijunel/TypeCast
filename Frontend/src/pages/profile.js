@@ -32,22 +32,32 @@ class Profile extends React.Component {
 	}
 
 	loadUserData = () => {
+		if (JSON.parse(Cookies.get('userData') === undefined))  {
+			alert("Not Logged into a valid account!");
+			window.location.href = '/login';
+		}
 		const username = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
-		fetch('/userData/games', {
-			method: 'GET',
-			credentials: "include",
-			headers: { 'Content-Type': 'application/json' }
-		})
-			.then(async res => {
-				if (res.status === 200) {
-					res = await res.json();
-					const pastGamesUI = this.generatePastGamesUI();
-					this.setState({ LPM: res.lpm, pastGamesUI: res.games, username: username });
-				} else alert("An error occured while finding your past games");
+		if (username === undefined)  {
+			alert("Not Logged into a valid account!");
+			window.location.href = '/login';
+		}
+		else  {
+			fetch('/userData/games', {
+				method: 'GET',
+				credentials: "include",
+				headers: { 'Content-Type': 'application/json' }
 			})
-			.catch(err => {
-				alert("An error occured while finding your past games");
-			});
+				.then(async res => {
+					if (res.status === 200) {
+						res = await res.json();
+						const pastGamesUI = this.generatePastGamesUI();
+						this.setState({ LPM: res.lpm, pastGamesUI: res.games, username: username });
+					} else alert("An error occured while finding your past games");
+				})
+				.catch(err => {
+					alert("An error occured while finding your past games");
+				});
+			}
 	}
 
 	clearHistory = () => {
