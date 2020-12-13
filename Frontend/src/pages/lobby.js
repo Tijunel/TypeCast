@@ -26,6 +26,7 @@ class Lobby extends React.Component {
     this.getLobby();
   }
 
+  // Lobby Control
   getLobby = async () => {
     let res = await fetch('/gaming/lobby/' + this.state.lobbyCode, {
       method: 'GET',
@@ -71,34 +72,6 @@ class Lobby extends React.Component {
     }
   }
 
-  getLobbyCode = () => {
-    let url = window.location.pathname;
-    return url.substr(url.length - 4);
-  }
-
-  copyLobbyCode = () => {
-    navigator.clipboard.writeText(this.state.lobbyCode);
-    alert("Copied to clipboard.");
-  }
-
-  flashVisualIndicatorForReadyButton = () => {
-    if (this.alreadyToggledReady) return;
-    this.readyFlashedAlready = true;
-    document.querySelector('.myReadyBtn').classList.add('flashReady');
-  }
-  
-  resizeTableForAdmins = () => {
-    if (this.state.iAmHost) {
-      let elements = document.querySelectorAll("#players td:nth-child(3)");
-      for (let x of elements) x.style.display = "block";
-      elements = document.querySelectorAll(".player-name");
-      for (let x of elements) x.style.flex = "60";
-      elements = document.querySelectorAll(".is-ready");
-      for (let x of elements) x.style.flex = "25";
-      document.querySelector('#lobby table').style.width = '100%';
-    }
-  }
-
   toggleReady = (i) => {
     if (!this.alreadyToggledReady && this.readyFlashedAlready) {
       const myReadyButton = document.querySelector(".myReadyBtn");
@@ -112,16 +85,26 @@ class Lobby extends React.Component {
     this.alreadyToggledReady = true;
   }
 
+  startGame = () => {
+    alert("todo: implement this startGame() method properly");
+    window.location.href = "/game/:" + this.state.lobbyCode;
+  }
+
   removePlayer = (playerIndex) => {
     alert("todo: implement this removePlayer() method");
   }
 
-  startGame = () => {
-    alert("todo: implement this startGame() method properly");
-    // just for demo purposes:
-    window.location.href = "/game/:" + this.state.lobbyCode;
+  getLobbyCode = () => {
+    let url = window.location.pathname;
+    return url.substr(url.length - 4);
   }
 
+  copyLobbyCode = () => {
+    navigator.clipboard.writeText(this.state.lobbyCode);
+    alert("Copied to clipboard.");
+  }
+
+  // UI Helpers
   generatePlayerUI = (players) => {
     let playerTable = [];
     playerTable.push(  
@@ -166,6 +149,24 @@ class Lobby extends React.Component {
       ); 
     }
     return playerTable;
+  }
+
+  flashVisualIndicatorForReadyButton = () => {
+    if (this.alreadyToggledReady) return;
+    this.readyFlashedAlready = true;
+    document.querySelector('.myReadyBtn').classList.add('flashReady');
+  }
+  
+  resizeTableForAdmins = () => {
+    if (this.state.iAmHost) {
+      let elements = document.querySelectorAll("#players td:nth-child(3)");
+      for (let x of elements) x.style.display = "block";
+      elements = document.querySelectorAll(".player-name");
+      for (let x of elements) x.style.flex = "60";
+      elements = document.querySelectorAll(".is-ready");
+      for (let x of elements) x.style.flex = "25";
+      document.querySelector('#lobby table').style.width = '100%';
+    }
   }
   
   render = () => {
