@@ -186,7 +186,7 @@ class Profile extends React.Component {
 			pastGamesTable.push(
 				<tr key={"game" + (i + 1)}>
 					<td className="position">
-						{pastGames[i].position}
+						{pastGames[i].placement}
 					</td>
 					<td className="speed">
 						<pre>
