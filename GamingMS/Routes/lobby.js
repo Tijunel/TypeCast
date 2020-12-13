@@ -26,25 +26,32 @@ lobby.get('/:id', async(req, res) => {
         return JSON.parse(value);
     });
     if(value !== null) res.status(200).json(value).end();
-    else res.sendStatus(500).end();
+    else res.status(500).end();
 });
 
 lobby.post('/create', (req, res) => {
     redis.set(req.body.lobbyCode, JSON.stringify(req.body));
-    res.sendStatus(200).end();
+    res.status(200).end();
 });
 
 lobby.delete('/delete', (req, res) => {
     client.del(req.body.lobbyCode);
-    res.sendStatus(200).end();
+    res.status(200).end();
 });
 
 lobby.post('/readyup', (req, res) => {
 
 });
 
-lobby.post('/join', (req, res) => {
-
+lobby.post('/join', async(req, res) => {
+    var value = await asyncRedis.get(req.params.id).then(value => {
+        return JSON.parse(value);
+    });
+    if(value !== null) {
+        value.players.push(req.body.player);
+        redis.set(req.body.lobbyCode, JSON.stringify(value));
+        res.sendStatus(200).end();
+    } else res.sendStatus(500).end();
 });
 
 lobby.post('/leave', (req, res) => {
