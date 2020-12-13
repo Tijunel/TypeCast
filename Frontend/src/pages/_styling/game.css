@@ -43,7 +43,7 @@
   padding: 6px 0;
 }
 .vis-player-lane {  /* 1st column */
-  flex: 88;
+  flex: 87;
   padding-top: 9px !important;
   border-bottom: 3px dashed #888;
   text-align: left;
@@ -79,7 +79,7 @@
   padding-top: 2px;
 }
 .vis-playerstats {  /* 2nd column */
-  flex: 12;
+  flex: 13;
   text-align: right;
 }
 .vis-playerstats .player-pos {
@@ -109,8 +109,9 @@
 .typingbox:focus {
   outline: 0;
 }
-pre {
+#game pre {
   color: white;
+  margin-bottom: 0;
 }
 #race-results {
   text-align: center;
