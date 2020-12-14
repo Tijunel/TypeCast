@@ -28,8 +28,8 @@ class Game extends React.Component {
     this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
-    this.AUTO_INDENT = true;              // (self explanitory)
-    this.DEBUG = false;                    // debug mode (lots of console output)
+    this.AUTO_INDENT = false;             // (self explanitory)
+    this.DEBUG = false;                   // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
     this.players = [];                // holds the players' race data. Not in state b/c needs to update fast.
@@ -153,33 +153,10 @@ class Game extends React.Component {
     } else {
       // Error
     }
-    // todo: update with code to send and receive player data to/from the server.
-    //       The game is already set up to call this method every 2 seconds.
+  }
 
-    // REQUEST:
-    // send this to the server:  {this.players[0].charsFin, this.players[0].time}
-    //    not sure: do we also need to send the player's name (this.players[0].name)
-    //    ...so the server can identify who tf is sending this stuff?
+  sendFinish = () => {
 
-
-    // RESPONSE:
-    // should receive an array of player entries, each looking like:  {name: _ , charsFin: _, time: _ }
-
-
-    // THEN, use that data to update this.players[]
-    // Assuming the received data is now stored in an array called 'response', do this:
-
-    // for (let pServer of response) {
-    //   if (pServer.name !== this.myName) { // don't update my data with stale server data
-    //     for (let pLocal of this.players) {
-    //       if (pServer.name === pLocal.name) { 
-    //         pLocal.charsFin = pServer.charsFin;
-    //         pLocal.time = pServer.time;
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
   }
   // ------------------ /server request/response methods ------------------------
 
@@ -765,6 +742,7 @@ class Game extends React.Component {
     this.calcAccuracy();
     this.setState({ redraw: !this.state.redraw });
     this.applyFinishedStyling();
+    this.sendFinish();
   }
 
   // --------- timer ----------------------------------------------------------

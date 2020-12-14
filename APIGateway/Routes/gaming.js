@@ -159,6 +159,12 @@ gaming.post('/update', withAuth, async (req, res) => {
         res.status(200).send(response.body).end();
     } else res.status(response.status).end();
 });
+
+gaming.post('/finish', withAuth, (req, res) => {
+    var firebaseAPI = new MSCall();
+    firebaseAPI.setPrefixURL('http://localhost:8000');
+    
+});
 // ---------------------
 
 module.exports = gaming;
