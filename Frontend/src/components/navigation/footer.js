@@ -20,8 +20,8 @@ export default class Footer extends React.Component {
             <footer id='footer'>
                 <div id='footer-content'>
                     <b>Copyright &copy; TypeCast 2020 </b>
-                    <b onClick={this.handleAttributions} id='attributions-button'>Attributions</b>
-                    <b onClick={this.handleLicenses} id='licenses-button'>Licenses</b>
+                    {/* <b onClick={this.handleAttributions} id='attributions-button'>Attributions</b> No Time, sorry to everyone that deserves a attribution for libraries and such
+                    <b onClick={this.handleLicenses} id='licenses-button'>Licenses</b> */}
                 </div>
             </footer>
         );

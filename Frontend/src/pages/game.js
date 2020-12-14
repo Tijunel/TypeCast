@@ -168,9 +168,6 @@ class Game extends React.Component {
         time: time
       })
     });
-    setTimeout(function () {
-      window.location.href = "/home"
-    }, 5000);
   }
   // ------------------ /server request/response methods ------------------------
 
