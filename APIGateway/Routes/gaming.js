@@ -135,8 +135,8 @@ gaming.post('/ready', withAuth, async (req, res) => {
             username: req.user.username
         }
     });
-    if(response.status === 200) {
-        if(response.body.readyLeft === 0) {
+    if (response.status === 200) {
+        if (response.body.readyLeft === 0) {
             const io = require('../server')[0];
             io.emit('start game', {
                 lobbyCode: req.body.lobbyCode
@@ -144,7 +144,7 @@ gaming.post('/ready', withAuth, async (req, res) => {
         }
     }
     res.status(response.status).end();
-}); 
+});
 
 gaming.post('/update', withAuth, async (req, res) => {
     const response = await api.call('game/update/', 'POST', {
@@ -155,15 +155,28 @@ gaming.post('/update', withAuth, async (req, res) => {
             lobbyCode: req.body.lobbyCode
         }
     });
-    if(response.status === 200) {
+    if (response.status === 200) {
         res.status(200).send(response.body).end();
     } else res.status(response.status).end();
 });
 
-gaming.post('/finish', withAuth, (req, res) => {
+gaming.post('/finish', withAuth, async (req, res) => {
     var firebaseAPI = new MSCall();
     firebaseAPI.setPrefixURL('http://localhost:8000');
-    
+    let response = await firebaseAPI.call('games/' + req.user.ID, 'POST', {
+        json: {
+            placement: req.body.placement,
+            typingSpeed: req.body.typingSpeed,
+            time: req.body.time,
+            date: new Date()
+        }
+    });
+    response = await api.call('game/delete/', 'POST', {
+        json: {
+            lobbyCode: req.body.lobbyCode
+        }
+    });
+    res.status(response.status).end();
 });
 // ---------------------
 
