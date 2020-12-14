@@ -132,7 +132,7 @@ class Game extends React.Component {
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        lobbyCode: this.lobbyCode,
+        lobbyCode: this.state.lobbyCode,
         charsFin: this.players[0].charsFin,
         time: this.players[0].time
       })
@@ -944,7 +944,7 @@ class Game extends React.Component {
             className='typingbox'
             autoComplete='off'
             disabled={true}
-            onKeyPress={(e) => (e.key === 'Enter' && e.preventDefault()) || (e.key === 'Tab' && e.preventDefault()) }
+            onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
             value={this.state.typed}
             onChange={this.typingHandler}
           />
