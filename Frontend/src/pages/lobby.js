@@ -89,7 +89,6 @@ class Lobby extends React.Component {
       this.setState({ lobbyPosted: true, playerUI: playerUI, private: this.isPrivate.current.checked});
       this.resizeTableForAdmins();
     } else alert("Something went wrong, try again.");
-    await this.getLobby();
   }
 
   listenOnSockets = () => {
