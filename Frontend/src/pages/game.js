@@ -28,7 +28,7 @@ class Game extends React.Component {
     this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
-    this.AUTO_INDENT = true;              // (self explanitory)
+    this.AUTO_INDENT = false;              // (self explanitory)
     this.DEBUG = false;                    // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
@@ -84,18 +84,8 @@ class Game extends React.Component {
       res = await res.json();
       let playerNames = [];
       for (let player of res.players) playerNames.push(player.username);
-      let raceCodeStr =
-`getIndentOf = (word) => {
-    let indent = 0;
-    for (let ch of word) {
-        if (ch === '\\n')
-          indent = 0;
-        else if (ch === ' ')
-          indent++;
-        else break;
-    }
-    return indent;
-}`;
+      console.log(res)
+      let raceCodeStr = res.code;
       this.setState({
         lobbyName: res.lobbyName,
         playerNames: playerNames,

@@ -4,6 +4,7 @@ const express = require('express');
 const game = express.Router();
 const redis = require('../Config/redis')[0];
 const asyncRedis = require('../Config/redis')[1];
+const snippets = require('./snippets')[0];
 
 game.get('/:id', async (req, res) => {
     var value = await asyncRedis.get(req.params.id+'-game').then(value => {
@@ -22,6 +23,7 @@ game.post('/start', async (req, res) => {
         player.charsFin = 0;
         player.time = 0;
     }
+    game.code = snippets[Math.floor(Math.random() * snippets.length)];
     redis.set(game.lobbyCode+'-game', JSON.stringify(game));
     res.status(200).end();
 });
