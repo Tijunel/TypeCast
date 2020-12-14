@@ -86,15 +86,15 @@ class Game extends React.Component {
       for (let player of res.players) playerNames.push(player.username);
       let raceCodeStr =
 `getIndentOf = (word) => {
-  let indent = 0;
-  for (let ch of word) {
-    if (ch === '\\n')
-      indent = 0;
-    else if (ch === ' ')
-      indent++;
-    else break;
-  }
-  return indent;
+    let indent = 0;
+    for (let ch of word) {
+        if (ch === '\\n')
+          indent = 0;
+        else if (ch === ' ')
+          indent++;
+        else break;
+    }
+    return indent;
 }`;
       this.setState({
         lobbyName: res.lobbyName,
@@ -364,7 +364,7 @@ class Game extends React.Component {
       }
     });
 
-    document.querySelector('#game').addEventListener("keyup", (event) => {
+    document.querySelector('#game').addEventListener("keydown", (event) => {
       if (event.key === "Tab") { // Tab
 
         event.preventDefault();
