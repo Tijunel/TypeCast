@@ -86,7 +86,7 @@ class Lobby extends React.Component {
     });
     if (res.status === 200) {
       let playerUI = this.generatePlayerUI([player]);
-      this.setState({ lobbyPosted: true, playerUI: playerUI, private: this.isPrivate.current.checked});
+      this.setState({ lobbyPosted: true, playerUI: playerUI, private: this.isPrivate.current.checked, timeLimit: this.timeLimit.current.value});
       this.resizeTableForAdmins();
     } else alert("Something went wrong, try again.");
   }
