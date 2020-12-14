@@ -38,7 +38,6 @@ class Join extends React.Component {
     });
     let lobbies = [];
     if (res.status === 200) {
-      // return structure of lobbies
       res = await res.json();
       for (let i = 0; i < res.lobbies.length; i++) {
         lobbies[i] = {lobbyCode: res.lobbies[i].lobbyCode, name: res.lobbies[i].lobbyName, numPlayers: res.lobbies[i].players.length, public: true};

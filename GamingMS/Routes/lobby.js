@@ -14,7 +14,10 @@ lobby.get('/lobbies', async (req, res) => {
                 var value = await asyncRedis.get(key).then(value => {
                     return JSON.parse(value);
                 });
-                values.push(value);
+                var inProgress = await asyncRedis.get(value.lobbyCode + '-inprogress').then(value => {
+                    return JSON.parse(value);
+                });
+                if (!inProgress && value.public) values.push(value);
             }
         }
         res.status(200).json({ lobbies: values }).end();
@@ -31,11 +34,13 @@ lobby.get('/:id', async (req, res) => {
 
 lobby.post('/create', (req, res) => {
     redis.set(req.body.lobbyCode, JSON.stringify(req.body));
+    redis.set(req.body.lobbyCode + '-inprogress', false);
     res.status(200).end();
 });
 
 lobby.delete('/delete', (req, res) => {
     redis.del(req.body.lobbyCode);
+    redis.del(req.body.lobbyCode + '-inprogress');
     res.status(200).end();
 });
 
@@ -43,9 +48,12 @@ lobby.post('/readyup', async (req, res) => {
     var value = await asyncRedis.get(req.body.lobbyCode).then(value => {
         return JSON.parse(value);
     });
-    if (value !== null) {
-        for (let player of value.players) 
-            if (player.username === req.body.username) 
+    var inProgress = await asyncRedis.get(value.lobbyCode + '-inprogress').then(value => {
+        return JSON.parse(value);
+    });
+    if (value !== null && !inProgress) {
+        for (let player of value.players)
+            if (player.username === req.body.username)
                 player.isReady = req.body.isReady;
         redis.set(value.lobbyCode, JSON.stringify(value));
         res.status(200).json({ players: value.players }).end();
@@ -56,7 +64,10 @@ lobby.post('/join', async (req, res) => {
     var value = await asyncRedis.get(req.body.lobbyCode).then(value => {
         return JSON.parse(value);
     });
-    if (value !== null) {
+    var inProgress = await asyncRedis.get(value.lobbyCode + '-inprogress').then(value => {
+        return JSON.parse(value);
+    });
+    if (value !== null && !inProgress) {
         for (let player of value.players)
             if (player.username === req.body.player.username)
                 return res.sendStatus(500).end();
@@ -72,25 +83,35 @@ lobby.post('/leave', (req, res) => {
         if (err) return res.sendStatus(500).end();
         if (keys) {
             for (let key of keys) {
-                var value = await asyncRedis.get(key).then(value => {
-                    return JSON.parse(value);
-                });
-                values.push(value);
+                if (key.length === 4) {
+                    var value = await asyncRedis.get(key).then(value => {
+                        return JSON.parse(value);
+                    });
+                    values.push(value);
+                }
             }
         }
         let target = null;
         for (let value of values) {
-            for (let player of value.players) {
-                if (player.username === req.body.username) {
-                    target = value;
-                    if (player.isHost) target.players = [];
-                    else {
-                        const index = value.players.indexOf(player);
-                        target.players.splice(index, 1);
+            var inProgress = await asyncRedis.get(value.lobbyCode + '-inprogress').then(value => {
+                return JSON.parse(value);
+            });
+            if (!inProgress) {
+                for (let player of value.players) {
+                    if (player.username === req.body.username) {
+                        target = value;
+                        if (player.isHost) target.players = [];
+                        else {
+                            const index = value.players.indexOf(player);
+                            target.players.splice(index, 1);
+                        }
+                        if (target.players.length === 0) {
+                            redis.del(target.lobbyCode);
+                            redis.del(target.lobbyCode+'-inprogress');
+                        } 
+                        else redis.set(target.lobbyCode, JSON.stringify(target));
+                        break;
                     }
-                    if (target.players.length === 0) redis.del(target.lobbyCode);
-                    else redis.set(target.lobbyCode, JSON.stringify(target));
-                    break;
                 }
             }
         }

@@ -91,7 +91,6 @@ gaming.post('/remove', withAuth, async (req, res) => {
         }
     });
     if (response.status === 200) {
-        console.log(response.body.players)
         const io = require('../server')[0];
         io.emit('lobby update', {
             lobbyCode: req.body.lobbyCode,
@@ -103,6 +102,24 @@ gaming.post('/remove', withAuth, async (req, res) => {
 // ---------------------
 
 // Game Endpoints ------
+gaming.post('/start', withAuth, async (req, res) => {
+    const response = await api.call('game/start/', 'POST', {
+        json: {
+            lobbyCode: req.body.lobbyCode
+        }
+    });
+    if (response.status === 200) {
+        const io = require('../server')[0];
+        io.emit('start game', {
+            lobbyCode: req.body.lobbyCode
+        });
+        io.emit('lobby update', {
+            lobbyCode: req.body.lobbyCode,
+            players: []
+        });
+    }
+    res.status(response.status).end();
+});
 
 // ---------------------
 
