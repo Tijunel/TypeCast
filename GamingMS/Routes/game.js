@@ -10,5 +10,8 @@ game.post('/start', (req, res) => {
     else res.status(500).end();
 });
 
+game.post('/ingame', (req, res) => {
+
+});
 
 module.exports = game;

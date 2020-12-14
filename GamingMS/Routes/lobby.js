@@ -17,7 +17,7 @@ lobby.get('/lobbies', async (req, res) => {
                 var inProgress = await asyncRedis.get(value.lobbyCode + '-inprogress').then(value => {
                     return JSON.parse(value);
                 });
-                if (!inProgress) values.push(value);
+                if (!inProgress && value.public) values.push(value);
             }
         }
         res.status(200).json({ lobbies: values }).end();
@@ -100,7 +100,6 @@ lobby.post('/leave', (req, res) => {
                 for (let player of value.players) {
                     if (player.username === req.body.username) {
                         target = value;
-
                         if (player.isHost) target.players = [];
                         else {
                             const index = value.players.indexOf(player);
