@@ -22,16 +22,13 @@ class Profile extends React.Component {
 			typingSpeed: 0.0,
 			changeUNVisible: false,
 			changePWVisible: false,
-			delAcctVisible: false
+			delAcctVisible: false,
+			clearHistoryVisible: false
 		}
 	}
 
 	componentDidMount = () => {
 		this.loadUserData();
-		// const tableWidth = document.querySelector("#past-games").offsetWidth;
-		// let tableContainer = document.querySelector("#table-container");
-		// tableContainer.style.width = tableWidth + "px";
-		// this.sizeTheExtendedFooter("initial load");
 	}
 
 	loadUserData = () => {
@@ -49,7 +46,7 @@ class Profile extends React.Component {
 				} 
 			})
 			.catch(err => {
-				
+				alert("Unable to load data.")
 			});
 	}
 
@@ -139,6 +136,7 @@ class Profile extends React.Component {
 	}
 
 	deleteAccountHandler = () => {
+		this.clearHistory();
 		fetch('/user/', {
 			method: 'DELETE',
 			credentials: "include",
@@ -153,6 +151,7 @@ class Profile extends React.Component {
 			})
 			.catch(err => {
 				//Goes into here again after pressing the button. It works but still throws an error.
+				alert("Could not delete account...")
 				return;
 			});
 			window.location.href = '/login';
