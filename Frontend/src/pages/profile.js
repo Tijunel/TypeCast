@@ -58,7 +58,7 @@ class Profile extends React.Component {
 		})
 			.then(res => {
 				if (res.status === 200) {
-					this.setState({ pastGames: [], typingSpeed: 0 });
+					this.setState({ pastGamesUI: [], typingSpeed: 0 });
 					alert("Game data reset was successfuly.");
 				} 
 				else alert("Game data reset was successfully.");
