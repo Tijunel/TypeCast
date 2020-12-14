@@ -22,8 +22,9 @@ class Lobby extends React.Component {
       timeLimit: 60,
       loading: true,
       ready: false,
-      gameReady: false, 
-      redirected: false
+      gameReady: false,
+      redirected: false,
+      started: false
     };
   }
 
@@ -85,7 +86,7 @@ class Lobby extends React.Component {
     });
     if (res.status === 200) {
       let playerUI = this.generatePlayerUI([player]);
-      this.setState({ lobbyPosted: true, playerUI: playerUI });
+      this.setState({ lobbyPosted: true, playerUI: playerUI, private: this.isPrivate.current.checked});
       this.resizeTableForAdmins();
     } else alert("Something went wrong, try again.");
   }
@@ -93,10 +94,10 @@ class Lobby extends React.Component {
   listenOnSockets = () => {
     const socket = SocketManager.getInstance().getSocket();
     socket.on('lobby update', (data) => {
-      if (data.lobbyCode === this.state.lobbyCode) {
+      if (data.lobbyCode === this.state.lobbyCode && !this.state.started) {
         if (data.players.length === 0 && !this.state.redirected) {
           alert('Lobby no longer exists...');
-          this.setState({redirected: true});
+          this.setState({ redirected: true });
           window.location.href = "/home";
         } else {
           this.kickSelf(data.players);
@@ -107,16 +108,22 @@ class Lobby extends React.Component {
         }
       }
     });
+    socket.on('start game', (data) => {
+      if(data.lobbyCode === this.state.lobbyCode) {
+        window.location.href = "/game/:" + this.state.lobbyCode;
+        this.setState({ started: true });
+      }
+    });
   }
 
   kickSelf = (players) => {
     let stillPlaying = false;
-    for(let player of players) 
-      if(player.username === JSON.parse(Cookies.get('userData').split('j:')[1]).username) 
+    for (let player of players)
+      if (player.username === JSON.parse(Cookies.get('userData').split('j:')[1]).username)
         stillPlaying = true;
-    if(!stillPlaying && !this.state.redirected) {
+    if (!stillPlaying && !this.state.redirected) {
       alert('You have been kicked from the lobby...');
-      this.setState({redirected: true});
+      this.setState({ redirected: true });
       window.location.href = "/home";
     }
   }
@@ -144,7 +151,22 @@ class Lobby extends React.Component {
   }
 
   startGame = () => {
-    window.location.href = "/game/:" + this.state.lobbyCode;
+    fetch('/gaming/start/', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lobbyCode: this.state.lobbyCode
+      })
+    })
+      .then(res => {
+        if (res.status === 200) {
+          window.location.href = "/game/:" + this.state.lobbyCode;
+        } else alert("Couldn't start game, please try again.");
+      })
+      .catch(err => {
+        alert("Couldn't start game, please try again.");
+      });
   }
 
   removePlayer = (username) => {
@@ -312,7 +334,7 @@ class Lobby extends React.Component {
                 START GAME
               </button>
               :
-              this.state.lobbyPosted && this.state.gameReady && <div style={{textAlign: 'center'}}>Waiting for host to start the game...</div>
+              this.state.lobbyPosted && this.state.gameReady && <div style={{ textAlign: 'center' }}>Waiting for host to start the game...</div>
             }
           </div>
           :
