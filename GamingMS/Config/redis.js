@@ -19,6 +19,8 @@ client.on('error', () => {
     console.log('Sync Client Connection Failed!');
 });
 
+client.flushall();
+
 // Async Client
 const asyncClient = asyncRedis.createClient({
     port: PORT,

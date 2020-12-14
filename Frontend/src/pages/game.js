@@ -29,7 +29,7 @@ class Game extends React.Component {
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
-    this.DEBUG = false;                    // debug mode (lots of console output)
+    this.DEBUG = true;                    // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
     this.players = [];                // holds the players' race data. Not in state b/c needs to update fast.
