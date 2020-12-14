@@ -46,7 +46,7 @@ export default class TopNav extends React.Component {
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className='mr-auto'>
                             <Nav.Link className="link-1" href="/home">Home</Nav.Link> 
-                            <Nav.Link className="link-2" href="/type" onClick={this.handleClick}>Type</Nav.Link> 
+                            <Nav.Link className="link-2" href="/join" onClick={this.handleClick}>Type</Nav.Link> 
                             <Nav.Link className="link-3" href="/lobby" onClick={this.handleClick}>Game</Nav.Link>
                         </Nav>
                         <Nav className='log'>
