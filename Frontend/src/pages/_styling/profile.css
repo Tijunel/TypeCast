@@ -201,3 +201,80 @@
 #delete-account-box .changed-my-mind:hover {
   text-decoration: underline;
 }
+
+@media only screen and (max-width: 768px) {
+
+
+  #profile {
+    max-height: 100%;
+    max-width: 100%;
+    margin: 1.0rem auto 0 auto;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 1.0rem;
+  }
+  .typingSpeed {
+    font-size: 1.2rem;
+  }
+
+  #table-container {
+    margin: 0 auto 80px auto;
+    font-size: 0.9rem;
+  }
+  
+  /* --- table ------------- */
+  
+.center-table  {
+  margin-left: auto;
+  margin-right: auto;
+}
+#table-container {
+  margin: 0 auto 100px auto;
+  font-size: 0.9rem;
+}
+#table-forehead {
+  width: 100%;
+  background: rgba(170, 161, 161, 0.14);
+  border-radius: 25px 25px 0 0;
+  color: rgb(137, 197, 253);
+  border: 0 !important;
+  padding: 10px 0 !important;
+  font-style: italic;
+}
+#past-games {
+  min-width: 100%;
+  margin-bottom: 30px;
+}
+
+#change-username-box, 
+#change-password-box,
+#delete-account-box {
+  margin: 50px auto 0;
+  font-size: 1.0rem;
+}
+#change-password-box {
+  max-width: 500px;
+}
+#change-username-box input[type="text"] {
+  background: #3E6C99;
+  color: white;
+  padding: 2px 12px;
+  margin-right: 14px;
+  border-radius: 50px;
+}
+#change-username-box input[type="password"] {
+  background: #3E6C99;
+  color: white;
+  padding: 2px 12px;
+  margin-right: 14px;
+  border-radius: 50px;
+}
+#change-username-box input[type="submit"] {
+  background: #3E6C99;
+  color: white;
+  padding: 2px 25px;
+  position: relative;
+  top: 3px;
+  border-radius: 50px;
+}
+}
