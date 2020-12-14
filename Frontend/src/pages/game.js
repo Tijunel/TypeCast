@@ -1,5 +1,6 @@
 import React, { Children } from 'react';
 import WithAuth from './withAuth';
+import SocketManager from '../socket';
 import Cookies from 'js-cookie';
 import './_styling/game.css';
 
@@ -21,7 +22,7 @@ class Game extends React.Component {
     this.playerNames = [];                // list of player names
     this.raceCodeStr = "";                // a string of the entire code
     this.timeLimit = null;                // time limit for this race
-    this.lobbyCode = null;                // I guess we need this? It uniquely identifies this lobby.
+    this.lobbyCode = this.getLobbyCode(); // I guess we need this? It uniquely identifies this lobby.
     this.lobbyName = null;                // not really needed, I think
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
@@ -29,7 +30,7 @@ class Game extends React.Component {
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
-    this.DEBUG = true;                    // debug mode (lots of console output)
+    this.DEBUG = false;                    // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
     this.players = [];                // holds the players' race data. Not in state b/c needs to update fast.
@@ -64,70 +65,90 @@ class Game extends React.Component {
     this.get_initial_data_from_server();
     this.initializeVars();
     this.inputSetup();
-
-    // and finally...
     this.tell_server_im_ready();
   }
 
+  listenOnSockets = () => {
+    const socket = SocketManager.getInstance().getSocket();
+    socket.on('start game', (data) => {
+      if (this.lobbyCode === data.lobbyCode) {
+        this.startTimer(true);
+      }
+    });
+  }
 
   // ------------------- server request/response methods ----------------------
-  get_initial_data_from_server = () => {
-    // todo: Receive these from the server instead of using these hardcoded values
-
-    // REQUEST: send this to the server:  this.lobbyCode
-      
-
-    // RESPONSE: server should respond with something structured like this:
-
-    //              {lobbyName: _ ,  raceCodeString: _ , time: _ , playerNames: _ }
-
-    // ...and assuming that stuff is now stored in a variable 'response', do this:
-
-    // this.lobbyName = response.lobbyName;  // <-- don't think we need this
-    // this.playerNames = response.playerNames;
-    // this.raceCodeStr = response.reaceCodeStr;
-    // this.timeLimit = response.time;
-
-    // ...and delete these three hardcoded values, below:
-
-    this.playerNames = ["Sarah W.", "Navjeet Pravdaal", "Chloe Salzar", "Test", "Tijunel"];
-    
-    this.raceCodeStr =
-`getIndentOf = (word) => {
-    let indent = 0;
-    for (let ch of word) {
-        if (ch === '\\n')
-            indent = 0;
-        else if (ch === ' ')
-            indent++;
-        else break;
+  get_initial_data_from_server = async () => {
+    const res = await fetch('/gaming/lobby/' + this.lobbyCode, {
+      method: 'GET',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if(res.status === 200) {
+      res = await res.json();
+      this.lobbyName = res.lobbyName;
+      for(let player of res.players) this.playerNames.push(player.username);
+      this.timeLimit = res.timeLimit;
+      this.raceCodeStr =
+      `getIndentOf = (word) => {
+          let indent = 0;
+          for (let ch of word) {
+              if (ch === '\\n')
+                  indent = 0;
+              else if (ch === ' ')
+                  indent++;
+              else break;
+          }
+          return indent;
+      }`
+    } else {
+      // Error
     }
-    return indent;
-}`
-
-    this.timeLimit = 60;
-
   }
 
+  tell_server_im_ready = async () => {
+    const res = await fetch('/gaming/ready', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lobbyCode: this.lobbyCode
+      })
+    });
+    if(res.status === 200) {
 
-
-  tell_server_im_ready = () => {
-    // todo
-    // Tell the server this player has finished setting things up and is ready.
-
-    // REQUEST:  let the server know that I am ready
-    // send this to the server:  this.myName
-
-
-    // RESPONSE: when server responds with {start: true}, 
-    // just start the race by calling this:  this.startTimer(true)
-
-
+    } else {
+      // Error
+    }
   }
 
-
-
-  send_receive_updated_player_data = () => {
+  send_receive_updated_player_data = async() => {
+    const res = await fetch('/gaming/update', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lobbyCode: this.lobbyCode,
+        charsFin: this.players[0].charsFin,
+        time: this.players[0].time
+      })
+    });
+    if(res.status === 200) {
+      res = await res.json();
+      for (let pServer of res) {
+        if (pServer.name !== this.myName) { // don't update my data with stale server data
+          for (let pLocal of this.players) {
+            if (pServer.name === pLocal.name) { 
+              pLocal.charsFin = pServer.charsFin;
+              pLocal.time = pServer.time;
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      // Error
+    }
     // todo: update with code to send and receive player data to/from the server.
     //       The game is already set up to call this method every 2 seconds.
 
@@ -155,11 +176,8 @@ class Game extends React.Component {
     //     }
     //   }
     // }
-
-
   }
 // ------------------ /server request/response methods ------------------------
-
 
   initializeVars = () => {
     this.myName = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
@@ -172,7 +190,6 @@ class Game extends React.Component {
     if (this.whitespaceAtStart)  this.cursorLocation = '.w1.c0'; // todo: test if this works
     if (this.AUTO_INDENT)  this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
   }
-
 
   buildPlayerArray = () => {
     // builds a player array that out of the names provided by the server.
@@ -191,6 +208,10 @@ class Game extends React.Component {
     }
   }
 
+  getLobbyCode = () => {
+    let url = window.location.pathname;
+    return url.substr(url.length - 4);
+  }
 
   buildRaceCodeHTML = (raceCode) => {
     let raceCodeHTML = [];
@@ -200,7 +221,6 @@ class Game extends React.Component {
     }
     this.setState({raceCodeHTML: raceCodeHTML});
   }
-
 
   buildVisualPlayerTable = () => {
     let visualData = [];
@@ -351,7 +371,6 @@ class Game extends React.Component {
       }
     })
   }
-
 
   // ===================== the main game engine ===============================
   typingHandler = (event) => {

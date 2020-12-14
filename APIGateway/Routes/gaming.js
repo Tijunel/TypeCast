@@ -110,7 +110,7 @@ gaming.post('/start', withAuth, async (req, res) => {
     });
     if (response.status === 200) {
         const io = require('../server')[0];
-        io.emit('start game', {
+        io.emit('go to game', {
             lobbyCode: req.body.lobbyCode
         });
         io.emit('lobby update', {
@@ -121,6 +121,36 @@ gaming.post('/start', withAuth, async (req, res) => {
     res.status(response.status).end();
 });
 
+gaming.post('/ready', withAuth, async (req, res) => {
+    const response = await api.call('game/ready/', 'POST', {
+        json: {
+            lobbyCode: req.body.lobbyCode,
+            username: req.user.username
+        }
+    });
+    if(response.status === 200) {
+        if(response.body.readyLeft === 0) {
+            io.emit('start game', {
+                lobbyCode: req.body.lobbyCode
+            });
+        }
+    }
+    res.status(response.status).end();
+}); 
+
+gaming.post('/update', withAuth, async (req, res) => {
+    const response = await api.call('game/update/', 'POST', {
+        json: {
+            charsFin: req.body.charsFin,
+            time: req.body.time,
+            username: req.user.username,
+            lobbyCode: req.body.lobbyCode
+        }
+    });
+    if(response.status === 200) {
+        res.status(200).send(response.body).end();
+    } else res.status(response.status).end();
+});
 // ---------------------
 
 module.exports = gaming;
