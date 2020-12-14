@@ -84,7 +84,6 @@ class Game extends React.Component {
       res = await res.json();
       let playerNames = [];
       for (let player of res.players) playerNames.push(player.username);
-      console.log(res)
       let raceCodeStr = res.code;
       this.setState({
         lobbyName: res.lobbyName,
