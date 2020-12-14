@@ -85,17 +85,18 @@ class Game extends React.Component {
       let playerNames = [];
       for (let player of res.players) playerNames.push(player.username);
       let raceCodeStr =
-`getIndentOf = (word) => {
-    let indent = 0;
-    for (let ch of word) {
-        if (ch === '\\n')
-          indent = 0;
-        else if (ch === ' ')
-          indent++;
-        else break;
-    }
-    return indent;
-}`;
+// `getIndentOf = (word) => {
+//     let indent = 0;
+//     for (let ch of word) {
+//         if (ch === '\\n')
+//           indent = 0;
+//         else if (ch === ' ')
+//           indent++;
+//         else break;
+//     }
+//     return indent;
+// }`;
+`getIndentOf`;
       this.setState({
         lobbyName: res.lobbyName,
         playerNames: playerNames,
