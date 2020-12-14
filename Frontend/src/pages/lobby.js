@@ -61,7 +61,7 @@ class Lobby extends React.Component {
         lobbyName: JSON.parse(Cookies.get('userData').split('j:')[1]).username + "'s Lobby",
         iAmHost: true,
         lobbyPosted: false,
-        loading: false,
+        loading: false
       });
     }
   }
