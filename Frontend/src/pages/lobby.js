@@ -61,7 +61,7 @@ class Lobby extends React.Component {
         lobbyName: JSON.parse(Cookies.get('userData').split('j:')[1]).username + "'s Lobby",
         iAmHost: true,
         lobbyPosted: false,
-        loading: false
+        loading: false,
       });
     }
   }
@@ -89,6 +89,7 @@ class Lobby extends React.Component {
       this.setState({ lobbyPosted: true, playerUI: playerUI, private: this.isPrivate.current.checked});
       this.resizeTableForAdmins();
     } else alert("Something went wrong, try again.");
+    await this.getLobby();
   }
 
   listenOnSockets = () => {
