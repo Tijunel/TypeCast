@@ -15,15 +15,14 @@ class Game extends React.Component {
       raceHasEnded: false,                // true when the time runs out or when all players have finished race
       timeElapsed: -1,                    // seconds passed since start of race, used for page's visual timer
       visualizedPlayerStatus: [],         // html table displaying player status in a visual readout
-      redraw: true                        // toggle this to force redraw (b/c many variables displayed are not in state)
+      redraw: true,                      // toggle this to force redraw (b/c many variables displayed are not in state)
+      // THESE ARE RECEIVED FROM SERVER BEFORE RACE STARTS ------------------------------------
+      playerNames: [],                // list of player names
+      raceCodeStr: "",                // a string of the entire code
+      timeLimit: null,                // time limit for this race
+      lobbyCode: this.getLobbyCode(), // I guess we need this? It uniquely identifies this lobby.
+      lobbyName: null                  // not really needed, I think
     }
-
-    // THESE ARE RECEIVED FROM SERVER BEFORE RACE STARTS ------------------------------------
-    this.playerNames = [];                // list of player names
-    this.raceCodeStr = "";                // a string of the entire code
-    this.timeLimit = null;                // time limit for this race
-    this.lobbyCode = this.getLobbyCode(); // I guess we need this? It uniquely identifies this lobby.
-    this.lobbyName = null;                // not really needed, I think
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
     this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
@@ -60,18 +59,15 @@ class Game extends React.Component {
     this.prevLineIndent = 0;          // used for auto-indent feature
   }
 
-
   componentDidMount = () => {
+    this.listenOnSockets();
     this.get_initial_data_from_server();
-    this.initializeVars();
-    this.inputSetup();
-    this.tell_server_im_ready();
   }
 
   listenOnSockets = () => {
     const socket = SocketManager.getInstance().getSocket();
     socket.on('start game', (data) => {
-      if (this.lobbyCode === data.lobbyCode) {
+      if (this.state.lobbyCode === data.lobbyCode) {
         this.startTimer(true);
       }
     });
@@ -79,51 +75,59 @@ class Game extends React.Component {
 
   // ------------------- server request/response methods ----------------------
   get_initial_data_from_server = async () => {
-    const res = await fetch('/gaming/lobby/' + this.lobbyCode, {
+    let res = await fetch('/gaming/game/' + this.state.lobbyCode, {
       method: 'GET',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' }
     });
-    if(res.status === 200) {
+    if (res.status === 200) {
       res = await res.json();
-      this.lobbyName = res.lobbyName;
-      for(let player of res.players) this.playerNames.push(player.username);
-      this.timeLimit = res.timeLimit;
-      this.raceCodeStr =
-      `getIndentOf = (word) => {
-          let indent = 0;
-          for (let ch of word) {
-              if (ch === '\\n')
-                  indent = 0;
-              else if (ch === ' ')
-                  indent++;
-              else break;
-          }
-          return indent;
-      }`
+      let playerNames = [];
+      for (let player of res.players) playerNames.push(player.username);
+      let raceCodeStr =
+`getIndentOf = (word) => {
+  let indent = 0;
+  for (let ch of word) {
+    if (ch === '\\n')
+      indent = 0;
+    else if (ch === ' ')
+      indent++;
+    else break;
+  }
+  return indent;
+}`;
+      this.setState({
+        lobbyName: res.lobbyName,
+        playerNames: playerNames,
+        timeLimit: res.timeLimit,
+        raceCodeStr: raceCodeStr
+      });
+      this.initializeVars();
+      this.inputSetup();
+      this.tell_server_im_ready();
     } else {
       // Error
     }
   }
 
   tell_server_im_ready = async () => {
-    const res = await fetch('/gaming/ready', {
+    let res = await fetch('/gaming/ready', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        lobbyCode: this.lobbyCode
+        lobbyCode: this.state.lobbyCode
       })
     });
-    if(res.status === 200) {
+    if (res.status === 200) {
 
     } else {
       // Error
     }
   }
 
-  send_receive_updated_player_data = async() => {
-    const res = await fetch('/gaming/update', {
+  send_receive_updated_player_data = async () => {
+    let res = await fetch('/gaming/update', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
@@ -133,12 +137,12 @@ class Game extends React.Component {
         time: this.players[0].time
       })
     });
-    if(res.status === 200) {
+    if (res.status === 200) {
       res = await res.json();
       for (let pServer of res) {
         if (pServer.name !== this.myName) { // don't update my data with stale server data
           for (let pLocal of this.players) {
-            if (pServer.name === pLocal.name) { 
+            if (pServer.name === pLocal.name) {
               pLocal.charsFin = pServer.charsFin;
               pLocal.time = pServer.time;
               break;
@@ -177,18 +181,18 @@ class Game extends React.Component {
     //   }
     // }
   }
-// ------------------ /server request/response methods ------------------------
+  // ------------------ /server request/response methods ------------------------
 
   initializeVars = () => {
     this.myName = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
     this.buildPlayerArray();
-    this.raceCode = this.raceCodeStr.split(/(\s+)/);
+    this.raceCode = this.state.raceCodeStr.split(/(\s+)/);
     this.buildRaceCodeHTML(this.raceCode);
     this.buildVisualPlayerTable();
     this.cw = this.raceCode[0];
     this.whitespaceAtStart = (this.cw === ' ' || this.cw === '\n' || !this.cw);
-    if (this.whitespaceAtStart)  this.cursorLocation = '.w1.c0'; // todo: test if this works
-    if (this.AUTO_INDENT)  this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
+    if (this.whitespaceAtStart) this.cursorLocation = '.w1.c0'; // todo: test if this works
+    if (this.AUTO_INDENT) this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
   }
 
   buildPlayerArray = () => {
@@ -200,11 +204,11 @@ class Game extends React.Component {
     //              time:   is sent to the server once this player is finished the race and received 
     //                        -for the other players when they have finished the race.
     //  position and lpm:   are calculated locally for visual display of the race stats
-    this.players.push({name: this.myName, charsFin: 0, time: null,   position: 0, lpm: 0});
+    this.players.push({ name: this.myName, charsFin: 0, time: null, position: 0, lpm: 0 });
 
-    for (let name of this.playerNames) {
+    for (let name of this.state.playerNames) {
       if (name === this.myName) continue;
-      this.players.push({name: name, charsFin: 0, time: null,   position: 0, lpm: 0});
+      this.players.push({ name: name, charsFin: 0, time: null, position: 0, lpm: 0 });
     }
   }
 
@@ -217,30 +221,30 @@ class Game extends React.Component {
     let raceCodeHTML = [];
     for (let i = 0; i < raceCode.length; i++) {
       for (let j = 0; j < raceCode[i].length; j++)
-        raceCodeHTML.push(<p key={i+'-'+j} className={'w'+i+' c'+j}>{raceCode[i][j]}</p>);
+        raceCodeHTML.push(<p key={i + '-' + j} className={'w' + i + ' c' + j}>{raceCode[i][j]}</p>);
     }
-    this.setState({raceCodeHTML: raceCodeHTML});
+    this.setState({ raceCodeHTML: raceCodeHTML });
   }
 
   buildVisualPlayerTable = () => {
     let visualData = [];
     for (let i = 0; i < this.players.length; i++) {
-      visualData.push( 
-        <tr key={"player"+(i+1)} className={"player"+i+"data playerdata"}>
+      visualData.push(
+        <tr key={"player" + (i + 1)} className={"player" + i + "data playerdata"}>
           <td className="vis-player-lane">
-            <div className={'vis-player-box p'+i}>
-              <div className={i === 0 ? 
-                              "vis-player-name vis-my-name" : "vis-player-name"}>
+            <div className={'vis-player-box p' + i}>
+              <div className={i === 0 ?
+                "vis-player-name vis-my-name" : "vis-player-name"}>
                 {this.players[i].name} {i === 0 ? '(you)' : ''}
               </div>
-              <div className={i === 0 ? 
-                              "vis-player-car vis-my-car" : "vis-player-car"}>[==])</div>
+              <div className={i === 0 ?
+                "vis-player-car vis-my-car" : "vis-player-car"}>[==])</div>
             </div>
           </td>
 
           <td className="vis-playerstats">
             <div className='player-pos'>
-              &nbsp;{ this.players[i].position ? this.formatPosition(this.players[i].position) + " place" : ""} 
+              &nbsp;{this.players[i].position ? this.formatPosition(this.players[i].position) + " place" : ""}
             </div>
             <div className='player-lpm'>{this.players[i].lpm} LPM</div>
           </td>
@@ -248,7 +252,7 @@ class Game extends React.Component {
       ); // pastGamesTable.push
     }
 
-    this.setState({visualizedPlayerStatus: visualData});
+    this.setState({ visualizedPlayerStatus: visualData });
   }
 
 
@@ -256,7 +260,7 @@ class Game extends React.Component {
 
     // If I'm not done the race, calc my progress send that data to the server
     if (!this.players[0].time) {
-      this.players[0].charsFin = this.userFinishedRace ? this.raceCodeStr.length : this.numCompletedChars;
+      this.players[0].charsFin = this.userFinishedRace ? this.state.raceCodeStr.length : this.numCompletedChars;
       this.calcMyFinalTime();
       this.send_receive_updated_player_data();
     }
@@ -271,7 +275,7 @@ class Game extends React.Component {
       // calc position
       this.players[i].position = this.calcPositionOfPlayer(i);
     }
-    
+
     this.updateCarPositions();
     this.buildVisualPlayerTable();
   }
@@ -279,7 +283,7 @@ class Game extends React.Component {
 
   calcMyFinalTime = () => {
     if (this.userFinishedRace || this.raceHasEnded) {
-      if (! this.players[0].time)
+      if (!this.players[0].time)
         this.players[0].time = this.calcElapsedTime();
     }
   }
@@ -288,7 +292,7 @@ class Game extends React.Component {
   calcLPM = (time, userIndex) => {
     // calc lpm (speed)
     let lpm = this.players[userIndex].time ?  // has this user finished the race yet?
-      Math.round((this.raceCodeStr.length / 80.0) * 100 / (time / 60.0)) / 100 :
+      Math.round((this.state.raceCodeStr.length / 80.0) * 100 / (time / 60.0)) / 100 :
       Math.round((this.players[userIndex].charsFin / 80.0) * 100 / (time / 60.0)) / 100;
     return lpm;
   }
@@ -302,7 +306,7 @@ class Game extends React.Component {
           pos++;
         else if (this.players[i].time && this.players[j].time)
           pos += (this.players[i].time > this.players[j].time) ? 1 : 0;
-        else 
+        else
           pos += (this.players[i].charsFin < this.players[j].charsFin) ? 1 : 0;
       }
     }
@@ -314,8 +318,8 @@ class Game extends React.Component {
     // move the cars to show players' progress, woohoo
     let progress;
     for (let i = 0; i < this.players.length; i++) {
-      progress = (this.players[i].charsFin * 10.0) / (this.raceCodeStr.length * 10.0);
-      document.querySelector('.vis-player-box.p'+i).style.left = `calc(${progress} * (100% - 160px))`;
+      progress = (this.players[i].charsFin * 10.0) / (this.state.raceCodeStr.length * 10.0);
+      document.querySelector('.vis-player-box.p' + i).style.left = `calc(${progress} * (100% - 160px))`;
     }
   }
 
@@ -325,16 +329,16 @@ class Game extends React.Component {
     this.myAccuracy = this.numCompletedChars / this.numTypedChars * 100.0;
   }
 
-  
+
   inputSetup = () => {
-  // sets up listeners for Enter, Tab, and Backspace key presses (they require special care)
+    // sets up listeners for Enter, Tab, and Backspace key presses (they require special care)
     const typingBox = document.querySelector(".typingbox");
     typingBox.addEventListener("keyup", (event) => {
-      
+
       if (event.key === "Enter") {
         event.preventDefault();
         this.printDebug("                              < Enter >");
-        this.enterPressed = true;    
+        this.enterPressed = true;
         if (this.wordWithEnters === '') {  // 1st enter used (comes after a word) 
           this.wordWithEnters = this.state.typed + '\n';
         }
@@ -367,7 +371,7 @@ class Game extends React.Component {
         this.printDebug("                               < Tab >");
         this.tabPressed = true;
         document.querySelector('.typingbox').focus();
-        this.typingHandler();        
+        this.typingHandler();
       }
     })
   }
@@ -375,17 +379,17 @@ class Game extends React.Component {
   // ===================== the main game engine ===============================
   typingHandler = (event) => {
     let text = '',
-        lastPressWasBackspace = false,
-        autoIndentThisLine = false,  // if gets flipped, auto indent by this.prevLineIndent amount
-        prevLineIndentBackup = this.prevLineIndent,
-        indent = -1;
+      lastPressWasBackspace = false,
+      autoIndentThisLine = false,  // if gets flipped, auto indent by this.prevLineIndent amount
+      prevLineIndentBackup = this.prevLineIndent,
+      indent = -1;
 
     // ------ Enter presses (newlines) part of cw -------
     if (this.wordWithEnters !== '') {
       if (this.enterPressed) {
         this.enterPressed = false;
         if (this.AUTO_INDENT) {
-          let wordIndex = (this.wordWithEnters === this.cw+'\n') ? this.cwi+1 : this.cwi;
+          let wordIndex = (this.wordWithEnters === this.cw + '\n') ? this.cwi + 1 : this.cwi;
           indent = this.getIndentationOf(this.raceCode[wordIndex]);
           if (indent >= this.prevLineIndent && this.prevLineIndent > 0)
             autoIndentThisLine = true;
@@ -393,19 +397,19 @@ class Game extends React.Component {
             if (!this.prevLineIndent == 0) {
               this.prevLineIndent = indent; //(this.prevLineIndent - this.TAB.length >= 0) ? this.prevLineIndent - this.TAB.length : 0;
               autoIndentThisLine = true;
-            // will screw up if user presses Enter mid-word somewhere (a mistake)
-            // ... so we check for this at the end of this method and correct if nec.
+              // will screw up if user presses Enter mid-word somewhere (a mistake)
+              // ... so we check for this at the end of this method and correct if nec.
             }
           }
         }
       }
       else { // not Enter for last press, but one already pressed for current word:
-        lastPressWasBackspace = 
-          (!this.wordChanged && !this.tabPressed && 
-          (this.undetectableBackspacePressed || event.target.value.length < this.state.typed.length) );
+        lastPressWasBackspace =
+          (!this.wordChanged && !this.tabPressed &&
+            (this.undetectableBackspacePressed || event.target.value.length < this.state.typed.length));
 
         if (lastPressWasBackspace) {
-          this.wordWithEnters = this.wordWithEnters.substring(0, this.wordWithEnters.length-1);
+          this.wordWithEnters = this.wordWithEnters.substring(0, this.wordWithEnters.length - 1);
           this.undetectableBackspacePressed = false;
         }
         else if (this.tabPressed) {
@@ -421,8 +425,8 @@ class Game extends React.Component {
           // if (this.prevLineIndent > 0 && this.getIndentationOf(this.raceCode[this.cwi]) > 0) {
           //   haveToIndentFurther = true;
           else {
-          // In an edge case involving Tabs actually being captured by the typingbox, sometimes lastChar = undefined.
-          // Check to ensure lastChar is defined. If it isn't, completely ignore it.
+            // In an edge case involving Tabs actually being captured by the typingbox, sometimes lastChar = undefined.
+            // Check to ensure lastChar is defined. If it isn't, completely ignore it.
             this.printDebug("\n\n    U N D E F I N E D  'lastChar' discarded\n\n");
           }
         }
@@ -443,14 +447,14 @@ class Game extends React.Component {
     else {
       text = event.target.value;
       lastPressWasBackspace = event.target.value.length < this.state.typed.length;
-    }  
+    }
 
     // ---------- Initialize values ---------------------
     const cw = this.cw;  // current 'word'
     const nw = this.raceCode[this.cwi + 1];  // next 'word'
     let cwIsLastWord = !nw;
     // even if !isLastWord, it might still be the last word if it's one character long...
-    if ( !cwIsLastWord && (nw.length === 1 && !this.raceCode[this.cwi + 2]) ) {  
+    if (!cwIsLastWord && (nw.length === 1 && !this.raceCode[this.cwi + 2])) {
       cwIsLastWord = true;
       this.charLastWord = true;
     }
@@ -458,12 +462,12 @@ class Game extends React.Component {
     // ---------- cw = Last word ----------------
     if (cwIsLastWord) {
       // finished the race?
-      if ( text === cw || (this.charLastWord && text[text.length-1] === this.raceCode[this.raceCode.length-1]) ) {
+      if (text === cw || (this.charLastWord && text[text.length - 1] === this.raceCode[this.raceCode.length - 1])) {
         this.userFinishedRace = true;
         this.finalizeRace();
         if (this.charLastWord) {
-          this.underlineHelper(this.raceCode.length-1, false); // refactor: shouldn't call this directly
-          this.makeLastCharTypedGreen(text[text.length-1], this.raceCode.length-1);
+          this.underlineHelper(this.raceCode.length - 1, false); // refactor: shouldn't call this directly
+          this.makeLastCharTypedGreen(text[text.length - 1], this.raceCode.length - 1);
         }
         else {
           this.underlineHelper(this.cwi, false); // refactor: shouldn't call this directly
@@ -473,18 +477,18 @@ class Game extends React.Component {
         this.numCompletedChars++;
         return;
       }
-      else  this.styleAnyMistakes(text, cw);
-    } 
+      else this.styleAnyMistakes(text, cw);
+    }
 
     // ---------- cw != Last word ----------------
-    else { 
+    else {
       // Did user just finish the current word? 
       // Words are completed by typing the entire word + the first character of following whitespace.
       // Whitespace chunks complete on their final character (don't require the next word's 1st chracter).
       const actualWordFinished = (text === cw + nw[0]);
       const whitespaceFinished = (!this.whitespaceAtStart && this.cwi % 2 === 1 && text === cw) ||
-                                 (this.whitespaceAtStart && this.cwi % 2 === 0 && text === cw)  ||
-                                 (this.tabPressed && text === this.cw + ' ');
+        (this.whitespaceAtStart && this.cwi % 2 === 0 && text === cw) ||
+        (this.tabPressed && text === this.cw + ' ');
       const finishedCW = actualWordFinished || whitespaceFinished;
 
       // ---------- cw has just been finished ----------------
@@ -494,17 +498,17 @@ class Game extends React.Component {
         let nw = this.raceCode[nwi];
         this.wordChanged = true;
         this.printDebug(` finished: '${cw}'\nnext word: '${nw}'\n----------------------------\n\n\n\n\n`);
-                      
+
         if (actualWordFinished) {
           //text = text[text.length-1];
-          let endingWS = text[text.length-1]; // delineating whitespace character that ended the word
-        
+          let endingWS = text[text.length - 1]; // delineating whitespace character that ended the word
+
           // check the delineating character
           if (endingWS === '\n')
             this.wordWithEnters = '\n';
           else                                    // BLAH DONT THINK THIS IS NEEDED. I COULD BE WRONG.
             this.wordWithEnters = ''
-          this.makeLastCharTypedGreen(text.substring(0, text.length-1), this.cwi);
+          this.makeLastCharTypedGreen(text.substring(0, text.length - 1), this.cwi);
           text = endingWS;
 
           // add the auto-indent, if applicable
@@ -513,7 +517,7 @@ class Game extends React.Component {
 
           // the last character typed was whitespace; see if that character IS
           // the entire next 'word' of whitespace (including cases where auto-indent is involved)
-          if (endingWS === nw || (autoIndentThisLine && text === nw) ) { // BLAH: don't think I need that autoIndentThisLine && first part
+          if (endingWS === nw || (autoIndentThisLine && text === nw)) { // BLAH: don't think I need that autoIndentThisLine && first part
             text = '';                                                   // just having || text === nw  should do it
             this.wordWithEnters = '';
             nwi++;
@@ -548,11 +552,11 @@ class Game extends React.Component {
         this.wordChanged = false;
         this.mistakesPresent = this.styleAnyMistakes(text, cw);
         this.printDebug(`cw: '${cw}'\ntx: '${text}'`);
-      } 
+      }
     }
-  
+
     // ----- in ALL cases -------------------------
-    this.setState({typed: text}); // BLAH: I guess in this particular case, THIS is where it hits the fan...
+    this.setState({ typed: text }); // BLAH: I guess in this particular case, THIS is where it hits the fan...
 
     // was the indentation data recorded over by a mistake?
     if (this.mistakesPresent)
@@ -560,12 +564,12 @@ class Game extends React.Component {
 
     // update character counts
     if (lastPressWasBackspace) {
-      if (!this.mistakesPresent && !this.mistakePresentOnLastType) 
+      if (!this.mistakesPresent && !this.mistakePresentOnLastType)
         this.numCompletedChars--;
-    } 
+    }
     else {
       this.numTypedChars++
-      if (!this.mistakesPresent)  this.numCompletedChars++;
+      if (!this.mistakesPresent) this.numCompletedChars++;
     }
 
     // update mistake history (used for keeping correct count 
@@ -579,7 +583,7 @@ class Game extends React.Component {
       if (!this.mistakesPresent)
         this.numCompletedChars += (this.TAB.length - 1);
     }
-    
+
     // account for auto-indent characters (spaces)
     if (autoIndentThisLine) {
       this.numTypedChars += (this.prevLineIndent);
@@ -589,37 +593,37 @@ class Game extends React.Component {
     }
 
     // record the indentation level
-    if (indent > -1 && !this.mistakesPresent)  
-    this.prevLineIndent = indent;
+    if (indent > -1 && !this.mistakesPresent)
+      this.prevLineIndent = indent;
 
     // move the cursor --------------------------------------------------------
     // BLAH: this is just a hack: I made it async to delay execution, as it depends
     // on values that have been setState()-ed, above.
     // TODO: refactor this so it executes synchronously, time permitting
-    setTimeout(()=> {
+    setTimeout(() => {
       let cursorType = 'cursor';
       let cursorWI = this.cwi;
-      let cursorCI; 
-          
+      let cursorCI;
+
       if (text.length === 0)
         cursorCI = 0;
       else if (text.length < this.cw.length)
         cursorCI = text.length;
       else if (text.length === this.cw.length) {
-        if (! this.mistakesPresent) {
-          cursorWI = cwIsLastWord ? cursorWI : cursorWI+1;
+        if (!this.mistakesPresent) {
+          cursorWI = cwIsLastWord ? cursorWI : cursorWI + 1;
           cursorCI = 0;
         }
         else
-          cursorCI = this.cw.length-1;
+          cursorCI = this.cw.length - 1;
       }
       else { // text.length > this.cw.length
-        if (! this.mistakesPresent) {
+        if (!this.mistakesPresent) {
           cursorWI++;
           cursorCI = 0;
         }
         else {
-          cursorCI = this.cw.length-1;
+          cursorCI = this.cw.length - 1;
           // and we need to move the cursor to the right side of the character!
           cursorType = 'cursorEnd';
         }
@@ -644,21 +648,21 @@ class Game extends React.Component {
     // checks a word for the amount of indentation present.
     // This is intended for use on 'words' that are the chunk of
     // whitespace between the end of a line and the beginning of a new one
-      let indent = 0;
-      for (let ch of word) {
-        if (ch === '\n')
-          indent = 0;
-        else if (ch === ' ')
-          indent++;
-        else
-          break;
-      }
-      return indent;
+    let indent = 0;
+    for (let ch of word) {
+      if (ch === '\n')
+        indent = 0;
+      else if (ch === ' ')
+        indent++;
+      else
+        break;
     }
+    return indent;
+  }
 
 
   styleAnyMistakes = (text, cw) => {
-  // also returns true if any mistakes are present, false if not
+    // also returns true if any mistakes are present, false if not
     let mistakesArePresent = text !== cw.substring(0, text.length);
     if (mistakesArePresent) {
       // color the text input box red
@@ -671,15 +675,15 @@ class Game extends React.Component {
           ch.style.background = "transparent"
           ch.style.color = "white";
         }
-        else if (text[i] === cw[i]) 
+        else if (text[i] === cw[i])
           ch.style.background = "transparent";
         else if (text[i] !== cw[i])
           ch.style.background = "#ac2f2f";
-        else 
+        else
           alert("This else should never be reached! :(");
       }
       this.printDebug(`v--- MISTAKES DETECTED ---v`);
-    } 
+    }
     else { // no mistakes present
       document.querySelector('.typingbox').style.cssText = "background: #292d3e; color: #a6accd";
       // used to un-color previously green words when backspacing past them
@@ -692,7 +696,7 @@ class Game extends React.Component {
       // While we're at it, since we know no mistakes are present at this point,
       // -so turn the last-typed character green:
       this.makeLastCharTypedGreen(text, this.cwi);
-      if (cw[text.length])  document.querySelector(`.w${this.cwi}.c${text.length}`).style.background = "transparent";
+      if (cw[text.length]) document.querySelector(`.w${this.cwi}.c${text.length}`).style.background = "transparent";
     }
 
     return mistakesArePresent;
@@ -700,9 +704,9 @@ class Game extends React.Component {
 
 
   makeLastCharTypedGreen = (text, cwi) => {
-  // makes the last character of 'text' turn green to indicate correct input
+    // makes the last character of 'text' turn green to indicate correct input
     if (text === '') return;  // handles when user backspaces to start of word
-    let char = document.querySelector('.w'+cwi+'.c'+(text.length-1));
+    let char = document.querySelector('.w' + cwi + '.c' + (text.length - 1));
     char.style.color = "#c3e88d";
   }
 
@@ -711,8 +715,8 @@ class Game extends React.Component {
     // for the first word
     if (wordIndex === 0) {
       if (this.whitespaceAtStart)
-        this.underlineHelper(1, true);     
-      else  
+        this.underlineHelper(1, true);
+      else
         this.underlineHelper(0, true);
       return;
     }
@@ -721,12 +725,12 @@ class Game extends React.Component {
     if (thisWordsFirstchar !== ' ' && thisWordsFirstchar !== '\n')
       this.underlineHelper(wordIndex, true);
     // for all: remove underline from previous word (need the -2 for edge case)
-    this.underlineHelper(wordIndex-1, false);
-    this.underlineHelper(wordIndex-2, false);  // BLAH will this -2 one ever be out of bounds (ie: -1) ? What about if we start with whitespace in raceCodeStr?
+    this.underlineHelper(wordIndex - 1, false);
+    this.underlineHelper(wordIndex - 2, false);  // BLAH will this -2 one ever be out of bounds (ie: -1) ? What about if we start with whitespace in raceCodeStr?
   }
   underlineHelper = (i, wordShouldBeUnderlined) => {
     let desiredTextDec = wordShouldBeUnderlined ? "underline" : "none";
-    let word = document.querySelectorAll('.w'+i);
+    let word = document.querySelectorAll('.w' + i);
     for (let char of word)
       char.style.textDecoration = desiredTextDec;
   }
@@ -751,7 +755,7 @@ class Game extends React.Component {
 
 
   startRace = () => {
-    this.setState({raceStarted: true});
+    this.setState({ raceStarted: true });
     this.applyInitialStyling(); // style the raceCode for playing the game
   }
 
@@ -759,18 +763,17 @@ class Game extends React.Component {
   finalizeRace = () => {
     this.calcStatsAndSendMyData();
     this.calcAccuracy();
-    this.setState({redraw: !this.state.redraw});
+    this.setState({ redraw: !this.state.redraw });
     this.applyFinishedStyling();
   }
-
 
   // --------- timer ----------------------------------------------------------
   formatTime = (s) => {
     //return ('000' + n).substr(-3);
-    let min = '', 
-        sec = s;
+    let min = '',
+      sec = s;
     if (s >= 60) {
-      min = Math.trunc(s/60);   
+      min = Math.trunc(s / 60);
       sec = s - min * 60;
     }
     sec = ('00' + sec).substr(-2);
@@ -779,22 +782,22 @@ class Game extends React.Component {
 
   update = (isCountdown, startingTime) => {
     let now = new Date().getTime(),
-        delta = now - this.lastUpdateTime;
-        this.currentTime += delta;
+      delta = now - this.lastUpdateTime;
+    this.currentTime += delta;
     let time = new Date(this.currentTime);
     let timerReadout;
-    let elapsed = startingTime - (time.getSeconds() + time.getMinutes()*60);
+    let elapsed = startingTime - (time.getSeconds() + time.getMinutes() * 60);
     timerReadout = this.formatTime(elapsed);
-    this.setState({timeElapsed: elapsed});
+    this.setState({ timeElapsed: elapsed });
     this.lastUpdateTime = now;
 
     if (timerReadout === ':00') {
       this.stopTimer();
       // if the countdown timer reached :00, now start the real timer
-      if (isCountdown)  this.startTimer(false); 
+      if (isCountdown) this.startTimer(false);
       // if time runs out on the actual race, stop the game
       if (!isCountdown) {
-        this.setState({raceHasEnded: true});
+        this.setState({ raceHasEnded: true });
         if (!this.userFinishedRace)
           this.finalizeRace();
       }
@@ -807,11 +810,11 @@ class Game extends React.Component {
   }
 
   startTimer = (isCountdown) => {
-  // isCountdown: true for countdown timer, false for race timer
+    // isCountdown: true for countdown timer, false for race timer
     if (!this.interval) {
       if (isCountdown) {
         this.lastUpdateTime = new Date().getTime();
-        this.setState({timeElapsed: this.COUNTDOWN_TIME});
+        this.setState({ timeElapsed: this.COUNTDOWN_TIME });
         this.interval = setInterval(this.update, 1000, true, this.COUNTDOWN_TIME);
         this.currentTime = 0;
       }
@@ -819,10 +822,10 @@ class Game extends React.Component {
         this.startRace();
         this.lastUpdateTime = new Date().getTime();
         this.raceStartTime = this.lastUpdateTime;
-        this.setState({timeElapsed: this.timeLimit});
-        this.interval = setInterval(this.update, 1000, false, this.timeLimit);
+        this.setState({ timeElapsed: this.state.timeLimit });
+        this.interval = setInterval(this.update, 1000, false, this.state.timeLimit);
         // todo: make next line call method that refreshes ALL player data, not just mine (need server code first)
-        this.interval2 = setInterval(this.calcStatsAndSendMyData, this.SERVER_UPDATE_INTERVAL); 
+        this.interval2 = setInterval(this.calcStatsAndSendMyData, this.SERVER_UPDATE_INTERVAL);
         this.currentTime = 0;
       }
     }
@@ -848,8 +851,8 @@ class Game extends React.Component {
       case (1): return withSauce ? "1st. Woohoo!" : "1st"; //break;  ... console says don't need break?
       case (2): return withSauce ? "2nd. Close!" : "2nd";
       case (3): return withSauce ? "3rd. Not bad :)" : "3rd";
-      case (4): return withSauce ? "4th. Meh." : "4th"; 
-      case (5): return withSauce ? "5th. Oof." : "5th"; 
+      case (4): return withSauce ? "4th. Meh." : "4th";
+      case (5): return withSauce ? "5th. Oof." : "5th";
       default: return pos + "th";
     }
   }
@@ -860,31 +863,31 @@ class Game extends React.Component {
       <div id='game'>
 
         <div id='timer'>
-          { this.state.raceStarted ?  
-              this.formatTime(this.state.timeElapsed)
+          {this.state.raceStarted ?
+            this.formatTime(this.state.timeElapsed)
             :
-              this.state.timeElapsed !== -1 && 
-              <span><span id="getReady">Get ready! Race starts in </span>
-                    {this.formatTime(this.state.timeElapsed)}</span>
+            this.state.timeElapsed !== -1 &&
+            <span><span id="getReady">Get ready! Race starts in </span>
+              {this.formatTime(this.state.timeElapsed)}</span>
           }
         </div>
 
         <div id='game-status'>
-          { this.state.raceHasEnded ?
-              <span>The race has ended.</span>
-            : 
-              this.userFinishedRace ?
-                <span>
-                  You finished { this.formatPosition(this.players[0].position, true) }
-                </span>
+          {this.state.raceHasEnded ?
+            <span>The race has ended.</span>
+            :
+            this.userFinishedRace ?
+              <span>
+                You finished {this.formatPosition(this.players[0].position, true)}
+              </span>
               :
-                this.state.raceStarted ?
-                  <span>The race is on! Type the code below:</span>
-                : 
-                  <span>The race is about to start!</span>
+              this.state.raceStarted ?
+                <span>The race is on! Type the code below:</span>
+                :
+                <span>The race is about to start!</span>
           }
         </div>
-        
+
         <div id="race-visualization">
           <table id="race-visualization">
             <tbody>{this.state.visualizedPlayerStatus}</tbody>
@@ -902,8 +905,8 @@ class Game extends React.Component {
 
             <div className="flex">
               <div className="res-att">Position:</div>
-              <div className="res-data"> 
-              { this.formatPosition(this.players[0].position) }
+              <div className="res-data">
+                {this.formatPosition(this.players[0].position)}
               </div>
             </div>
 
@@ -924,36 +927,28 @@ class Game extends React.Component {
             <div className="flex">
               <div className="res-att">Time:</div>
               <div className="res-data">
-                { this.userFinishedRace ? 
-                <span>{Math.round(this.players[0].time * 10.0) / 10.0}
-                <span className="units"> s</span></span>
-                :
+                {this.userFinishedRace ?
+                  <span>{Math.round(this.players[0].time * 10.0) / 10.0}
+                    <span className="units"> s</span></span>
+                  :
                   <span>(DNF)</span>
                 }
               </div>
             </div>
 
           </div>
-        :
+          :
           <input
             type='text'
             name='typed'
             className='typingbox'
             autoComplete='off'
             disabled={true}
-            onKeyPress={ (e) => e.key === 'Enter' && e.preventDefault() }
+            onKeyPress={(e) => (e.key === 'Enter' && e.preventDefault()) || (e.key === 'Tab' && e.preventDefault()) }
             value={this.state.typed}
             onChange={this.typingHandler}
           />
         }
-
-        <div id="testStartBtn">
-          <br/><br/>
-          <button onClick={() => this.startTimer(true)} 
-                  style={{marginBottom: "20px"}}>Start Race</button>
-          <span>&nbsp; {'<--'} Just for testing</span>
-        </div>
-
       </div>
     );
   }
