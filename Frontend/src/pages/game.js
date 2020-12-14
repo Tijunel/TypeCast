@@ -156,7 +156,21 @@ class Game extends React.Component {
   }
 
   sendFinish = () => {
-
+    let time = this.userFinishedRace ? toString(Math.round(this.players[0].time * 10.0) / 10.0) : "(DNF)";
+    fetch('/gaming/finish', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lobbyCode: this.state.lobbyCode,
+        placement: this.players[0].position.toString() + '/' + this.players.length.toString(),
+        typingSpeed: this.players[0].lpm,
+        time: time
+      })
+    });
+    setTimeout(function () {
+      window.location.href = "/home"
+    }, 5000);
   }
   // ------------------ /server request/response methods ------------------------
 
