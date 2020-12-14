@@ -13,7 +13,8 @@ class Join extends React.Component {
     super();
     this.state = {
       games: [],  // todo (returns hardcoded game array rn)
-      typedJoinCode: ""
+      typedJoinCode: "",
+      loading: true
     }
     this.MAX_PLAYERS_PER_GAME = 5;
   }
@@ -21,10 +22,10 @@ class Join extends React.Component {
 
   componentDidMount = () => {
     // align the page title with the left edge of the games list
-    const tableWidth = document.querySelector("#games").offsetWidth;
-    let title = document.querySelector("#join-heading");
-    title.style.marginLeft = ((900 - tableWidth - 60) / 2) + "px";
-    // API call
+    // TODO not sure where to put this so comment out for now
+    // const tableWidth = document.querySelector("#games").offsetWidth;
+    // let title = document.querySelector("#join-heading");
+    // title.style.marginLeft = ((900 - tableWidth - 60) / 2) + "px";
     this.listenOnSockets();
     this.getGames();
   }
@@ -42,7 +43,7 @@ class Join extends React.Component {
       for (let i = 0; i < res.lobbies.length; i++) {
         lobbies[i] = {lobbyCode: res.lobbies[i].lobbyCode, name: res.lobbies[i].lobbyName, numPlayers: res.lobbies[i].players.length, public: true};
       }
-      this.setState( { games: lobbies});
+      this.setState( { games: lobbies, loading: false});
       this.listenOnSockets();
     }
   }
@@ -199,30 +200,40 @@ class Join extends React.Component {
 
   render = () => {
     return (
-      <div id='join'>
-        <div id="join-heading"><h1>Join Game</h1></div>
+        <div>
+          {!this.state.loading ?
+            <div id='join'>
+              <div id="join-heading"><h1>Join Game</h1></div>
 
-        <table id="games"><tbody>{this.getGameTable()}</tbody></table>
+              <table id="games">
+                <tbody>{this.getGameTable()}</tbody>
+              </table>
 
-        <div id="join-by-code">
-          <form onSubmit={this.joinGameViaCode}>
-            <div className="setting">
-              <div className="labl">Join by code:&nbsp;</div>
-              <div className="inpt">
-                <input 
-                  type='text'
-                  maxLength='4'
-                  name='typedJoinCode'
-                  className='joinWithCodeField'
-                  value={this.state.typedJoinCode}
-                  onChange={this.joinCodeUpdater}
-                />
-                <input type='submit' value='Join'/>
+              <div id="join-by-code">
+                <form onSubmit={this.joinGameViaCode}>
+                  <div className="setting">
+                    <div className="labl">Join by code:&nbsp;</div>
+                    <div className="inpt">
+                      <input
+                          type='text'
+                          maxLength='4'
+                          name='typedJoinCode'
+                          className='joinWithCodeField'
+                          value={this.state.typedJoinCode}
+                          onChange={this.joinCodeUpdater}
+                      />
+                      <input type='submit' value='Join'/>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
-          </form>
+            :
+            <div id='lobby' style={{ textAlign: 'center' }}>
+              Loading...
+            </div>
+          }
         </div>
-      </div>
     );
   }
 }
