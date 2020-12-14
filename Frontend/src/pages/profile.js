@@ -42,7 +42,7 @@ class Profile extends React.Component {
 				if (res.status === 200) {
 					res = await res.json();
 					const pastGamesUI = this.generatePastGamesUI(res.games);
-					this.setState({ typingSpeed: res.typingSpeed, pastGamesUI: pastGamesUI, username: username });
+					this.setState({pastGamesUI: pastGamesUI, username: username });
 				} 
 			})
 			.catch(err => {
@@ -207,6 +207,7 @@ class Profile extends React.Component {
 
 	generatePastGamesUI = (pastGames) => {
 		let pastGamesTable = [];
+		let totalTS= 0.0
 		pastGamesTable.push(
 			<tr key="headings">
 				<td className="position">Result</td>
@@ -215,7 +216,13 @@ class Profile extends React.Component {
 				<td className="date">Date</td>
 			</tr>
 		);
-		for (let i = 0; i < pastGames.length; i++) {
+		let len = 0;
+		if (pastGames.length >	10)  {
+			len = 10;
+		}
+		else len = pastGames.length;
+		for (let i = pastGames.length - len; i < pastGames.length; i++) {
+			var l = pastGames[i].date.split('T');
 			pastGamesTable.push(
 				<tr key={"game" + (i + 1)}>
 					<td className="position">
@@ -229,10 +236,16 @@ class Profile extends React.Component {
 						</pre> <span className="typingSpeed">LPM</span>
 					</td>
 					<td className="time">{pastGames[i].time}</td>
-					<td className="date">{pastGames[i].date}</td>
+					<td className="date">{l[0]}</td>
 				</tr>
 			); 
+			totalTS += pastGames[i].typingSpeed;
 		}
+		if (pastGames.length > 0) totalTS = totalTS / pastGames.length;
+		else totalTS = 0.0;
+		totalTS = Math.round(totalTS * 100) / 100;
+		this.setState({typingSpeed: totalTS});
+		
 		return pastGamesTable;
 	}
 
