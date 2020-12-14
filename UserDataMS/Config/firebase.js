@@ -23,5 +23,5 @@ module.exports = firebase;
 //                  gameID:
 //                      placement: string ('x/y') where x > 0, x <= y and ymax = 6
 //                      typingSpeed: float
-//                      time: float (seconds)
+//                      time: string
 //                      date: UTC

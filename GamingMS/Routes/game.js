@@ -65,8 +65,9 @@ game.post('/update', async (req, res) => {
 });
 
 // End point for each player 
-game.post('/finish', (req, res) => {
-
+game.post('/delete', (req, res) => {
+    redis.del(req.body.lobbyCode+'-game');
+    res.status(200).end();
 });
 
 module.exports = game;

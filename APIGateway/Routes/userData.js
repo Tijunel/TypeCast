@@ -17,6 +17,7 @@ userData.get('/games', withAuth, async (req, res) => {
 
 // Add a new game (Trigger after finishing a game)
 userData.post('/game', withAuth, async (req, res) => {
+    // Need to add accuracy stat
     const response = await api.call('games/' + req.user.ID, 'POST', {
         json: {
             placement: req.body.placement,
