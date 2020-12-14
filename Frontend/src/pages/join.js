@@ -48,6 +48,23 @@ class Join extends React.Component {
     }
   }
 
+  privateGameExists = async (id) => {
+    let res = await fetch('/gaming/lobby/:'+id, {
+      method: 'GET',
+      credentials: "include",
+      headers: {'Content-Type': 'application/json'}
+    });
+    console.log(res.status);
+    if (res.status === 200) {
+      return true;
+    } else if (res.status === 500) {
+      return false;
+    } else {
+      console.log("error with response in privateGameExists");
+      return false;
+    }
+  }
+
   listenOnSockets = () => {
     const socket = SocketManager.getInstance().getSocket();
     socket.on('lobby update', (data) => {
@@ -95,15 +112,17 @@ class Join extends React.Component {
     window.location.href = "/lobby/:" + this.state.games[i].lobbyCode;
   }
 
+
   joinGameViaCode = (event) => {
+    console.log(this.state.typedJoinCode);
     if (this.state.typedJoinCode.length !== 4) 
       alert("Lobby codes are 4 letters long: try re-entering");
-    else if ( ! this.gameSpecifiedExists(this.state.typedJoinCode) ) 
+    else if ( ! this.privateGameExists(this.state.typedJoinCode) )
       alert("Uh oh! A game with the lobby code \"" + this.state.typedJoinCode + 
             "\" does not exist right now.");
-    else if ( this.gameIsFull(this.state.typedJoinCode) )
-      alert("You can't join game \"" + this.state.typedJoinCode + 
-            "\": maximum players reached!");
+    // else if ( this.gameIsFull(this.state.typedJoinCode) ) // TODO add check to see if game full
+    //   alert("You can't join game \"" + this.state.typedJoinCode +
+    //         "\": maximum players reached!");
     else  // valid game specified, so send the user to it
       window.location.href = "/lobby/:" + this.state.typedJoinCode;
     event.preventDefault();  // prevent page reload on form submission
