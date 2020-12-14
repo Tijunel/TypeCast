@@ -225,7 +225,7 @@ class Lobby extends React.Component {
               </div>
             }
           </td>
-          {this.state.iAmHost ? (players[i].username !== JSON.parse(Cookies.get('userData').split('j:')[1]).username) &&
+          {this.state.iAmHost && (players[i].username !== JSON.parse(Cookies.get('userData').split('j:')[1]).username) ?
             <td className="remove-player">
               <button onClick={() => this.removePlayer(players[i].username)}>X</button>
             </td>
