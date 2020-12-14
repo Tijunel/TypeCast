@@ -108,7 +108,7 @@ class Lobby extends React.Component {
         }
       }
     });
-    socket.on('start game', (data) => {
+    socket.on('go to game', (data) => {
       if(data.lobbyCode === this.state.lobbyCode) {
         window.location.href = "/game/:" + this.state.lobbyCode;
         this.setState({ started: true });
