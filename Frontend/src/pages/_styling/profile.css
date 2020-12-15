@@ -273,6 +273,9 @@
   #user-menu button:nth-child(odd) {
     border-right: 1px solid #555;
   }
+  #user-menu button:hover {
+    background: #1a1a1a;
+  }
 }
 
 @media (max-width: 600px) {

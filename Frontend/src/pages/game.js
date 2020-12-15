@@ -212,7 +212,7 @@ class Game extends React.Component {
     let visualData = [];
     for (let i = 0; i < this.players.length; i++) {
       visualData.push(
-        <tr key={"player" + (i + 1)} className={"player" + i + "data playerdata"}>
+        <tr key={"player" + (i + 1)} className={"player" + i + "data player-row"}>
           <td className="vis-player-lane">
             <div className={'vis-player-box p' + i}>
               <div className={i === 0 ?
@@ -234,7 +234,7 @@ class Game extends React.Component {
       ); // pastGamesTable.push
     }
 
-    this.setState({ visualizedPlayerStatus: visualData });
+    this.setState({visualizedPlayerStatus: visualData});
   }
 
 
@@ -308,7 +308,10 @@ class Game extends React.Component {
 
   calcAccuracy = () => {
     // calc typing accuracy
-    this.myAccuracy = this.numCompletedChars / this.numTypedChars * 100.0;
+    if (this.numTypedChars > 0)
+      this.myAccuracy = this.numCompletedChars / this.numTypedChars * 100.0;
+    else
+      this.myAccuracy = 0.00;
   }
 
 

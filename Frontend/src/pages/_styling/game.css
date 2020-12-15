@@ -6,8 +6,9 @@
   padding: 30px;
 }
 #timer {
-  font-size: 1.8rem;
+  font-size: 2rem;
   float: right;
+  padding-top: 8px;
 }
 #getReady {
   font-size: 1rem;
@@ -25,25 +26,25 @@
 }
 #race-visualization {  /* table's container */
   background: #373a4a;
+  border-radius: 20px 20px 0 0;
   width: 100%;
-  margin-bottom: 20px;
-  padding: 0 20px;
+  padding: 10px 20px 20px;
 }
-.playerdata {  /* the row */
+.player-row {  /* the row */
   display: flex;
   padding: 0 5px;
 }
-.playerdata:first-child {
+.player-row:first-child {
   margin-top: 10px;
 }
-.playerdata:last-child {
+.player-row:last-child {
   margin-bottom: 20px;
 }
-.playerdata td {
+.player-row td {
   padding: 6px 0;
 }
 .vis-player-lane {  /* 1st column */
-  flex: 87;
+  flex: 86;
   padding-top: 9px !important;
   border-bottom: 3px dashed #888;
   text-align: left;
@@ -76,21 +77,20 @@
   flex: 4;
   font-size: 1.3rem;
   text-align: right;
-  padding-top: 2px;
+  padding-top: 3px;
 }
 .vis-playerstats {  /* 2nd column */
-  flex: 13;
+  flex: 14;
   text-align: right;
 }
-.vis-playerstats .player-pos {
+/* .vis-playerstats .player-pos {
 }
 .vis-playerstats .player-lpm {
-}
+} */
 #codebox {
   background: #1c1f2b;
   padding: 20px;
-  border: 3px solid #111;
-  border-bottom: 0;
+  border: 3px solid #222;
   font-size: 1.25rem;
 }
 #codebox p {
@@ -102,6 +102,7 @@
   background: #292d3e;
   color: #a6accd;
   border: 3px solid #111;
+  border-top: 0;
   border-radius: 0;
   font-size: 1.1rem;
   width: 100%;
@@ -114,22 +115,37 @@
   margin-bottom: 0;
 }
 #race-results {
+  font-size: 1rem;
   text-align: center;
+  padding: 5px 0 100px;
+  background: linear-gradient(
+    180deg,
+  rgba(28,31,43,0.6) 0%, 
+  rgba(28,31,43,0) 100%
+  );
+  animation: fade-in ease 2.5s;
 }
+  @keyframes fade-in {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+  }
 #result-heading {
-  margin: 30px 0 10px;
+  margin: 32px auto 15px;
   font-size: 1.3rem;
+  text-decoration: underline;
+  xborder-bottom: 1px solid #ccc;
+  width: 260px;
 }
 #race-results .flex {
   width: 100%;
 }
 .res-att {
-  flex: 1;
+  flex: 52;
   text-align: right;
   margin: 0 5px 0 0;
 }
 .res-data {
-  flex: 1;
+  flex: 48;
   text-align: left;
   margin: 0 0 0 5px;
 }
@@ -149,7 +165,4 @@
 .cursorEnd {
   border-right: 1px solid #ffcc00;
   animation: cursor 1s linear infinite;
-}
-@keyframes cursorEnd {
-  50% { border-color: transparent }
 }
