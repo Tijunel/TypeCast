@@ -12,7 +12,7 @@ class Game extends React.Component {
       raceCodeHTML: [],                   // styled raceCode html, reflecting what the player has typed
       typed: "",                          // what has been typed into the text box for the current 'word' so far
       raceStarted: false,                 // race has started?
-      raceHasEnded: false,                // true when the time runs out or when all players have finished race
+      raceHasEnded: false,                // true when the time runs out or when all players have finished race   todo: implement that second part
       timeElapsed: -1,                    // seconds passed since start of race, used for page's visual timer
       visualizedPlayerStatus: [],         // html table displaying player status in a visual readout
       redraw: true,                       // toggle this to force redraw (b/c many variables displayed are not in state)
@@ -146,7 +146,7 @@ class Game extends React.Component {
   }
 
   sendFinish = () => {
-    let time = this.userFinishedRace ? toString(Math.round(this.players[0].time * 10.0) / 10.0) : "(DNF)";
+    let time = this.userFinishedRace ? this.players[0].time : "(DNF)";
     fetch('/gaming/finish', {
       method: 'POST',
       credentials: "include",
