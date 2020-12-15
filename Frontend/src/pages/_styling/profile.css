@@ -1,38 +1,36 @@
-#profile {
-  min-height: calc(100vh - (3.5rem + 2rem));
+#profile{
+  min-height: calc(100vh - (5.5rem));
   margin: 3.5rem auto 0 auto;
-  padding-top: 30px;
   text-align: center;
   font-size: 1.6rem;
-} 
+  background: rgba(0,0,0,0.3);
+}
+#tophalf-profile {
+  background: #45495c;
+  padding-top: 40px;
+}
 #profile-heading {
-  margin: 20px 0 40px;
+  padding: 20px 0 40px;
 }
 
+
 /* --- table ------------- */
-.center-table  {
-  margin-left: auto;
-  margin-right: auto;
-}
-#table-container {
-  margin: 0 auto 100px auto;
+#past-games { /* THE table itself */
   font-size: 1.2rem;
+  margin: 0 auto 40px auto;
+  min-width: 540px;
 }
-#table-forehead {
-  width: 100%;
+.table-forehead td {
+  flex: 1;
   background: rgba(0,0,0,0.14);
   border-radius: 25px 25px 0 0;
-  color: rgb(137, 197, 253);
+  color: #89c5fd;
   border: 0 !important;
-  padding: 15px 0 !important;
+  padding: 20px 0 !important;
   font-style: italic;
 }
-#past-games {
-  min-width: 500px;
-  margin-bottom: 30px;
-}
 #past-games td {
-  padding: 3px;
+  padding: 5px 3px;
   background: #29547e;
   border: 2px solid black;
 }
@@ -43,25 +41,46 @@
   flex: 18;
 }
 .speed {
-  flex: 22;
+  flex: 25;
+  display: flex;
 }
 .time {
-  flex: 27;
+  flex: 25;
+  display: flex;
 }
 .date {
   flex: 33;
 }
-#past-games pre {
-  display: inline;
-  font-size: 1.2rem;
+#past-games .dnf {
+  flex: 1;
+}
+.speed-number, .time-number {text-align: right}
+.speed-suffix, .time-suffix {text-align: left}
+.speed-number, .speed-suffix {
+  flex: 1;
+}
+.time-number {
+  flex: 6;
+} 
+.time-suffix {
+  flex: 4;
 }
 .typingSpeed {
-  font-size: 1.2rem;
+  font-size: 0.95rem;
 }
 #past-games tr:nth-child(1) td {
   background: rgba(0, 0, 0, 0.27) !important;
   border: 0;
 }
+#past-games tr:nth-child(2) td{
+  font-style: italic;
+  color: #89c5fd;
+  background:rgba(0, 0, 0, 0.6) !important;
+}
+#past-games tr:nth-child(2) td:nth-child(2), 
+#past-games tr:nth-child(2) td:nth-child(3) {
+  display: table-cell;
+} 
 #past-games tr:last-child td {
   padding-bottom: 5px;
 }
@@ -71,34 +90,26 @@
 #past-games tr:last-child td:last-child {
   border-radius: 0 0 25px 0;
 }
-/* --- /table ------------ */
 
 #table-chin {
-  /* background: rgba(0,0,0,0.14); */
+  max-width: 540px;
+  margin: 0 auto;
+  padding-bottom: 130px;
+  font-size: 1.3rem;
 }
-#table-chin button {
-  text-decoration: underline;
-  font-size: 1rem;
+#table-chin::after {
+  content: " LPM";
+  font-size: 1.2rem;
 }
-#table-chin button:hover {
-  text-decoration: none;
-}
-#avg-speed {
-  display: inline-block;
-  margin-right: 50px;
-}
-#avg-speed-nbr{
-  display: inline-block;
-}
+/* --- /table ------------ */
+
 
 
 #extended-footer {
-  background: rgba(0,0,0,0.3);
-  height: 420px;
-  position: relative;
+  min-height: 30px;
 }
 #user-menu {
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.2);
 }
 #user-menu button {
   display: inline-block;
@@ -117,58 +128,75 @@
 .del-acct-btn {
   color: rgb(255, 136, 136) !important;
 }
+
+#extended-footer input:hover {
+  background: #4b7cad !important;
+}
+
 #change-username-box, 
 #change-password-box,
 #delete-account-box {
-  margin: 50px auto 0;
+  padding: 70px 0;
   font-size: 1.2rem;
 }
-#change-password-box {
+.flex-container {
+  display: flex;
+  margin-bottom: 25px;
+  text-align: right;
+}
+#change-username-box {
   max-width: 500px;
+  margin: 0 auto;
+}
+#change-username-box label {
+  flex: 35;
+  position: relative;
+  top: 2px;
+}
+#change-username-box input {
+  border-radius: 50px;
 }
 #change-username-box input[type="text"] {
+  flex: 65;
   background: #3E6C99;
   color: white;
-  padding: 2px 12px;
-  margin-right: 14px;
-  border-radius: 50px;
+  padding: 2px 14px;
 }
 #change-username-box input[type="password"] {
+  flex: 65;
   background: #3E6C99;
   color: white;
-  padding: 2px 12px;
-  margin-right: 14px;
-  border-radius: 50px;
+  padding: 2px 14px;
 }
 #change-username-box input[type="submit"] {
   background: #3E6C99;
   color: white;
   padding: 2px 25px;
-  position: relative;
-  top: 3px;
-  border-radius: 50px;
+  float: right;
 }
 #close-pannel-container {
-  width: 100%;
-  position: absolute;
-  bottom: 40px;
+  padding: 40px;
 }
 #close-pannel-container .text-btn {
   font-size: 0.9rem;
   color: #888;
   text-decoration: underline;
 }
-.flex-container {
-  display: flex;
-  margin-bottom: 20px;
-  text-align: right;
+#close-pannel-container .text-btn:hover {
+  text-decoration: none;
+}
+
+
+#change-password-box {
+  max-width: 500px;
+  margin: 0 auto;
 }
 #change-password-box form label {
   flex: 41;
 }
 #change-password-box form input {
   flex: 59;
-  padding: 0 12px;
+  padding: 0 14px;
   background: #3E6C99;
   color: white;
   border-radius: 50px;
@@ -179,6 +207,8 @@
   margin-top: 10px;
   border-radius: 50px;
 }
+
+
 #delete-account-box {
   font-size: 1.2rem;
   color: rgb(255, 136, 136);
@@ -189,10 +219,12 @@
   font-weight: 900;
   padding: 16px 32px;
   border-radius: 50px;
-  margin-top: 40px;
+  margin: 40px 0 60px;
+}
+.delete-acct-button:hover {
+  background: rgb(212, 102, 102);
 }
 #delete-account-box .changed-my-mind  {
-  margin-top: 40px;
   background: transparent;
   border: 0;
   color: #FFF;
@@ -202,35 +234,41 @@
   text-decoration: underline;
 }
 
+
+
+
+
+
 @media only screen and (max-width: 768px) {
 
 
-  #profile {
-    max-height: 100%;
-    max-width: 100%;
-    margin: 1.0rem auto 0 auto;
-    padding-top: 15px;
-    text-align: center;
-    font-size: 1.0rem;
-  }
-  .typingSpeed {
-    font-size: 1.2rem;
-  }
+#profile {
+  max-height: 100%;
+  max-width: 100%;
+  margin: 1.0rem auto 0 auto;
+  padding-top: 15px;
+  text-align: center;
+  font-size: 1.0rem;
+}
+.typingSpeed {
+  font-size: 1.2rem;
+}
 
-  #table-container {
-    margin: 0 auto 80px auto;
-    font-size: 0.9rem;
-  }
+#table-container {
+  margin: 0 auto 80px auto;
+  font-size: 0.9rem;
+}
   
   /* --- table ------------- */
   
-.center-table  {
-  margin-left: auto;
-  margin-right: auto;
-}
+
 #table-container {
   margin: 0 auto 100px auto;
   font-size: 0.9rem;
+}
+#past-games { /* THE table itself */
+  min-width: 100%;
+  margin-bottom: 30px;
 }
 #table-forehead {
   width: 100%;
@@ -241,11 +279,6 @@
   padding: 10px 0 !important;
   font-style: italic;
 }
-#past-games {
-  min-width: 100%;
-  margin-bottom: 30px;
-}
-
 #change-username-box, 
 #change-password-box,
 #delete-account-box {

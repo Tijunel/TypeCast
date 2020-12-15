@@ -18,7 +18,7 @@ class Profile extends React.Component {
 		this.username = React.createRef();
 		this.state = {
 			username: "",
-			pastGamesUI: [],
+			pastGamesTable: [],
 			typingSpeed: 0.0,
 			changeUNVisible: false,
 			changePWVisible: false,
@@ -28,8 +28,11 @@ class Profile extends React.Component {
 	}
 
 	componentDidMount = () => {
-		this.loadUserData();
+    this.loadUserData();
+    if(document.querySelector('#footer'))
+      document.querySelector('#footer').style.background = "rgba(0,0,0,0.5)";
 	}
+
 
 	loadUserData = () => {
 		const username = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
@@ -41,14 +44,75 @@ class Profile extends React.Component {
 			.then(async res => {
 				if (res.status === 200) {
 					res = await res.json();
-					const pastGamesUI = this.generatePastGamesUI(res.games);
-					this.setState({pastGamesUI: pastGamesUI, username: username });
+					const pastGamesTable = this.generatePastGamesTable(res.games);
+					this.setState({pastGamesTable: pastGamesTable, username: username });
 				} 
 			})
 			.catch(err => {
 				alert("Unable to load data.")
 			});
+    }
+    
+
+    generatePastGamesTable = (pastGames) => {
+		let pastGamesTable = [];
+    let totalTS= 0.0
+    pastGamesTable.push( // table forehead
+      <tr key="forehead" className="table-forehead"><td>Your Race Results</td></tr>
+    );
+		pastGamesTable.push( // table headers
+			<tr key="headings">
+				<td className="position">Pos</td>
+				<td className="speed">Speed</td>
+				<td className="time">Time</td>
+				<td className="date">Date</td>
+			</tr>
+		);
+		let len = 0;
+		if (pastGames.length >	10)  {
+			len = 10;
+		}
+		else len = pastGames.length;
+		for (let i = pastGames.length - len; i < pastGames.length; i++) {
+      let time = String(Math.round(pastGames[i].time * 10) / 10);
+      let secondLastCh = time.substring(time.length - 2)[0];
+      // No decimal will show if the tenths place digit is a zero.
+      // This fixes that (the && !== 'a' covers bad data 'NaN' cases)
+      if (secondLastCh !== '.' && secondLastCh !== 'a') 
+        time += '.0';
+			var l = pastGames[i].date.split('T');
+			pastGamesTable.push(
+				<tr key={"game" + (i + 1)}>
+					<td className="position">
+						{pastGames[i].placement}
+					</td>
+					<td className="speed">
+						<div className="speed-number">
+              {Math.round(pastGames[i].typingSpeed * 10) / 10}
+            </div>
+	          <div className="speed-suffix">&nbsp;LPM</div>
+					</td>
+					<td className="time">
+            { pastGames[i].time === "(DNF)" ? 
+              <div className="dnf">{pastGames[i].time}</div>
+            :
+              <><div className="time-number">{time}</div>
+              <div className="time-suffix">&nbsp;s</div></>
+            }
+          </td>
+					<td className="date">{l[0]}</td>
+				</tr>
+			); 
+      totalTS += pastGames[i].typingSpeed;
+    }
+		if (pastGames.length > 0) totalTS = totalTS / pastGames.length;
+		else totalTS = 0.0;
+		totalTS = Math.round(totalTS * 100) / 100;
+		this.setState({typingSpeed: totalTS});
+		
+		return pastGamesTable;
 	}
+
 
 	clearHistory = () => {
 		fetch('/userData/games', {
@@ -58,7 +122,7 @@ class Profile extends React.Component {
 		})
 			.then(res => {
 				if (res.status === 200) {
-					this.setState({ pastGamesUI: [], typingSpeed: 0 });
+					this.setState({ pastGamesTable: [], typingSpeed: 0 });
 					alert("Game data reset was successfuly.");
 				} 
 				else alert("Game data reset was successfully.");
@@ -67,6 +131,7 @@ class Profile extends React.Component {
 				alert("Error. Game data reset was unsucessful.");
 			});
 	}
+
 
 	updateUsernameHandler = (event) => {
 		event.preventDefault();
@@ -99,6 +164,7 @@ class Profile extends React.Component {
 				this.currentPassword.current.value = "";
 			});
 	}
+
 
 	updatePasswordHandler = (event) => {
 		event.preventDefault();
@@ -135,6 +201,7 @@ class Profile extends React.Component {
 			});
 	}
 
+
 	deleteAccountHandler = () => {
 		this.clearHistory();
 		fetch('/user/', {
@@ -157,21 +224,23 @@ class Profile extends React.Component {
 			window.location.href = '/login';
 	}
 
-	sizeTheExtendedFooter = (situation) => {
-		// This is janky af. Clean this up if there's time:
-		const extFooter = document.querySelector('#extended-footer');
-		let offset = extFooter.getBoundingClientRect();
-		let topOfFooter = offset.top;
-		let diff = window.innerHeight - topOfFooter;
-		if (diff > 420) {  // need at least this much px height for the bottom ctrl pannel
-			if (situation === "initial load") {
-				extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem));" +
-					"position: relative; height: 420px";
-			} else if (situation === "after deletion") {
-				extFooter.style.cssText = "min-height: calc(100vh - (255px + 70px + 5.5rem))";
-			}
-		}
-	}
+
+	// sizeTheExtendedFooter = (situation) => {
+	// 	// This is janky af. Clean this up if there's time:
+	// 	const extFooter = document.querySelector('#extended-footer');
+	// 	let offset = extFooter.getBoundingClientRect();
+	// 	let topOfFooter = offset.top;
+	// 	let diff = window.innerHeight - topOfFooter;
+	// 	if (diff > 420) {  // need at least this much px height for the bottom ctrl pannel
+	// 		if (situation === "initial load") {
+	// 			extFooter.style.cssText = "min-height: calc(100vh - (148px + 398px + 5.5rem));" +
+	// 				"position: relative; height: 420px";
+	// 		} else if (situation === "after deletion") {
+	// 			extFooter.style.cssText = "min-height: calc(100vh - (255px + 70px + 5.5rem))";
+	// 		}
+	// 	}
+	// }
+
 
 	showChangeUsername = () => {
 		this.setState({ changeUNVisible: true, changePWVisible: false, delAcctVisible: false , clearHistoryVisible: false});
@@ -187,7 +256,12 @@ class Profile extends React.Component {
 
 	showClearHistory = () => {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false, clearHistoryVisible: true });
+    }
+    
+    closePanel = () => {
+		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false, clearHistoryVisible: false});
 	}
+
 
 	newPasswordInfoChecksOut = () => {
 		if (this.newPassword1.current.value !== this.newPassword2.current.value) {
@@ -201,69 +275,19 @@ class Profile extends React.Component {
 		return false;
 	}
 
-	closePanel = () => {
-		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false, clearHistoryVisible: false});
-	}
-
-	generatePastGamesUI = (pastGames) => {
-		let pastGamesTable = [];
-		let totalTS= 0.0
-		pastGamesTable.push(
-			<tr key="headings">
-				<td className="position">Result</td>
-				<td className="speed">Speed</td>
-				<td className="time">Time</td>
-				<td className="date">Date</td>
-			</tr>
-		);
-		let len = 0;
-		if (pastGames.length >	10)  {
-			len = 10;
-		}
-		else len = pastGames.length;
-		for (let i = pastGames.length - len; i < pastGames.length; i++) {
-			var l = pastGames[i].date.split('T');
-			pastGamesTable.push(
-				<tr key={"game" + (i + 1)}>
-					<td className="position">
-						{pastGames[i].placement}
-					</td>
-					<td className="speed">
-						<pre>
-							{pastGames[i].typingSpeed > 9 ?
-								pastGames[i].typingSpeed
-								: " " + pastGames[i].typingSpeed}
-						</pre> <span className="typingSpeed">LPM</span>
-					</td>
-					<td className="time">{pastGames[i].time}</td>
-					<td className="date">{l[0]}</td>
-				</tr>
-			); 
-			totalTS += pastGames[i].typingSpeed;
-		}
-		if (pastGames.length > 0) totalTS = totalTS / pastGames.length;
-		else totalTS = 0.0;
-		totalTS = Math.round(totalTS * 100) / 100;
-		this.setState({typingSpeed: totalTS});
-		
-		return pastGamesTable;
-	}
-
+    
 	render = () => {
 		return (
 			<div id='profile'>
+
 				<div id="tophalf-profile">
 					<div id="profile-heading"><h1>{this.state.username}</h1></div>
-					<div id="table-container">
-						<div id="table-forehead">Your Race Results</div>
-						<table class="center-table" id="past-games"><tbody>{this.state.pastGamesUI}</tbody></table>
-						<div id="table-chin">
-							<div id="avg-speed">
-								Average Typing Speed: <div id="avg-speed-nbr">{this.state.typingSpeed}</div>
-							</div>
-						</div>
-					</div>
+          <table id="past-games"><tbody>{this.state.pastGamesTable}</tbody></table>
+          <div id="table-chin">
+              Average coding speed: {this.state.typingSpeed}
+          </div>
 				</div>
+
 				<div id="extended-footer">
 					<div id="user-menu">
 						<button onClick={() => this.showChangeUsername()}>Change UserName</button>
@@ -273,28 +297,37 @@ class Profile extends React.Component {
 						<button onClick={() => this.showDeleteAccount()}
 							className="del-acct-btn">Delete Account</button>
 					</div>
-					{this.state.changeUNVisible ?
+
+
+
+					{this.state.changeUNVisible &&
 						<div id="change-username-box">
 							<form onSubmit={this.updateUsernameHandler}>
-								<label>New Username &nbsp;</label>
-								<input
-									type="text"
-									ref={this.username}
-								/>
-								<br></br><br></br>
-								<label>Password &nbsp;</label>
-								<input
-									type="password"
-									ref={this.currentPassword}
-								/>
-								<br></br><br></br>
+
+								<div className="flex-container">
+                  <label>New Username &nbsp;</label>
+                  <input
+                    type="text"
+                    ref={this.username}
+                  />
+                </div>
+
+								<div className="flex-container">
+                  <label>Password &nbsp;</label>
+                  <input
+                    type="password"
+                    ref={this.currentPassword}
+                  />
+								</div>
+
 								<input type='submit' value='Change' />
 							</form>
 						</div>
-						:
-						<p></p>
 					}
-					{this.state.changePWVisible ?
+
+
+
+					{this.state.changePWVisible &&
 						<div id="change-password-box">
 							<form onSubmit={this.updatePasswordHandler}>
 								<div className="flex-container">
@@ -321,8 +354,6 @@ class Profile extends React.Component {
 								<input type='submit' value='Change' />
 							</form>
 						</div>
-						:
-						<p></p>
 					}
 					{this.state.delAcctVisible &&
 						<div id="delete-account-box">
