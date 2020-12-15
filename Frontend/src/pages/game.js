@@ -15,21 +15,21 @@ class Game extends React.Component {
       raceHasEnded: false,                // true when the time runs out or when all players have finished race
       timeElapsed: -1,                    // seconds passed since start of race, used for page's visual timer
       visualizedPlayerStatus: [],         // html table displaying player status in a visual readout
-      redraw: true,                      // toggle this to force redraw (b/c many variables displayed are not in state)
+      redraw: true,                       // toggle this to force redraw (b/c many variables displayed are not in state)
       // THESE ARE RECEIVED FROM SERVER BEFORE RACE STARTS ------------------------------------
-      playerNames: [],                // list of player names
-      raceCodeStr: "",                // a string of the entire code
-      timeLimit: null,                // time limit for this race
-      lobbyCode: this.getLobbyCode(), // I guess we need this? It uniquely identifies this lobby.
-      lobbyName: null                  // not really needed, I think
+      playerNames: [],                    // list of player names
+      raceCodeStr: "",                    // a string of the entire code
+      timeLimit: null,                    // time limit for this race
+      lobbyCode: this.getLobbyCode(),     // I guess we need this? It uniquely identifies this lobby.
+      lobbyName: null                     // not really needed, I think
     }
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
     this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
-    this.AUTO_INDENT = false;              // (self explanitory)
-    this.DEBUG = false;                    // debug mode (lots of console output)
+    this.AUTO_INDENT = true;              // (self explanitory)
+    this.DEBUG = false;                   // debug mode (lots of console output)
 
     // used for calculations. Try to not touch these ----------------------------------------------
     this.players = [];                // holds the players' race data. Not in state b/c needs to update fast.
@@ -45,7 +45,7 @@ class Game extends React.Component {
     this.mistakesPresent = false;                // true when user types wrong key, false otherwise
     this.mistakePresentOnLastType = false;       // true when a mistake was present on user's previous key press
     this.undetectableBackspacePressed = false;   // allows keyup event listener to communicate backspace presses
-    this.tabPressed = false;                     // allows keyup event listener to communicate tab presses 
+    this.tabPressed = false;                     // allows keydown event listener to communicate tab presses 
     this.enterPressed = false;        // allows keyup event listener to communicate Enter presses
     this.wordWithEnters = "";         // used for handling Enter key presses (newlines)
     this.wordChanged = false;         // used to assist in detecting backspaces under different conditions
@@ -64,14 +64,6 @@ class Game extends React.Component {
     this.get_initial_data_from_server();
   }
 
-  listenOnSockets = () => {
-    const socket = SocketManager.getInstance().getSocket();
-    socket.on('start game', (data) => {
-      if (this.state.lobbyCode === data.lobbyCode) {
-        this.startTimer(true);
-      }
-    });
-  }
 
   // ------------------- server request/response methods ----------------------
   get_initial_data_from_server = async () => {
@@ -113,6 +105,15 @@ class Game extends React.Component {
     } else {
       // Error
     }
+  }
+
+  listenOnSockets = () => {
+    const socket = SocketManager.getInstance().getSocket();
+    socket.on('start game', (data) => {
+      if (this.state.lobbyCode === data.lobbyCode) {
+        this.startTimer(true);
+      }
+    });
   }
 
   send_receive_updated_player_data = async () => {
@@ -160,6 +161,7 @@ class Game extends React.Component {
   }
   // ------------------ /server request/response methods ------------------------
 
+
   initializeVars = () => {
     this.myName = JSON.parse(Cookies.get('userData').split('j:')[1]).username;
     this.buildPlayerArray();
@@ -172,14 +174,14 @@ class Game extends React.Component {
     if (this.AUTO_INDENT) this.prevLineIndent = this.getIndentationOf(this.raceCode[0]);
   }
 
+
   buildPlayerArray = () => {
     // builds a player array that out of the names provided by the server.
-    // NOTE: the user places himself at position '0' in the this array.
+    // NOTE: the user places himself at position '0' in this array.
 
     // NOTE:        name:   comes from the server.
     //          charsFin:   is shared back and forth with the server.
-    //              time:   is sent to the server once this player is finished the race and received 
-    //                        -for the other players when they have finished the race.
+    //              time:   is shared back and forth with the server.
     //  position and lpm:   are calculated locally for visual display of the race stats
     this.players.push({ name: this.myName, charsFin: 0, time: null, position: 0, lpm: 0 });
 
@@ -189,10 +191,12 @@ class Game extends React.Component {
     }
   }
 
+
   getLobbyCode = () => {
     let url = window.location.pathname;
     return url.substr(url.length - 4);
   }
+
 
   buildRaceCodeHTML = (raceCode) => {
     let raceCodeHTML = [];
@@ -202,6 +206,7 @@ class Game extends React.Component {
     }
     this.setState({ raceCodeHTML: raceCodeHTML });
   }
+
 
   buildVisualPlayerTable = () => {
     let visualData = [];
