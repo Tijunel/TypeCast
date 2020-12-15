@@ -31,8 +31,11 @@
 }
 #past-games td {
   padding: 5px 3px;
-  background: #29547e;
   border: 2px solid black;
+  background: #29547e;
+}
+#past-games tr:nth-child(even) td {
+  background: #1c3a57;
 }
 #past-games tr {
   display: flex;
