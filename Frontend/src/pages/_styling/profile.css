@@ -59,13 +59,17 @@
 .speed-number, .speed-suffix {
   flex: 1;
 }
+.speed-suffix {
+  font-size: 1rem;
+  margin-top: 4px;
+}
 .time-number {
   flex: 6;
 } 
 .time-suffix {
   flex: 4;
 }
-.typingSpeed {
+.lpm-suffix {
   font-size: 0.95rem;
 }
 #past-games tr:nth-child(1) td {
@@ -82,7 +86,7 @@
   display: table-cell;
 } 
 #past-games tr:last-child td {
-  padding-bottom: 5px;
+  padding-bottom: 7px;
 }
 #past-games tr:last-child td:first-child {
   border-radius: 0 0 0 25px;
@@ -102,6 +106,7 @@
   font-size: 1.2rem;
 }
 /* --- /table ------------ */
+
 
 
 
@@ -133,6 +138,7 @@
   background: #4b7cad !important;
 }
 
+
 #change-username-box, 
 #change-password-box,
 #delete-account-box {
@@ -155,6 +161,7 @@
 }
 #change-username-box input {
   border-radius: 50px;
+  margin-left: 20px;
 }
 #change-username-box input[type="text"] {
   flex: 65;
@@ -196,7 +203,7 @@
 }
 #change-password-box form input {
   flex: 59;
-  padding: 0 14px;
+  padding: 2px 14px;
   background: #3E6C99;
   color: white;
   border-radius: 50px;
@@ -237,77 +244,122 @@
 
 
 
+/* ------------- mobile ----------------*/
+@media (max-width: 640px) {
 
+  #tophalf-profile {
+    padding-top: 0px;
+  }
+  #profile-heading {
+    padding: 30px 0 20px;
+  }
+  #table-chin {
+    padding-bottom: 40px;
+  }
+  #user-menu {
+    border-top: 1px solid #555;
+  }
+  #user-menu button {
+    width: 50%;
+    margin: 0 auto;
+    padding: 15px 20px;
+    border: 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #555;
+  }
+  #user-menu button:nth-child(odd) {
+    border-right: 1px solid #555;
+  }
+}
 
-@media only screen and (max-width: 768px) {
+@media (max-width: 600px) {
 
+  #past-games { /* THE table itself */
+    min-width: 100%;
+  }
+  .table-forehead td {
+    border-radius: 0;
+  }
+  #past-games tr:last-child td:first-child {
+    border-radius: 0;
+  }
+  #past-games tr:last-child td:last-child {
+    border-radius: 0;
+  }
+}
 
-#profile {
-  max-height: 100%;
-  max-width: 100%;
-  margin: 1.0rem auto 0 auto;
-  padding-top: 15px;
-  text-align: center;
-  font-size: 1.0rem;
-}
-.typingSpeed {
-  font-size: 1.2rem;
+@media (max-width: 540px) {
+
+  #change-username-box, 
+  #change-password-box,
+  #delete-account-box {
+    padding: 38px 0;
+    font-size: 1.1rem;
+  }
+  #change-username-box {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .flex-container {
+    display: block;
+    text-align: center;
+  }
+  #change-username-box label, 
+  #change-password-box label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  #change-username-box input, 
+  #change-password-box input {
+    font-size: 1.4rem !important;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+  }
+  #change-username-box input[type="submit"], 
+  #change-password-box input[type="submit"] {
+    padding: 10px 50px !important;
+    float: none !important;
+    margin: 40px auto 0 !important;
+  }
+  #delete-account-box {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }
 
-#table-container {
-  margin: 0 auto 80px auto;
-  font-size: 0.9rem;
-}
-  
-  /* --- table ------------- */
-  
+@media (max-width: 380px) {
 
-#table-container {
-  margin: 0 auto 100px auto;
-  font-size: 0.9rem;
+  #past-games { /* THE table itself */
+    font-size: 1rem;
+  }
+  .speed-suffix {
+    font-size: 0.85rem;
+    margin-top: 3px;
+  }
+  #table-chin {
+    font-size: 1.1rem;
+  }
 }
-#past-games { /* THE table itself */
-  min-width: 100%;
-  margin-bottom: 30px;
+
+@media (max-width: 350px) {
+
+  #profile-heading {
+    padding: 20px 0 10px;
+  }
+  .date {
+    font-size: 0.9rem;
+    padding-top: 6px !important;
+  }
 }
-#table-forehead {
-  width: 100%;
-  background: rgba(170, 161, 161, 0.14);
-  border-radius: 25px 25px 0 0;
-  color: rgb(137, 197, 253);
-  border: 0 !important;
-  padding: 10px 0 !important;
-  font-style: italic;
-}
-#change-username-box, 
-#change-password-box,
-#delete-account-box {
-  margin: 50px auto 0;
-  font-size: 1.0rem;
-}
-#change-password-box {
-  max-width: 500px;
-}
-#change-username-box input[type="text"] {
-  background: #3E6C99;
-  color: white;
-  padding: 2px 12px;
-  margin-right: 14px;
-  border-radius: 50px;
-}
-#change-username-box input[type="password"] {
-  background: #3E6C99;
-  color: white;
-  padding: 2px 12px;
-  margin-right: 14px;
-  border-radius: 50px;
-}
-#change-username-box input[type="submit"] {
-  background: #3E6C99;
-  color: white;
-  padding: 2px 25px;
-  position: relative;
-  top: 3px;
-  border-radius: 50px;
-}
+
+@media (max-width: 300px) {
+
+  #user-menu button {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    border: 0;
+    border-bottom: 1px solid #555;
+  }
 }

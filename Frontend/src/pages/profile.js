@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import Cookies from 'js-cookie';
 import WithAuth from './withAuth';
@@ -305,7 +303,7 @@ class Profile extends React.Component {
 							<form onSubmit={this.updateUsernameHandler}>
 
 								<div className="flex-container">
-                  <label>New Username &nbsp;</label>
+                  <label>New Username</label>
                   <input
                     type="text"
                     ref={this.username}
@@ -313,7 +311,7 @@ class Profile extends React.Component {
                 </div>
 
 								<div className="flex-container">
-                  <label>Password &nbsp;</label>
+                  <label>Password</label>
                   <input
                     type="password"
                     ref={this.currentPassword}
@@ -357,7 +355,7 @@ class Profile extends React.Component {
 					}
 					{this.state.delAcctVisible &&
 						<div id="delete-account-box">
-							Are you SURE you want to delete your account?<br />
+							Are you SURE you want to delete your&nbsp;account?<br />
               				It will be gone forever.<br />
 							<button onClick={() => this.deleteAccountHandler()}
 								className="delete-acct-button">
