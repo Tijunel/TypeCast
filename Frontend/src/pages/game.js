@@ -25,7 +25,7 @@ class Game extends React.Component {
     }
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
-    this.SERVER_UPDATE_INTERVAL = 1000;   // how often (ms) user updates server with his race data (todo: make it 2000)
+    this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 5;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
@@ -244,8 +244,8 @@ class Game extends React.Component {
     if (!this.players[0].time) {
       this.players[0].charsFin = this.userFinishedRace ? this.state.raceCodeStr.length : this.numCompletedChars;
       this.calcMyFinalTime();
-      this.send_receive_updated_player_data();
     }
+    this.send_receive_updated_player_data(); // this was inside the if, above, before...
 
     // Now calculate the stats for all players
     let userTime;
@@ -734,11 +734,8 @@ class Game extends React.Component {
     // stop the cursor
     if (document.querySelector(this.cursorLocation))
       document.querySelector(this.cursorLocation).classList.remove('cursor');
-    // todo: remove the below two lines once server is starting the game
-    if (document.querySelector('#testStartBtn'))
-      document.querySelector('#testStartBtn').style.display = 'none';
-    // fade the clock
-    if (document.querySelector('#timer'))  // document.querySelector('#timer').classList.add('timer-hidden');
+    // fade the timer if game is over (all players finished or timer expired)
+    if (this.state.raceHasEnded && document.querySelector('#timer'))  // document.querySelector('#timer').classList.add('timer-hidden');
       document.querySelector('#timer').style.opacity = "0";
   }
 
@@ -746,9 +743,10 @@ class Game extends React.Component {
   allRacersFinished = () => {
     let allFinished = true;
     for (let p of this.players) {
+      // console.log(p.name + "'s time value: " + p.time + "   and their charsFin value: " + p.charsFin);
       if (!p.time) {
         allFinished = false;
-        break;
+        //break;
       }
     }
     return allFinished;
