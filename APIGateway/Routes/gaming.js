@@ -135,6 +135,7 @@ gaming.post('/ready', withAuth, async (req, res) => {
             username: req.user.username
         }
     });
+    console.log(response);
     if (response.status === 200) {
         console.log('here')
         if (response.body.readyLeft === 0) {
@@ -145,7 +146,7 @@ gaming.post('/ready', withAuth, async (req, res) => {
             });
         }
     }
-    res.status(response.status).end();
+    res.status(response.status).json(response.body).end();
 });
 
 gaming.post('/update', withAuth, async (req, res) => {
