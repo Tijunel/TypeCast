@@ -3,7 +3,7 @@
 const redis = require("redis");
 const asyncRedis = require("async-redis");
 const PORT = 6379;
-const HOST = "typecast.xypzmb.ng.0001.use2.cache.amazonaws.com";
+const HOST = "localhost";
 
 // Sync Client
 const client = redis.createClient({
