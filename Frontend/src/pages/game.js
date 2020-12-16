@@ -25,7 +25,7 @@ class Game extends React.Component {
     }
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
-    this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
+    this.SERVER_UPDATE_INTERVAL = 1000;   // how often (ms) user updates server with his race data (todo: make it 2000)
     this.COUNTDOWN_TIME = 5;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
@@ -57,6 +57,7 @@ class Game extends React.Component {
     this.interval = 0;                // used for updating game timer
     this.interval2 = 0;               // used for updating user's own data
     this.prevLineIndent = 0;          // used for auto-indent feature
+    this.raceHasEndedRedundant = false;
   }
 
   componentDidMount = () => {
@@ -175,7 +176,7 @@ class Game extends React.Component {
 
 
   checkForPageRefresh = () => {
-    if (this.state.raceHasEnded && performance.navigation.type == performance.navigation.TYPE_RELOAD) { 
+    if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
       alert("Game no longer exists.\nRedirecting you home...");
       window.location.href = "/home";
     }
@@ -272,7 +273,7 @@ class Game extends React.Component {
 
 
   calcMyFinalTime = () => {
-    if (this.userFinishedRace || this.state.raceHasEnded) {
+    if (this.userFinishedRace || this.state.raceHasEnded || this.raceHasEndedRedundant) {
       if (!this.players[0].time)
         this.players[0].time = this.calcElapsedTime();
     }
@@ -743,7 +744,7 @@ class Game extends React.Component {
     if (document.querySelector(this.cursorLocation))
       document.querySelector(this.cursorLocation).classList.remove('cursor');
     // fade the timer if game is over (all players finished or timer expired)
-    if (this.state.raceHasEnded && document.querySelector('#timer'))  // document.querySelector('#timer').classList.add('timer-hidden');
+    if ((this.state.raceHasEnded || this.raceHasEndedRedundant) && document.querySelector('#timer'))  // document.querySelector('#timer').classList.add('timer-hidden');
       document.querySelector('#timer').style.opacity = "0";
   }
 
@@ -751,10 +752,9 @@ class Game extends React.Component {
   allRacersFinished = () => {
     let allFinished = true;
     for (let p of this.players) {
-      // console.log(p.name + "'s time value: " + p.time + "   and their charsFin value: " + p.charsFin);
       if (!p.time) {
         allFinished = false;
-        //break;
+        break;
       }
     }
     return allFinished;
@@ -772,7 +772,6 @@ class Game extends React.Component {
     this.calcAccuracy();
     this.setState({ redraw: !this.state.redraw });
     this.applyFinishedStyling();
-    this.sendFinish();
   }
 
   // --------- timer ----------------------------------------------------------
@@ -799,15 +798,17 @@ class Game extends React.Component {
     this.setState({ timeElapsed: elapsed });
     this.lastUpdateTime = now;
 
-    if (timerReadout === ':00' || this.allRacersFinished() ) {
+    if ((isCountdown && timerReadout === ':00') || this.allRacersFinished() ) {
       this.stopTimer();
       // if the countdown timer reached :00, now start the real timer
       if (isCountdown) this.startTimer(false);
       // if time runs out on the actual race, stop the game
       if (!isCountdown) {
         this.setState({raceHasEnded: true});
+        this.raceHasEndedRedundant = true;
         if (!this.userFinishedRace)
           this.finalizeRace();
+        this.sendFinish();
       }
     }
     // else if (this.userFinishedRace) {  // BLAH: don't think this is needed now
