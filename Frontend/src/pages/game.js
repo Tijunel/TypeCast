@@ -25,8 +25,8 @@ class Game extends React.Component {
     }
 
     // CONSTANTS we may want to adjust  -----------------------------------------------------------
-    this.SERVER_UPDATE_INTERVAL = 2000;   // how often (ms) user updates server with his race data (todo: make it 2000)
-    this.COUNTDOWN_TIME = 3;              // seconds of countdown before the actual race starts
+    this.SERVER_UPDATE_INTERVAL = 1000;   // how often (ms) user updates server with his race data (todo: make it 2000)
+    this.COUNTDOWN_TIME = 5;              // seconds of countdown before the actual race starts
     this.TAB = '    ';                    // what gets typed when player hits the Tab key in game
     this.AUTO_INDENT = true;              // (self explanitory)
     this.DEBUG = false;                   // debug mode (lots of console output)
@@ -732,10 +732,26 @@ class Game extends React.Component {
 
   applyFinishedStyling = () => {
     // stop the cursor
-    document.querySelector(this.cursorLocation).classList.remove('cursor');
+    if (document.querySelector(this.cursorLocation))
+      document.querySelector(this.cursorLocation).classList.remove('cursor');
     // todo: remove the below two lines once server is starting the game
     if (document.querySelector('#testStartBtn'))
       document.querySelector('#testStartBtn').style.display = 'none';
+    // fade the clock
+    if (document.querySelector('#timer'))  // document.querySelector('#timer').classList.add('timer-hidden');
+      document.querySelector('#timer').style.opacity = "0";
+  }
+
+
+  allRacersFinished = () => {
+    let allFinished = true;
+    for (let p of this.players) {
+      if (!p.time) {
+        allFinished = false;
+        break;
+      }
+    }
+    return allFinished;
   }
 
 
@@ -777,7 +793,7 @@ class Game extends React.Component {
     this.setState({ timeElapsed: elapsed });
     this.lastUpdateTime = now;
 
-    if (timerReadout === ':00') {
+    if (timerReadout === ':00' || this.allRacersFinished() ) {
       this.stopTimer();
       // if the countdown timer reached :00, now start the real timer
       if (isCountdown) this.startTimer(false);
@@ -853,8 +869,8 @@ class Game extends React.Component {
             this.formatTime(this.state.timeElapsed)
             :
             this.state.timeElapsed !== -1 &&
-            <span><span id="getReady">Get ready! Race starts in </span>
-              {this.formatTime(this.state.timeElapsed)}</span>
+            <div><div id="getReady">Get ready! Race starts in</div>
+              {this.formatTime(this.state.timeElapsed)}</div>
           }
         </div>
 

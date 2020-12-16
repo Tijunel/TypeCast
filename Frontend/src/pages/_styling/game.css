@@ -6,13 +6,20 @@
   padding: 30px;
 }
 #timer {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity ease 2s;
   font-size: 2rem;
   float: right;
   padding-top: 8px;
 }
+
 #getReady {
+  display: inline-block;
   font-size: 1rem;
-  margin-right: 8px;
+  margin-right: 17px;
+  position: relative;
+  top: -1px;
 }
 /* #timer::before {
   content: "Time: ";
@@ -66,9 +73,9 @@
 .vis-my-name {
   font-size: 1rem;
 }
-.vis-my-car {
+/* .vis-my-car {
 
-}
+} */
 .vis-my-name, .vis-my-car {
   font-weight: 700;
   color: #c3e88d ;
@@ -91,20 +98,21 @@
   background: #1c1f2b;
   padding: 20px;
   border: 3px solid #222;
-  font-size: 1.25rem;
+  /* font-size: 1.25rem; */
+  font-size: 1.6rem;
 }
 #codebox p {
   display: inline;
-  color: #fff;
+  color: white;
 }
 .typingbox {
   padding: 5px 20px;
   background: #292d3e;
   color: #a6accd;
-  border: 3px solid #111;
+  border: 3px solid #222;
   border-top: 0;
   border-radius: 0;
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   width: 100%;
 }
 .typingbox:focus {
@@ -123,7 +131,7 @@
   rgba(28,31,43,0.6) 0%, 
   rgba(28,31,43,0) 100%
   );
-  animation: fade-in ease 2.5s;
+  animation: fade-in ease 2s;
 }
   @keyframes fade-in {
     0% {opacity: 0;}
@@ -133,8 +141,6 @@
   margin: 32px auto 15px;
   font-size: 1.3rem;
   text-decoration: underline;
-  xborder-bottom: 1px solid #ccc;
-  width: 260px;
 }
 #race-results .flex {
   width: 100%;
@@ -161,8 +167,512 @@
 @keyframes cursor {
   50% { border-color: transparent }
 }
-
 .cursorEnd {
   border-right: 1px solid #ffcc00;
   animation: cursor 1s linear infinite;
+}
+
+
+
+
+
+
+/* ------------ mobile ------------- */
+@media (max-width: 900px) {
+  #codebox {
+    /* font-size: 1.15rem; */
+    font-size: 1.5rem;
+  }
+}
+@media (max-width: 825px) {
+  .typingbox {
+    font-size: 1.2rem;
+  }
+  #codebox {
+    /* font-size: 1.1rem; */
+    font-size: 1.4rem;
+  }
+}
+@media (max-width: 790px) {
+  #codebox {
+    /* font-size: 1rem; */
+    font-size: 1.3rem;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+
+  #game {
+    padding: 20px 0;
+  }
+  #timer {
+    padding-top: 6px;
+    margin: 0 24px 0 0;
+  }
+  #game-status {
+    margin: 20px 0 17px 24px;
+  }
+  #race-visualization {  /* table's container */
+    border-radius: 0;
+  }
+  .player-row {  /* the row */
+    padding: 0 5px;
+  }
+  .player-row:first-child {
+    margin-top: 6px;
+  }
+  .player-row:last-child {
+    margin-bottom: 5px;
+  }
+  .player-row td {
+    padding: 4px 0;
+  }
+  .vis-player-lane {  /* 1st column */
+    flex: 83;
+    padding-top: 5px !important;
+  }
+  .vis-player-box {
+    max-width: 160px;
+    position: relative;
+    left: 0;
+  }
+  .vis-player-name {
+    flex: 65;
+    font-size: 0.9rem;
+    padding-right: 8px;
+  }
+  .vis-my-name {
+    font-size: 0.95rem;
+    margin-top: -4px;
+  }
+  .vis-my-car {
+    margin-top: -5px;
+  } 
+  .vis-player-car {
+    flex: 35;
+    font-size: 1.2rem;
+    padding-top: 5px;
+  }
+  .vis-playerstats {  /* 2nd column */
+    flex: 17;
+  }
+  #codebox {
+    padding: 20px;
+    /* font-size: 1.1rem; */
+    font-size: 1.4rem;
+  }
+  .typingbox {
+    padding: 5px 19px;
+  }
+  #result-heading {
+    margin: 26px auto 14px;
+  }
+}
+
+
+
+
+
+@media (max-width: 740px) {
+  #codebox {
+    /* font-size: 1rem; */
+    font-size: 1.3rem;
+  }
+}
+
+
+
+
+@media (max-width: 700px) {
+  #getReady {
+    max-width: 110px;
+    max-height: 25px;
+    text-align: right;
+    overflow: hidden;
+    position: relative;
+    top: 7px;
+    right: 3px;
+  }
+  #getReady::after {
+    content: "Get ready! ";
+    color: white;
+  }
+}
+
+
+
+
+@media (max-width: 680px) {
+  .typingbox {
+    font-size: 1.1rem;
+  }
+  #codebox {
+    /* font-size: 0.95rem; */
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 615px) {
+  #codebox {
+    /* font-size: 0.85rem; */
+    font-size: 1.1rem;
+  }
+}
+
+
+
+
+
+@media (max-width: 600px) {
+
+  #game {
+    padding: 10px 0 0 0;
+  }
+  .player-row:first-child {
+    margin-top: 3px;
+  }
+  .player-row:last-child {
+    margin-bottom: 1px;
+  }
+  .player-row td {
+    padding: 3px 0;
+  }
+  .vis-player-lane { 
+    flex: 80;
+  }
+  .vis-playerstats {
+    flex: 20;
+  }
+  #codebox {
+    padding: 14px;
+    /* font-size: 0.85rem; */
+    font-size: 1.05rem;
+  }
+}
+
+
+
+
+/* @media (max-width: 580px) {
+  #codebox {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 540px) {
+  #codebox {
+    font-size: 0.75rem;
+  }
+} */
+
+
+
+@media (max-width: 560px) {
+  #getReady {
+    display: none;
+  }
+}
+
+
+
+@media (max-width: 540px) { /* new */
+  #codebox {
+    font-size: 1rem;
+  }
+}
+
+
+
+
+@media (max-width: 520px) {
+
+  #game {
+    padding: 5px 0 0 0;
+  }
+  .player-row:last-child {
+    margin-bottom: 0;
+  }
+  .player-row td {
+    padding: 3px 0;
+  }
+  .vis-player-lane { 
+    flex: 77;
+  }
+  .vis-playerstats {
+    flex: 23;
+  }
+  #codebox {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
+/* @media (max-width: 510px) {
+  #codebox {font-size: 0.7rem}
+}
+
+@media (max-width: 470px) {
+  #codebox {font-size: 0.65rem}
+} */
+
+
+@media (max-width: 480px) { /* new */
+  #codebox {font-size: 0.85rem}
+}
+
+
+
+
+
+@media (max-width: 450px) {
+
+  #timer {
+    font-size: 1.9rem;
+    padding-top: 0;
+    margin: -8px 12px 0 0;
+  }
+  #game-status {
+    margin: 6px 0 6px 12px;
+    font-size: 1rem;
+    max-width: 330px;
+  }
+  #race-visualization {  /* table's container */
+    padding: 6px 6px 6px;
+  }
+  .player-row td {
+    padding: 0;
+  }
+  .vis-player-lane {  /* 1st column */
+    padding-top: 2px !important;
+  border-bottom: 2px dashed #888;
+  }
+  .vis-player-box {
+    max-width: 110px;
+  }
+  .vis-player-name {
+    font-size: 0.7rem;
+    padding: 1px 4px 0 0;
+    line-height: 0.8rem;
+  }
+  .vis-player-car {
+    font-size: 0.9rem;
+  }
+  .vis-playerstats .player-pos {
+    font-size: 0.8rem;
+    line-height: 0.8rem;
+  }
+  .vis-playerstats .player-lpm {
+    font-size: 0.8rem;
+  }
+  #codebox {
+    /* padding: 7px 7px; */
+    padding: 7px 4px 7px 10px;
+    border: 0;
+    /* font-size: 0.6rem; */
+    font-size: 0.8rem;
+  } 
+  .typingbox {
+    padding: 3px 16px;
+    border: 2px solid #111;
+    font-size: 1rem;
+  }
+  #race-results {
+    font-size: 0.95rem;
+    line-height: 1.3rem;
+  }
+  #result-heading {
+    margin: 15px auto 12px;
+    font-size: 1.2rem;
+  }
+  .res-att {
+    flex: 54;
+    text-align: right;
+    margin: 0 5px 0 0;
+  }
+  .res-data {
+    flex: 46;
+    text-align: left;
+    margin: 0 0 0 5px;
+  }
+  .units {
+    font-size: 1rem;
+  }
+}
+
+
+
+
+
+/* above this, they CAN fit 80 chars / line */
+/* below this, they can't fit 80 chars / line */
+
+
+
+
+
+@media (max-width: 421px) {
+
+  #timer {
+    font-size: 1.7rem;
+    margin: -7px 12px 0 0;
+  }
+  #game-status {
+    margin: 4px 0 6px 12px;
+    font-size: 0.9rem;
+    max-width: 330px;
+  }
+  #race-visualization {  /* table's container */
+    padding: 6px 6px 6px;
+  }
+  .player-row:first-child {
+    margin-top: 4px;
+  }
+  .player-row:last-child {
+    margin-bottom: 5px;
+  }
+  .player-row td {
+    padding: 0;
+  }
+  .vis-player-lane {  /* 1st column */
+    flex: 78;
+    padding-top: 2px !important;
+  }
+  .vis-player-box {
+    max-width: 110px;
+  }
+  .vis-player-name {
+    font-size: 0.7rem;
+    padding: 1px 4px 0 0;
+    line-height: 0.8rem;
+  }
+  .vis-player-car {
+    font-size: 0.9rem;
+    padding-top: 0;
+  }
+  .vis-playerstats {  /* 2nd column */
+    flex: 22;
+  }
+  .vis-playerstats .player-pos {
+    font-size: 0.8rem;
+    line-height: 0.8rem;
+  }
+  .vis-playerstats .player-lpm {
+    font-size: 0.8rem;
+  }
+  #codebox {
+    font-size: 0.77rem;
+  }
+}
+
+
+
+
+
+
+@media (max-width: 401px) {
+
+  #timer {
+    font-size: 1.7rem;
+    margin: -7px 8px 0 0;
+  }
+  #game-status {
+    margin: 4px 0 6px 8px;
+    font-size: 0.85rem;
+  }
+}
+
+
+
+
+
+@media (max-width: 381px) {
+
+  #timer {
+    font-size: 1.5rem;
+    margin: -5px 8px 0 0;
+  }
+  #game-status {
+    font-size: 0.8rem;
+  }
+  #race-visualization {  /* table's container */
+    padding: 5px 5px;
+  }
+  .vis-player-car {
+    font-size: 0.9rem;
+    padding-top: 0;
+  }
+  #codebox {
+    font-size: 0.72rem;
+    /* font-size: 0.7rem; */
+  }
+}
+
+
+
+
+
+@media (max-width: 361px) {
+
+  #timer {
+    font-size: 1.4rem;
+    margin: -4px 8px 0 0;
+  }
+  #race-visualization {  /* table's container */
+    padding: 5px 4px;
+  }
+  #codebox {
+    font-size: 0.65rem;
+  }
+}
+
+
+
+
+
+@media (max-width: 342px) {
+
+  #timer {
+    font-size: 1.3rem;
+    margin: -5px 8px 0 0;
+  }
+  #game-status {
+    margin: 2px 0 3px 8px;
+    max-width: 260px;
+  }
+  #race-visualization {  /* table's container */
+    padding: 0px 6px 6px;
+  }
+  .vis-player-lane {  /* 1st column */
+    flex: 75;
+  }
+  .vis-player-box {
+    max-width: 100px;
+  }
+  .vis-player-name {
+    font-size: 0.6rem;
+  }
+  .vis-playerstats {  /* 2nd column */
+    flex: 25;
+  }
+  #codebox {
+    /* padding: 7px 4px; */
+    padding: 7px 3px 7px 10px;
+    /* font-size: 0.6rem; */
+    font-size: 0.65rem;
+  }
+  .typingbox {
+    padding: 3px 14px;
+  }
+}
+
+
+
+
+@media (max-width: 335px) { /* new */
+  #codebox {
+    font-size: 0.63rem;
+  }
 }
