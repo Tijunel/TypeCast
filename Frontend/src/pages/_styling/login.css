@@ -6,7 +6,7 @@
 }
 #login h1 {
   text-align: center;
-  margin: 30px 0;
+  margin: 25px 0 40px;
 }
 #login form {
   max-width: 400px;
@@ -19,7 +19,7 @@
   width: 100%;
   padding: 5px 20px;
   margin-bottom: 15px;
-  border-radius: 50px;
+  border-radius: 10px;
   background: #3E6C99;
   color: white;
 }
@@ -46,8 +46,9 @@
   color: white;
   width: 100%;
   max-width: 250px;
-  border-radius: 50px;
+  border-radius: 10px;
   margin: 0 auto;
+  padding: 5px 20px;
 }
 #regbox button:hover  {
   background: #555;
@@ -64,4 +65,27 @@
 #forgotpw button:hover {
   text-decoration: underline;
   color: white;
+}
+
+
+
+@media (max-width: 500px) {
+  #login h1 {
+    margin: 5px 0 30px;
+  }
+}
+
+
+
+@media (max-width: 360px) {
+  #login {
+    padding: 20px;
+  }
+  #login h1 {
+    margin: 5px 0 22px;
+    font-size: 2rem;
+  }
+  #login input[type="submit"] {
+    margin: 25px auto;
+  }
 }

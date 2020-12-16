@@ -37,8 +37,6 @@ export default class Register extends React.Component {
 	render = () => {
 		return (
 			<div id='register'>
-				<button onClick={() => window.location.href = document.referrer}
-					className="back-btn">Back</button>
 				<h1>Register</h1>
 				<form onSubmit={this.registrationHandler}>
 					<label>Username</label>

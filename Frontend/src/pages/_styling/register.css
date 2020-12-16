@@ -6,7 +6,7 @@
 }
 #register h1 {
   text-align: center;
-  margin: 30px 0;
+  margin: 25px 0 40px;
 }
 #register form {
   max-width: 400px;
@@ -17,7 +17,7 @@
 }
 #register input {
   width: 100%;
-  border-radius: 50px;
+  border-radius: 10px;
   padding: 5px 15px;
   margin-bottom: 15px;
   background: #3E6C99;
@@ -38,4 +38,27 @@
 }
 #register input[type="submit"]:hover {
   background: #6daae7;
+}
+
+
+
+@media (max-width: 500px) {
+  #register h1 {
+    margin: 5px 0 30px;
+  }
+}
+
+
+
+@media (max-width: 360px) {
+  #register {
+    padding: 20px;
+  }
+  #register h1 {
+    margin: 5px 0 22px;
+    font-size: 2rem;
+  }
+  #register input[type="submit"] {
+    margin: 25px auto;
+  }
 }
