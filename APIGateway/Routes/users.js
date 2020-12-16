@@ -48,7 +48,6 @@ user.put('/', withAuth, async (req, res) => {
             newPass: req.body.newPassword
         }
     });
-    console.log(response);
     if (response.status !== 200) return res.status(response.status).end();
     else {
         jwt.sign(response.body, 'Secret', { expiresIn: '30m' }, (err, token) => {

@@ -11,6 +11,7 @@ export default class TopNav extends React.Component {
     }
 
     componentDidMount = () => {
+        this.setState({ signedIn: false });
         fetch('/user/validate', {
             method: 'GET',
             credentials: "include",

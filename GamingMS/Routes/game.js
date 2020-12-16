@@ -22,6 +22,7 @@ game.post('/start', async (req, res) => {
         player.isReady = false;
         player.charsFin = 0;
         player.time = 0;
+        player.finished = false;
     }
     game.code = snippets[Math.floor(Math.random() * snippets.length)];
     redis.set(game.lobbyCode+'-game', JSON.stringify(game));

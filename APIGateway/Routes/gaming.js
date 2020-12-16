@@ -173,7 +173,8 @@ gaming.post('/finish', withAuth, async (req, res) => {
     });
     response = await api.call('game/delete/', 'POST', {
         json: {
-            lobbyCode: req.body.lobbyCode
+            lobbyCode: req.body.lobbyCode,
+            username: req.user.username
         }
     });
     res.status(response.status).end();

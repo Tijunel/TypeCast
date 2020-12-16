@@ -64,7 +64,6 @@ class Game extends React.Component {
     this.get_initial_data_from_server();
   }
 
-
   // ------------------- server request/response methods ----------------------
   get_initial_data_from_server = async () => {
     let res = await fetch('/gaming/game/' + this.state.lobbyCode, {
@@ -239,7 +238,6 @@ class Game extends React.Component {
 
 
   calcStatsAndSendMyData = () => {
-
     // If I'm not done the race, calc my progress send that data to the server
     if (!this.players[0].time) {
       this.players[0].charsFin = this.userFinishedRace ? this.state.raceCodeStr.length : this.numCompletedChars;
