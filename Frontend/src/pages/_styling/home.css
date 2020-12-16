@@ -1,32 +1,133 @@
 #home {
   margin: 3.5rem auto 0 auto;
-  padding: 30px;
   min-height: calc(100vh - (3.5rem + 2rem));
   text-align: center;
+}
+#homeTopSection {
+  background: rgba(0,0,0,0.2);
+  padding: 50px 40px 60px;
+  margin: 0 auto 40px;
 }
 #home h1 {
   margin: 10px 0 30px;
 }
-#home p {
-  max-width: 700px;
-  min-width: 300px;
+#home button {
+  display: inline-block;
+  background: #5490CC;
+  color: white;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  padding: 10px 30px !important;
+  margin: 0 16px;
+  min-width: 200px;
+}
+#home button:hover {
+  background: #6ba9e7;
+}
+#blurb {
+  max-width: 800px;
   margin: auto;
   text-align: justify;
 }
-#home button, .log-out-btn {
+
+
+
+/* -------  alternate design...  --------*/
+/* #home {
+  margin: 3.5rem auto 0 auto;
+  min-height: calc(100vh - (3.5rem + 2rem));
+  text-align: center;
+  padding-top: 40px;
+}
+#homeTopSection{
+  background: rgba(0,0,0,0.2);
+  padding: 20px 40px 40px;
+  margin: 0 auto 40px;
+  max-width: 800px;
+  border-radius: 10px;
+}
+#home h1 {
+  margin: 10px 0 30px;
+}
+#home button {
+  display: inline-block;
   background: #5490CC;
-  border-radius: 4px;
-  padding: 10px 30px !important;
-  display: block;
-  min-width: 300px;
-  margin: 20px auto 24px;
   color: white;
+  border-radius: 10px;
   font-size: 1.2rem;
-  border-radius: 50px;
+  padding: 10px 30px !important;
+  margin: 0 15px;
+  min-width: 200px;
 }
-.log-out-btn {
-  margin-top: 70px !important;
-}
-#home button:hover, .log-out-btn:hover {
+#home button:hover {
   background: #6ba9e7;
+}
+#blurb {
+  margin: 0 0 40px 0;
+  max-width: 800px;
+  min-width: 300px;
+  xpadding: 30px;
+  xbackground: rgba(0,0,0,0.15);
+  xborder-radius: 25px;
+  margin: auto;
+  text-align: justify;
+} */
+
+
+
+/* -------- mobile -------------*/
+@media (max-width: 800px) {
+  #homeTopSection {
+    padding: 35px 40px 50px;
+    margin: 0 auto 30px;
+  }
+  #home h1 {
+    margin: 0 0 30px;
+  }
+  #home button {
+    margin: 0 13px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  #homeTopSection {
+    margin: 0 auto 35px;
+  }
+  #home button {
+    display: block;
+    font-size: 1.25rem;
+    margin: 30px auto;
+    min-width: 330px;
+  }
+}
+
+
+@media (max-width: 550px) {
+  #homeTopSection {
+    padding: 35px 40px 50px;
+    margin: 0 auto 35px;
+  }
+  #home h1 {
+    font-size: 2rem;
+  }
+}
+
+
+@media (max-width: 470px) {
+  #homeTopSection {
+    padding: 35px 40px 40px;
+    margin: 0 auto 30px;
+  }
+}
+
+
+@media (max-width: 400px) {
+  #homeTopSection {
+    margin: 0 auto 20px;
+  }
+  #home button {
+    margin: 20px auto;
+    min-width: calc(100% - 40px);
+  }
 }
