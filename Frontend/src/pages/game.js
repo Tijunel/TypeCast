@@ -60,6 +60,7 @@ class Game extends React.Component {
   }
 
   componentDidMount = () => {
+    this.checkForPageRefresh();
     this.listenOnSockets();
     this.get_initial_data_from_server();
   }
@@ -173,6 +174,14 @@ class Game extends React.Component {
   }
 
 
+  checkForPageRefresh = () => {
+    if (this.state.raceHasEnded && performance.navigation.type == performance.navigation.TYPE_RELOAD) { 
+      alert("Game no longer exists.\nRedirecting you home...");
+      window.location.href = "/home";
+    }
+  }
+
+
   buildPlayerArray = () => {
     // builds a player array that out of the names provided by the server.
     // NOTE: the user places himself at position '0' in this array.
@@ -263,7 +272,7 @@ class Game extends React.Component {
 
 
   calcMyFinalTime = () => {
-    if (this.userFinishedRace || this.raceHasEnded) {
+    if (this.userFinishedRace || this.state.raceHasEnded) {
       if (!this.players[0].time)
         this.players[0].time = this.calcElapsedTime();
     }
@@ -796,7 +805,7 @@ class Game extends React.Component {
       if (isCountdown) this.startTimer(false);
       // if time runs out on the actual race, stop the game
       if (!isCountdown) {
-        this.setState({ raceHasEnded: true });
+        this.setState({raceHasEnded: true});
         if (!this.userFinishedRace)
           this.finalizeRace();
       }

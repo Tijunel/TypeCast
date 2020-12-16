@@ -169,11 +169,14 @@ class Join extends React.Component {
     if (this.state.games.length === 0) {
       // If there are no games available
       gameTable.push(
+        <tr key="noGames">
           <td className="no-games-available">
-            <h1 onClick={ () => this.hostNewGame() }>No games available... Click to host one!</h1>
-            {/*<button onClick={() => window.location.href = "/join"}>Host Game</button>*/}
-            <button onClick={ () => this.hostNewGame() }>Host Game</button>
+              <div id="noGamesAvailableMsg" onClick={ () => this.hostNewGame() }>
+                  No games currently available: click to host one!<br/><br/>
+                  <button onClick={ () => this.hostNewGame() }>Host Game</button>
+              </div>
           </td>
+        </tr>
       )
     } else {
       // If there are games available
