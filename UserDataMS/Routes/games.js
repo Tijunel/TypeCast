@@ -37,7 +37,7 @@ games.get('/:id', async (req, res) => {
                 });
             });
         });
-        games.sort((b, a) => {
+        games.sort((a, b) => {
             if (a.date > b.date) return -1;
             else if (b.date > a.date) return 1;
             else return 0;
