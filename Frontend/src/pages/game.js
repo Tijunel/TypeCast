@@ -84,7 +84,6 @@ class Game extends React.Component {
       });
       this.initializeVars();
       this.inputSetup();
-      console.log('Tell server I am ready.');
       this.tell_server_im_ready();
     } else {
       // Error

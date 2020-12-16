@@ -6,7 +6,7 @@ export default class SocketManager {
         // CHANGE ME 
         // For AWS: http://[IP Address]/
         // For localhost: http://localhost:5000/
-        this.socket = SocketIOClient('http://3.129.16.155', {transports: ['websocket', 'polling', 'flashsocket']});
+        this.socket = SocketIOClient('http://3.129.16.155');
     }
 
     getSocket = () => {
@@ -18,6 +18,10 @@ export default class SocketManager {
     }
 
     static getInstance = () => {
-        return new SocketManager();
+        if (this.instance === null) {
+            this.instance = new SocketManager();
+            return this.instance;
+        } 
+        else return this.instance;
     }
 }
