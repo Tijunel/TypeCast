@@ -84,6 +84,7 @@ class Game extends React.Component {
       });
       this.initializeVars();
       this.inputSetup();
+      console.log('Tell server I am ready.');
       this.tell_server_im_ready();
     } else {
       // Error
@@ -100,15 +101,16 @@ class Game extends React.Component {
       })
     });
     if (res.status === 200) {
-
+      console.log('told server I am ready')
     } else {
-      // Error
+      console.log('Failed to get ready')
     }
   }
 
   listenOnSockets = () => {
     const socket = SocketManager.getInstance().getSocket();
     socket.on('start game', (data) => {
+      console.log('starting game')
       if (this.state.lobbyCode === data.lobbyCode) {
         this.startTimer(true);
       }
