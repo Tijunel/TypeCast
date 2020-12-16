@@ -1,20 +1,19 @@
 #join {
-  max-width: 900px;
   margin: 3.5rem auto 0 auto;
   min-height: calc(100vh - (3.5rem + 2rem));
   font-size: 1.6rem;
   padding: 30px;
 }
 #join-heading {
-  margin: 20px 0 40px 50px;
+  margin: 20px auto 40px auto;
+  text-align: center;
 }
-#join table {
-  width: 80%;
-}
+
 #games {
   min-height: 100px;
-  margin: 0 auto 40px auto;
-  min-width: 500px;
+  min-width: 660px;
+  margin: 0 auto 50px auto;
+  max-width: 700px;
 }
 #games tr {
   display: flex;
@@ -62,7 +61,7 @@
   padding: 0 !important;
 }
 .join-game button {
-  background: #2b50c9;;
+  background: #4c7eb1;;
   font-weight: 900;
   width: 100%;
   height: 100%;
@@ -70,7 +69,7 @@
   border-right: 1px solid black !important;
 }
 .join-game button:hover{
-  background: #3b65f0;
+  background: #426c96;
 }
 #games button {
   border-width: 0px;
@@ -81,15 +80,139 @@
   top: -3px;
   padding-left: 5px;
 }
+/* #join-by-code {
+
+} */
+#join-by-code input[type="text"] {
+  background: #3E6C99;
+  color: white;
+}
 #join-by-code input[type="submit"] {
   margin-left: 15px;
   padding: 2px 20px;
-  background: #2b50c9;
+  background: #4c7eb1;
   border: 3px solid black;
   color: white;
   position: relative;
   top: -3px;
 }
 #join-by-code input[type="submit"]:hover {
-  background: #3b65f0;
+  background: #426c96;
+}
+.joinWithCode {
+  display: flex;
+  width: 100%;
+}
+.joinLabl {
+  flex: 48;
+  text-align: right;
+}
+.codeInpt {
+  flex: 52;
+}
+
+
+
+
+
+
+
+
+/* --------------- mobile ----------------- */
+@media (max-width: 730px) {
+  #games {
+    min-width: calc(100% - 80px);
+    margin: 0 40px 40px 40px;
+  }
+  .game-name, .player-count, .join-game {
+    font-size: 1.4rem;
+  }
+}
+
+
+
+@media (max-width: 600px) {
+  #games {
+    min-width: calc(100% - 40px);
+    margin: 0 20px 40px 20px;
+  }
+  #games tr:first-child td {
+    margin-bottom: 8px;
+  } 
+  .game-name, .player-count, .join-game {
+    font-size: 1.3rem;
+  }
+}
+
+
+
+@media (max-width: 500px) {
+  #join {
+    padding: 5px 0;
+  }
+  #join-heading  {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+  #games tr:first-child td {
+    font-size: 1rem;
+  } 
+  .joinLabl {
+    font-size: 1.3rem;
+  }
+  .codeInpt input[type="submit"] {
+    font-size: 1.3rem;
+  }
+}
+
+
+
+@media (max-width: 460px) {
+  #games {
+    margin: 0 20px 30px 20px;
+  }
+  .game-name, .player-count, .join-game {
+    font-size: 1.1rem;
+  }
+}
+
+
+
+@media (max-width: 420px) {
+  #games {
+    min-width: 100%;
+    margin: 0 0 30px 0;
+  }
+  #join-heading {
+    margin: 20px auto 25px auto;
+  }
+  #join-heading h1 {
+    font-size: 2rem;
+  }
+}
+
+
+
+@media (max-width: 400px) {
+  #join-heading h1 {
+    font-size: 1.9rem;
+  }
+  #lobby-name {
+    font-size: 1.7rem;
+  }
+  #games tr:first-child td {
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+  }
+  .joinLabl {
+    flex: 42;
+    font-size: 1rem;
+  }
+  .codeInpt {
+    flex: 58;
+  }
+  .codeInpt input[type="submit"] {
+
+    font-size: 1rem;
+  }
 }

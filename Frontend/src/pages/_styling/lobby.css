@@ -244,19 +244,11 @@ div.ready, div.not-ready {
     min-width: calc(100% - 80px);
     margin: 0 40px 40px 40px;
   }
-  /* #players tr:first-child td {
-    xfont-size: 1rem;
-  } */
   .player-name {
-    flex: 80;
     font-size: 1.4rem;
   }
   .is-ready {
-    flex: 20;
     font-size: 1.4rem;
-  }
-  .remove-player {
-    flex: 15;
   }
 }
 
@@ -271,15 +263,10 @@ div.ready, div.not-ready {
     margin-bottom: 8px;
   } 
   .player-name {
-    flex: 80;
     font-size: 1.3rem;
   }
   .is-ready {
-    flex: 20;
     font-size: 1.3rem;
-  }
-  .remove-player {
-    flex: 15;
   }
   #settings {
     padding: 20px 0 5px;
@@ -321,19 +308,13 @@ div.ready, div.not-ready {
 
 @media (max-width: 460px) {
   #players {
-    min-width: calc(100% - 40px);
     margin: 0 20px 10px 20px;
   }
   .player-name {
-    flex: 80;
     font-size: 1.1rem;
   }
   .is-ready {
-    flex: 20;
     font-size: 1.1rem;
-  }
-  .remove-player {
-    flex: 15;
   }
 }
 

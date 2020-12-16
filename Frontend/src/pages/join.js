@@ -222,7 +222,7 @@ class Join extends React.Component {
         <div>
           {!this.state.loading ?
             <div id='join'>
-              <div id="join-heading"><h1>Join Game</h1></div>
+              <div id="join-heading"><h1>Join A Lobby</h1></div>
 
               <table id="games">
                 <tbody>{this.getGameTable()}</tbody>
@@ -230,9 +230,9 @@ class Join extends React.Component {
 
               <div id="join-by-code">
                 <form onSubmit={this.joinGameViaCode}>
-                  <div className="setting">
-                    <div className="labl">Join by code:&nbsp;</div>
-                    <div className="inpt">
+                  <div className="joinWithCode">
+                    <div className="joinLabl">Join by code:&nbsp;</div>
+                    <div className="codeInpt">
                       <input
                           type='text'
                           maxLength='4'
@@ -246,10 +246,11 @@ class Join extends React.Component {
                   </div>
                 </form>
               </div>
+
             </div>
             :
             <div id='lobby' style={{ textAlign: 'center' }}>
-              Loading...
+              <br/><br/>Loading...
             </div>
           }
         </div>

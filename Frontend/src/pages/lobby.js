@@ -336,7 +336,7 @@ class Lobby extends React.Component {
           </div>
           :
           <div id='lobby' style={{ textAlign: 'center' }}>
-            Loading...
+            <br/><br/>Loading...
           </div>
         }
       </div>
