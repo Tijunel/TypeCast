@@ -798,7 +798,7 @@ class Game extends React.Component {
     this.setState({ timeElapsed: elapsed });
     this.lastUpdateTime = now;
 
-    if ((isCountdown && timerReadout === ':00') || this.allRacersFinished() ) {
+    if ((isCountdown && timerReadout === ':00') || (timerReadout === ':00' || this.allRacersFinished() ) ) {
       this.stopTimer();
       // if the countdown timer reached :00, now start the real timer
       if (isCountdown) this.startTimer(false);
