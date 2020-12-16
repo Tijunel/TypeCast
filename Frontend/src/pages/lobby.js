@@ -198,8 +198,8 @@ class Lobby extends React.Component {
       <tr key="headings">
         <td className="player-name">Players</td>
         <td className="is-ready">Status</td>
-        {this.state.iAmHost ?
-          <td className="remove-player">Remove?</td>
+        { this.state.iAmHost && players.length > 1 ?
+          <td className="remove-player">Kick?</td>
           :
           <td className="inviz"> &nbsp;</td>
         }
@@ -212,6 +212,7 @@ class Lobby extends React.Component {
             {players[i].username}
             {players[i].isHost ? " (Host)" : ""}
           </td>
+
           <td className="is-ready">
             {players[i].username === JSON.parse(Cookies.get('userData').split('j:')[1]).username ?
               <button
@@ -225,7 +226,8 @@ class Lobby extends React.Component {
               </div>
             }
           </td>
-          {this.state.iAmHost && (players[i].username !== JSON.parse(Cookies.get('userData').split('j:')[1]).username) ?
+
+          { this.state.iAmHost && (players[i].username !== JSON.parse(Cookies.get('userData').split('j:')[1]).username) ?
             <td className="remove-player">
               <button onClick={() => this.removePlayer(players[i].username)}>X</button>
             </td>
@@ -259,26 +261,20 @@ class Lobby extends React.Component {
   render = () => {
     return (
       <div>
-        {!this.state.loading ?
+        { !this.state.loading ?
           <div id='lobby'>
             <div id="lobby-name">
               {this.state.lobbyName}
             </div>
+
             <div id="lobby-code-section">
               <div id="code-heading">Lobby Code:</div>
-            </div>
-            <div style={{ height: '80px' }}>
-              <div class='row'>
-                <div class='col' style={{ padding: '0' }}>
-                  <div id="code" style={{ width: '110px', marginRight: '0', float: 'right' }}>{this.state.lobbyCode}</div>
-                </div>
-                <div class='col' style={{ padding: '0' }}>
-                  <button className="copy-btn" onClick={() => this.copyLobbyCode()} style={{ width: '110px' }}>
-                    Copy
-                </button>
-                </div>
+              <div id="codeContainer">
+                <div id="code">{this.state.lobbyCode}</div>
+                <button className="copy-btn" onClick={()=>this.copyLobbyCode()}>Copy</button>
               </div>
             </div>
+
             {this.state.lobbyPosted &&
               <table id="players">
                 <tbody>{this.state.playerUI}</tbody>
@@ -327,20 +323,21 @@ class Lobby extends React.Component {
             {this.state.iAmHost && !this.state.lobbyPosted &&
               <button className="start-btn" onClick={() => this.createLobby()}>
                 CREATE LOBBY
-            </button>
+              </button>
             }
             {this.state.iAmHost && this.state.lobbyPosted && this.state.gameReady ?
               <button className="start-btn" onClick={() => this.startGame()}>
                 START GAME
               </button>
               :
-              this.state.lobbyPosted && this.state.gameReady && <div style={{ textAlign: 'center' }}>Waiting for host to start the game...</div>
+              this.state.lobbyPosted && this.state.gameReady && 
+              <div className="waitingMsg">Waiting for host to start the game...</div>
             }
           </div>
           :
           <div id='lobby' style={{ textAlign: 'center' }}>
             Loading...
-        </div>
+          </div>
         }
       </div>
     );

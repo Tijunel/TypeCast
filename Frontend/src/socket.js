@@ -6,8 +6,8 @@ export default class SocketManager {
         // CHANGE ME 
         // For AWS: http://[IP Address]/
         // For localhost: http://localhost:5000/
-        this.socket = SocketIOClient('http://3.129.16.155');
-    }
+        this.socket = SocketIOClient('http://localhost:5000/'); 
+    }                              // http://3.129.16.155
 
     getSocket = () => {
         return this.socket;
