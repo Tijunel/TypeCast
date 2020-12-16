@@ -68,7 +68,7 @@ game.post('/update', async (req, res) => {
 });
 
 // End point for each player 
-game.post('/delete', (req, res) => {
+game.post('/delete', async (req, res) => {
     var game = await asyncRedis.get(req.body.lobbyCode + '-game').then(value => {
         return JSON.parse(value);
     });
@@ -79,6 +79,7 @@ game.post('/delete', (req, res) => {
     for (let player of game.players)
         if (!player.finished) deleteDB = false;
     if (deleteDB) redis.del(req.body.lobbyCode + '-game');
+    else redis.set(req.body.lobbyCode + '-game', JSON.stringify(game));
     res.status(200).end();
 });
 
