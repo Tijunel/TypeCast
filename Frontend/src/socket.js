@@ -18,10 +18,6 @@ export default class SocketManager {
     }
 
     static getInstance = () => {
-        if (this.instance === null) {
-            this.instance = new SocketManager();
-            return this.instance;
-        } 
-        else return this.instance;
+        return new SocketManager();
     }
 }

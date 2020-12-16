@@ -101,17 +101,14 @@ class Game extends React.Component {
       })
     });
     if (res.status === 200) {
-      console.log(res)
-      console.log('told server I am ready')
+
     } else {
-      console.log('Failed to get ready')
     }
   }
 
   listenOnSockets = () => {
     const socket = SocketManager.getInstance().getSocket();
-    socket.on('start game', (data) => {
-      console.log('starting game')
+    socket.on('play', (data) => {
       if (this.state.lobbyCode === data.lobbyCode) {
         this.startTimer(true);
       }
