@@ -135,7 +135,9 @@ gaming.post('/ready', withAuth, async (req, res) => {
             username: req.user.username
         }
     });
+    console.log(response)
     if (response.status === 200) {
+        console.log(response.body.readyLeft)
         if (response.body.readyLeft === 0) {
             const io = require('../server')[0];
             io.emit('start game', {
