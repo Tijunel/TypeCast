@@ -21,10 +21,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Served minified files
-// app.use(express.static(path.join(__dirname, '../Frontend/build')));
-// app.get('*', function (req, res) {
-//     res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
-// });
+app.use(express.static(path.join(__dirname, '../Frontend/build')));
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+app.get('/lobby/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+app.get('/game/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+app.get('/join', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/build', 'index.html'));
+});
+
 
 // Import routes
 const gaming = require('./Routes/gaming');
@@ -35,11 +54,6 @@ const users = require('./Routes/users');
 app.use('/gaming', gaming);
 app.use('/userdata', userdata);
 app.use('/user', users);
-
-// Catch bad requests
-app.get('*', (req, res) => {
-    res.sendStatus(404).end();
-});
 
 // Configure our server to listen on the port defiend by our port variable
 const server = require('http').createServer(app);

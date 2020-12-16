@@ -38,6 +38,17 @@ export default class TopNav extends React.Component {
         }
     }
 
+    hostGame = () => {
+		// generate a random 4 digit room code / lobby code
+		let roomCode = "";
+		let menu = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		var menuLength = 26;
+		for (let i = 0; i < 4; i++)
+			roomCode += menu.charAt(Math.floor(Math.random() * menuLength));
+		// load lobby page. Not sure how else to do it. This is not very React-y
+		window.location.href = "/lobby/:" + roomCode;
+	}
+
     render = () => {
         return (
             <header>
@@ -48,7 +59,7 @@ export default class TopNav extends React.Component {
                         <Nav className='mr-auto'>
                             <Nav.Link className="link-1" href="/home">Home</Nav.Link> 
                             <Nav.Link className="link-2" href="/join" onClick={this.handleClick}>Type</Nav.Link> 
-                            <Nav.Link className="link-3" href="/lobby" onClick={this.handleClick}>Game</Nav.Link>
+                            <Nav.Link className="link-3" onClick={this.hostGame}>Game</Nav.Link>
                         </Nav>
                         <Nav className='log'>
                             <Nav.Link className="link-4" href="/login" onClick={this.handleAuth}>
