@@ -239,6 +239,8 @@ class Game extends React.Component {
   calcStatsAndSendMyData = () => {
     // If I'm not done the race, calc my progress send that data to the server
     if (!this.players[0].time) {
+      if (this.numCompletedChars > this.state.raceCodeStr.length) // quick fix, in case of a leak
+        this.numCompletedChars = this.state.raceCodeStr.length; 
       this.players[0].charsFin = this.userFinishedRace ? this.state.raceCodeStr.length : this.numCompletedChars;
       this.calcMyFinalTime();
     }
