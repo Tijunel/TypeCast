@@ -242,18 +242,22 @@ class Profile extends React.Component {
 
 	showChangeUsername = () => {
 		this.setState({ changeUNVisible: true, changePWVisible: false, delAcctVisible: false , clearHistoryVisible: false});
-	}
+        window.location.href = "#extended-footer";
+    }
 
 	showChangePassword = () => {
 		this.setState({ changeUNVisible: false, changePWVisible: true, delAcctVisible: false , clearHistoryVisible: false});
-	}
+        window.location.href = "#extended-footer";
+    }
 
 	showDeleteAccount = () => {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: true, clearHistoryVisible: false});
-	}
+        window.location.href = "#extended-footer";
+    }
 
 	showClearHistory = () => {
 		this.setState({ changeUNVisible: false, changePWVisible: false, delAcctVisible: false, clearHistoryVisible: true });
+        window.location.href = "#extended-footer";
     }
     
     closePanel = () => {
@@ -303,7 +307,7 @@ class Profile extends React.Component {
 							<form onSubmit={this.updateUsernameHandler}>
 
 								<div className="flex-container">
-                  <label>New Username</label>
+                  <label>New Username&nbsp;</label>
                   <input
                     type="text"
                     ref={this.username}
@@ -311,7 +315,7 @@ class Profile extends React.Component {
                 </div>
 
 								<div className="flex-container">
-                  <label>Password</label>
+                  <label>Password&nbsp;</label>
                   <input
                     type="password"
                     ref={this.currentPassword}

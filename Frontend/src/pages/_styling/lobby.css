@@ -32,7 +32,7 @@
   font-weight: 900;
   padding: 10px 0;
   text-transform: uppercase;
-  border-radius: 50px 0 0 50px;
+border-radius: 10px 0 0 10px;
 }
 .copy-btn {
   flex: 1;
@@ -41,7 +41,7 @@
   background: #5490CC;
   color: white;
   border: 2px solid #000;
-  border-radius: 0 50px 50px 0;
+  border-radius: 0 10px 10px 0;
 }
 .copy-btn:hover {
   background: #6daae7;
@@ -162,7 +162,7 @@ div.ready, div.not-ready {
   padding: 20px 0 5px;
   max-width: 660px;
   font-size: 1.3rem;
-
+  border-radius: 10px;
 }
 .setting {
   display: flex;
@@ -217,7 +217,7 @@ div.ready, div.not-ready {
   display: block;
   margin: 0 auto;
   padding: 4px 30px;
-  border-radius: 25px;
+  border-radius: 10px;
   background: #5490CC;
   color: white;
 }
@@ -254,6 +254,14 @@ div.ready, div.not-ready {
 
 
 
+@media (max-width: 660px) {
+  #settings {
+    border-radius: 0;
+  }
+}
+
+
+
 @media (max-width: 600px) {
   #players {
     min-width: calc(100% - 40px);
@@ -272,7 +280,6 @@ div.ready, div.not-ready {
     padding: 20px 0 5px;
     max-width: 100%;
     font-size: 1.3rem;
-    border-radius: 0;
   }
 }
 
